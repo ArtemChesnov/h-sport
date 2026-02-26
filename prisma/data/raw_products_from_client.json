@@ -1,0 +1,1171 @@
+[
+  {
+    "name": "Топ",
+    "categorySlug": "tops",
+    "description": "Практичный топ для повседневной носки и тренировок. Выполнен из эластичного и комфортного материала, подходящего для активной носки. Подходит для базовых и спортивных образов.",
+    "variations": [
+      {
+        "color": "Голубой",
+        "sizes": ["S", "M", "L"],
+        "priceRub": 2000,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Желтый",
+        "sizes": ["S", "M", "L"],
+        "priceRub": 2000,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Зеленый",
+        "sizes": ["S", "M", "L"],
+        "priceRub": 2000,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Красный",
+        "sizes": ["M"],
+        "priceRub": 2000,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Оранжевый",
+        "sizes": ["M"],
+        "priceRub": 2000,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Розовый",
+        "sizes": ["M"],
+        "priceRub": 2000,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Серый",
+        "sizes": ["S", "M", "L"],
+        "priceRub": 2000,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Сиреневый",
+        "sizes": ["S", "M", "L"],
+        "priceRub": 2000,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Фиолетовый",
+        "sizes": ["S", "M", "L"],
+        "priceRub": 2000,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Чёрный",
+        "sizes": ["S"],
+        "priceRub": 2000,
+        "composition": null,
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Леггинсы",
+    "categorySlug": "leggings",
+    "description": "Удобные леггинсы для спорта и активного образа жизни. Выполнен из эластичного и комфортного материала, подходящего для активной носки. Обеспечивают свободу движений и комфорт.",
+    "variations": [
+      {
+        "color": "Голубой",
+        "sizes": ["S", "M", "L"],
+        "priceRub": 3000,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Желтый",
+        "sizes": ["S", "M", "L"],
+        "priceRub": 3000,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Зеленый",
+        "sizes": ["S", "M", "L"],
+        "priceRub": 3000,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Красный",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Оранжевый",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Серый",
+        "sizes": ["S", "M", "L"],
+        "priceRub": 3000,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Сиреневый",
+        "sizes": ["S", "M", "L"],
+        "priceRub": 3000,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Фиолетовый",
+        "sizes": ["S", "M", "L"],
+        "priceRub": 3000,
+        "composition": null,
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Топ",
+    "categorySlug": "tops",
+    "description": "Практичный топ для повседневной носки и тренировок. Изготовлен из материала 90% nylon 10 % elastane, который обеспечивает комфорт и хорошую посадку. Подходит для базовых и спортивных образов.",
+    "variations": [
+      {
+        "color": "Чёрный",
+        "sizes": ["M"],
+        "priceRub": 2000,
+        "composition": "90% nylon 10 % elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Леггинсы",
+    "categorySlug": "leggings",
+    "description": "Удобные леггинсы для спорта и активного образа жизни. Изготовлен из материала 90% nylon 10 % elastane, который обеспечивает комфорт и хорошую посадку. Обеспечивают свободу движений и комфорт.",
+    "variations": [
+      {
+        "color": "Чёрный",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": "90% nylon 10 % elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Топ",
+    "categorySlug": "tops",
+    "description": "Практичный топ для повседневной носки и тренировок. Изготовлен из материала 68% nylon 32% elastane, который обеспечивает комфорт и хорошую посадку. Подходит для базовых и спортивных образов.",
+    "variations": [
+      {
+        "color": "Голубой",
+        "sizes": ["L"],
+        "priceRub": 2000,
+        "composition": "68% nylon 32% elastane",
+        "isAvailable": true
+      },
+      {
+        "color": "Зелёный",
+        "sizes": ["M"],
+        "priceRub": 2000,
+        "composition": "68% nylon 32% elastane",
+        "isAvailable": true
+      },
+      {
+        "color": "Розовый",
+        "sizes": ["M"],
+        "priceRub": 2000,
+        "composition": "68% nylon 32% elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Леггинсы",
+    "categorySlug": "leggings",
+    "description": "Удобные леггинсы для спорта и активного образа жизни. Изготовлен из материала 68% nylon 32% elastane, который обеспечивает комфорт и хорошую посадку. Обеспечивают свободу движений и комфорт.",
+    "variations": [
+      {
+        "color": "Голубой",
+        "sizes": ["L"],
+        "priceRub": 3000,
+        "composition": "68% nylon 32% elastane",
+        "isAvailable": true
+      },
+      {
+        "color": "Зелёный",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": "68% nylon 32% elastane",
+        "isAvailable": true
+      },
+      {
+        "color": "Розовый",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": "68% nylon 32% elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Платье",
+    "categorySlug": "dresses-jumpsuits",
+    "description": "Практичная модель для повседневной носки. Изготовлен из материала 75% nylon 25% elastane, который обеспечивает комфорт и хорошую посадку. Подходит для базового гардероба.",
+    "variations": [
+      {
+        "color": "Бежевый",
+        "sizes": ["M"],
+        "priceRub": 5500,
+        "composition": "75% nylon 25% elastane",
+        "isAvailable": false
+      },
+      {
+        "color": "Белый",
+        "sizes": ["L"],
+        "priceRub": 5500,
+        "composition": "75% nylon 25% elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Комбинезон",
+    "categorySlug": "dresses-jumpsuits",
+    "description": "Универсальный комбинезон для активной и повседневной носки. Изготовлен из материала 68% nylon 32% elastane, который обеспечивает комфорт и хорошую посадку. Комфортен и практичен в использовании.",
+    "variations": [
+      {
+        "color": "Персиковый",
+        "sizes": ["M"],
+        "priceRub": 5000,
+        "composition": "68% nylon 32% elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Боди",
+    "categorySlug": "bodysuits",
+    "description": "Практичная модель для повседневной носки. Выполнен из эластичного и комфортного материала, подходящего для активной носки. Подходит для базового гардероба.",
+    "variations": [
+      {
+        "color": "Розовый",
+        "sizes": ["M"],
+        "priceRub": 4500,
+        "composition": null,
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Юбка-шорты",
+    "categorySlug": "skirts",
+    "description": "Юбка для повседневного гардероба с лаконичным дизайном. Изготовлен из материала 90% polyester 10% elastane  , который обеспечивает комфорт и хорошую посадку. Хорошо сочетается с базовыми верхами.",
+    "variations": [
+      {
+        "color": "Синий",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": "90% polyester 10% elastane",
+        "isAvailable": true
+      },
+      {
+        "color": "Чёрный",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": "90% polyester 10% elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Комбинезон",
+    "categorySlug": "dresses-jumpsuits",
+    "description": "Универсальный комбинезон для активной и повседневной носки. Выполнен из эластичного и комфортного материала, подходящего для активной носки. Комфортен и практичен в использовании.",
+    "variations": [
+      {
+        "color": "Коричневый",
+        "sizes": ["S"],
+        "priceRub": 5000,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Чёрный",
+        "sizes": [],
+        "priceRub": 5000,
+        "composition": null,
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Юбка-шорты",
+    "categorySlug": "skirts",
+    "description": "Юбка для повседневного гардероба с лаконичным дизайном. Выполнен из эластичного и комфортного материала, подходящего для активной носки. Хорошо сочетается с базовыми верхами.",
+    "variations": [
+      {
+        "color": "Голубой",
+        "sizes": ["S", "M"],
+        "priceRub": 3000,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Коричневый",
+        "sizes": ["S"],
+        "priceRub": 3000,
+        "composition": null,
+        "isAvailable": false
+      }
+    ]
+  },
+  {
+    "name": "Топ на молнии",
+    "categorySlug": "tops",
+    "description": "Практичный топ для повседневной носки и тренировок. Изготовлен из материала 90% polyamide 10% elastane, который обеспечивает комфорт и хорошую посадку. Подходит для базовых и спортивных образов.",
+    "variations": [
+      {
+        "color": "Чёрный",
+        "sizes": ["S"],
+        "priceRub": 2000,
+        "composition": "90% polyamide 10% elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Леггинсы",
+    "categorySlug": "leggings",
+    "description": "Удобные леггинсы для спорта и активного образа жизни. Изготовлен из материала 90% polyamide 10% elastane, который обеспечивает комфорт и хорошую посадку. Обеспечивают свободу движений и комфорт.",
+    "variations": [
+      {
+        "color": "Бежевый",
+        "sizes": ["S", "M"],
+        "priceRub": 3000,
+        "composition": "90% polyamide 10% elastane",
+        "isAvailable": true
+      },
+      {
+        "color": "Бордовый",
+        "sizes": ["S", "M"],
+        "priceRub": 3000,
+        "composition": "90% polyamide 10% elastane",
+        "isAvailable": true
+      },
+      {
+        "color": "Коричневый",
+        "sizes": ["S", "M"],
+        "priceRub": 3000,
+        "composition": "90% polyamide 10% elastane",
+        "isAvailable": true
+      },
+      {
+        "color": "Чёрный",
+        "sizes": ["S"],
+        "priceRub": 3000,
+        "composition": "90% polyamide 10% elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Кофта на молнии",
+    "categorySlug": "tops",
+    "description": "Кофта на молнии для повседневной носки. Изготовлен из материала 75% nylon 25% Lycra , который обеспечивает комфорт и хорошую посадку. Удобна для активного дня и многослойных образов.",
+    "variations": [
+      {
+        "color": "Малиновый",
+        "sizes": ["M"],
+        "priceRub": 5000,
+        "composition": "75% nylon 25% Lycra",
+        "isAvailable": false
+      }
+    ]
+  },
+  {
+    "name": "Топ",
+    "categorySlug": "tops",
+    "description": "Практичный топ для повседневной носки и тренировок. Изготовлен из материала 75% nylon 25% Lycra , который обеспечивает комфорт и хорошую посадку. Подходит для базовых и спортивных образов.",
+    "variations": [
+      {
+        "color": "Малиновый",
+        "sizes": ["M"],
+        "priceRub": 2000,
+        "composition": "75% nylon 25% Lycra",
+        "isAvailable": true
+      },
+      {
+        "color": "Чёрный",
+        "sizes": ["M"],
+        "priceRub": 2000,
+        "composition": "75% nylon 25% Lycra",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Юбка-шорты",
+    "categorySlug": "skirts",
+    "description": "Юбка для повседневного гардероба с лаконичным дизайном. Изготовлен из материала 75% nylon 25% Lycra , который обеспечивает комфорт и хорошую посадку. Хорошо сочетается с базовыми верхами.",
+    "variations": [
+      {
+        "color": "Зеленый",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": "75% nylon 25% Lycra",
+        "isAvailable": true
+      },
+      {
+        "color": "Малиновый",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": "75% nylon 25% Lycra",
+        "isAvailable": true
+      },
+      {
+        "color": "Фиолетовый",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": "75% nylon 25% Lycra",
+        "isAvailable": true
+      },
+      {
+        "color": "Чёрный",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": "75% nylon 25% Lycra",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Топ",
+    "categorySlug": "tops",
+    "description": "Практичный топ для повседневной носки и тренировок. Изготовлен из материала 78%nylon 22% elastane, который обеспечивает комфорт и хорошую посадку. Подходит для базовых и спортивных образов.",
+    "variations": [
+      {
+        "color": "Чёрный",
+        "sizes": ["M"],
+        "priceRub": 2000,
+        "composition": "78% nylon 22% elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Брюки спортивные",
+    "categorySlug": "pants",
+    "description": "Практичная модель для повседневной носки. Изготовлен из материала 75% nylon 25% spandex, который обеспечивает комфорт и хорошую посадку. Подходит для базового гардероба.",
+    "variations": [
+      {
+        "color": "Бежевый",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": "75% nylon 25% spandex",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Топ",
+    "categorySlug": "tops",
+    "description": "Практичный топ для повседневной носки и тренировок. Изготовлен из материала 90% polyamide 10% elastane, который обеспечивает комфорт и хорошую посадку. Подходит для базовых и спортивных образов.",
+    "variations": [
+      {
+        "color": "Бежевый",
+        "sizes": ["S", "M"],
+        "priceRub": 2000,
+        "composition": "90% polyamide 10% elastane",
+        "isAvailable": true
+      },
+      {
+        "color": "Бордовый",
+        "sizes": ["S", "M"],
+        "priceRub": 2000,
+        "composition": "90% polyamide 10% elastane",
+        "isAvailable": true
+      },
+      {
+        "color": "Коричневый",
+        "sizes": ["S", "M"],
+        "priceRub": 2000,
+        "composition": "90% polyamide 10% elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Топ",
+    "categorySlug": "tops",
+    "description": "Практичный топ для повседневной носки и тренировок. Изготовлен из материала 78%polyamed 22% elastane, который обеспечивает комфорт и хорошую посадку. Подходит для базовых и спортивных образов.",
+    "variations": [
+      {
+        "color": "Бежевый",
+        "sizes": ["M"],
+        "priceRub": 2000,
+        "composition": "78 %polyamed 22% elastane",
+        "isAvailable": true
+      },
+      {
+        "color": "Белый",
+        "sizes": ["M"],
+        "priceRub": 2000,
+        "composition": "78% polyamed 22% elastane",
+        "isAvailable": true
+      },
+      {
+        "color": "Сиреневый",
+        "sizes": ["M"],
+        "priceRub": 2000,
+        "composition": "78% polyamed 22% elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Юбка-шорты",
+    "categorySlug": "skirts",
+    "description": "Юбка для повседневного гардероба с лаконичным дизайном. Изготовлен из материала 85%nylon 15%spandex, который обеспечивает комфорт и хорошую посадку. Хорошо сочетается с базовыми верхами.",
+    "variations": [
+      {
+        "color": "Чёрный",
+        "sizes": ["L"],
+        "priceRub": 3000,
+        "composition": "85% nylon 15% spandex",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Майка",
+    "categorySlug": "tops",
+    "description": "Практичная модель для повседневной носки. Выполнен из эластичного и комфортного материала, подходящего для активной носки. Подходит для базового гардероба.",
+    "variations": [
+      {
+        "color": "Белый",
+        "sizes": ["M"],
+        "priceRub": 4500,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Синий",
+        "sizes": ["S"],
+        "priceRub": 4500,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Чёрный",
+        "sizes": ["M"],
+        "priceRub": 4500,
+        "composition": null,
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Леггинсы",
+    "categorySlug": "leggings",
+    "description": "Удобные леггинсы для спорта и активного образа жизни. Изготовлен из материала 85% polyamide 15% elastane, который обеспечивает комфорт и хорошую посадку. Обеспечивают свободу движений и комфорт.",
+    "variations": [
+      {
+        "color": "Чёрный",
+        "sizes": ["S", "M", "L"],
+        "priceRub": 3000,
+        "composition": "85% polyamide 15% elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Топ",
+    "categorySlug": "tops",
+    "description": "Практичный топ для повседневной носки и тренировок. Изготовлен из материала 80% nylon 20% spandex, который обеспечивает комфорт и хорошую посадку. Подходит для базовых и спортивных образов.",
+    "variations": [
+      {
+        "color": "Белый",
+        "sizes": ["M"],
+        "priceRub": 2000,
+        "composition": "80% nylon 20% spandex",
+        "isAvailable": true
+      },
+      {
+        "color": "Голубой",
+        "sizes": ["S", "M", "L"],
+        "priceRub": 2000,
+        "composition": "80% nylon 20% spandex",
+        "isAvailable": true
+      },
+      {
+        "color": "Коричневый",
+        "sizes": ["M"],
+        "priceRub": 2000,
+        "composition": "80% nylon 20% spandex",
+        "isAvailable": true
+      },
+      {
+        "color": "Лимонный",
+        "sizes": ["S", "M", "L"],
+        "priceRub": 2000,
+        "composition": "80% nylon 20% spandex",
+        "isAvailable": true
+      },
+      {
+        "color": "Оранжевый",
+        "sizes": ["S", "M", "L"],
+        "priceRub": 2000,
+        "composition": "80% nylon 20% spandex",
+        "isAvailable": true
+      },
+      {
+        "color": "Салатовый",
+        "sizes": ["S", "M", "L"],
+        "priceRub": 2000,
+        "composition": "80% nylon 20% spandex",
+        "isAvailable": true
+      },
+      {
+        "color": "Синий",
+        "sizes": ["S"],
+        "priceRub": 2000,
+        "composition": "80% nylon 20% spandex",
+        "isAvailable": true
+      },
+      {
+        "color": "Фиолетовый",
+        "sizes": ["S", "M", "L"],
+        "priceRub": 2000,
+        "composition": "80% nylon 20% spandex",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Ветровка",
+    "categorySlug": "outerwear",
+    "description": "Практичная модель для повседневной носки. Изготовлен из материала 100% polyester , который обеспечивает комфорт и хорошую посадку. Подходит для базового гардероба.",
+    "variations": [
+      {
+        "color": "Бежевый",
+        "sizes": ["M"],
+        "priceRub": 6500,
+        "composition": "100% polyester",
+        "isAvailable": true
+      },
+      {
+        "color": "Розовый",
+        "sizes": ["M"],
+        "priceRub": 6500,
+        "composition": "100% polyester",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Ветровка",
+    "categorySlug": "outerwear",
+    "description": "Практичная модель для повседневной носки. Изготовлен из материала 88%polyamide 12% elastane, который обеспечивает комфорт и хорошую посадку. Подходит для базового гардероба.",
+    "variations": [
+      {
+        "color": "Бежевый",
+        "sizes": ["L"],
+        "priceRub": 6000,
+        "composition": "88% polyamide 12% elastane",
+        "isAvailable": true
+      },
+      {
+        "color": "Чёрный",
+        "sizes": ["L"],
+        "priceRub": 6000,
+        "composition": "88% polyamide 12% elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Юбка-шорты",
+    "categorySlug": "skirts",
+    "description": "Юбка для повседневного гардероба с лаконичным дизайном. Изготовлен из материала 100% polyester , который обеспечивает комфорт и хорошую посадку. Хорошо сочетается с базовыми верхами.",
+    "variations": [
+      {
+        "color": "Чёрный",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": "100% polyester",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Юбка-шорты",
+    "categorySlug": "skirts",
+    "description": "Юбка для повседневного гардероба с лаконичным дизайном. Изготовлен из материала 80% nylon 20% spandex, который обеспечивает комфорт и хорошую посадку. Хорошо сочетается с базовыми верхами.",
+    "variations": [
+      {
+        "color": "Белый",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": "80% nylon 20% spandex",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Платье",
+    "categorySlug": "dresses-jumpsuits",
+    "description": "Практичная модель для повседневной носки. Изготовлен из материала 75% nylon 25% spandex, который обеспечивает комфорт и хорошую посадку. Подходит для базового гардероба.",
+    "variations": [
+      {
+        "color": "Желтый",
+        "sizes": ["M", "L"],
+        "priceRub": 5500,
+        "composition": "75% nylon 25% spandex",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Кофта на молнии флис",
+    "categorySlug": "tops",
+    "description": "Кофта на молнии для повседневной носки. Выполнен из эластичного и комфортного материала, подходящего для активной носки. Удобна для активного дня и многослойных образов.",
+    "variations": [
+      {
+        "color": "Чёрный",
+        "sizes": ["M"],
+        "priceRub": 4500,
+        "composition": null,
+        "isAvailable": false
+      }
+    ]
+  },
+  {
+    "name": "Куртка",
+    "categorySlug": "outerwear",
+    "description": "Практичная модель для повседневной носки. Выполнен из эластичного и комфортного материала, подходящего для активной носки. Подходит для базового гардероба.",
+    "variations": [
+      {
+        "color": "Чёрный",
+        "sizes": ["M"],
+        "priceRub": 8000,
+        "composition": null,
+        "isAvailable": false
+      }
+    ]
+  },
+  {
+    "name": "Жилет",
+    "categorySlug": "outerwear",
+    "description": "Жилет для многослойных повседневных образов. Выполнен из эластичного и комфортного материала, подходящего для активной носки. Подходит для комбинирования с базовой одеждой.",
+    "variations": [
+      {
+        "color": "Бежевый",
+        "sizes": ["M"],
+        "priceRub": 6000,
+        "composition": null,
+        "isAvailable": false
+      },
+      {
+        "color": "Чёрный",
+        "sizes": ["M"],
+        "priceRub": 6000,
+        "composition": null,
+        "isAvailable": false
+      }
+    ]
+  },
+  {
+    "name": "Куртка мех",
+    "categorySlug": "outerwear",
+    "description": "Практичная модель для повседневной носки. Выполнен из эластичного и комфортного материала, подходящего для активной носки. Подходит для базового гардероба.",
+    "variations": [
+      {
+        "color": "Бежевый",
+        "sizes": ["M"],
+        "priceRub": 8000,
+        "composition": null,
+        "isAvailable": false
+      }
+    ]
+  },
+  {
+    "name": "Комбинезон",
+    "categorySlug": "dresses-jumpsuits",
+    "description": "Универсальный комбинезон для активной и повседневной носки. Изготовлен из материала 90% nylon 10 % elastane, который обеспечивает комфорт и хорошую посадку. Комфортен и практичен в использовании.",
+    "variations": [
+      {
+        "color": "Бежевый",
+        "sizes": ["M"],
+        "priceRub": 5000,
+        "composition": "90% nylon 10 % elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Платье",
+    "categorySlug": "dresses-jumpsuits",
+    "description": "Практичная модель для повседневной носки. Изготовлен из материала 90% polyester 10% elastane  , который обеспечивает комфорт и хорошую посадку. Подходит для базового гардероба.",
+    "variations": [
+      {
+        "color": "Голубой",
+        "sizes": ["M"],
+        "priceRub": 5500,
+        "composition": "90% polyester 10% elastane",
+        "isAvailable": true
+      },
+      {
+        "color": "Сиреневый",
+        "sizes": ["M"],
+        "priceRub": 5500,
+        "composition": "90% polyester 10% elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Велосипедки",
+    "categorySlug": "shorts",
+    "description": "Практичная модель для повседневной носки. Выполнен из эластичного и комфортного материала, подходящего для активной носки. Подходит для базового гардероба.",
+    "variations": [
+      {
+        "color": "Желтый",
+        "sizes": ["S"],
+        "priceRub": 3000,
+        "composition": null,
+        "isAvailable": true
+      },
+      {
+        "color": "Розовый",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": null,
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Топ",
+    "categorySlug": "tops",
+    "description": "Практичный топ для повседневной носки и тренировок. Изготовлен из материала 94% nylon 6% spandex, который обеспечивает комфорт и хорошую посадку. Подходит для базовых и спортивных образов.",
+    "variations": [
+      {
+        "color": "Белый",
+        "sizes": ["S"],
+        "priceRub": 2000,
+        "composition": "94% nylon 6% spandex",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Юбка-шорты",
+    "categorySlug": "skirts",
+    "description": "Юбка для повседневного гардероба с лаконичным дизайном. Изготовлен из материала 75%nylon 25% spandex, который обеспечивает комфорт и хорошую посадку. Хорошо сочетается с базовыми верхами.",
+    "variations": [
+      {
+        "color": "Сиреневый",
+        "sizes": ["S"],
+        "priceRub": 3000,
+        "composition": "75% nylon 25% spandex",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Платье",
+    "categorySlug": "dresses-jumpsuits",
+    "description": "Практичная модель для повседневной носки. Изготовлен из материала 97% polyester 3% elastane  , который обеспечивает комфорт и хорошую посадку. Подходит для базового гардероба.",
+    "variations": [
+      {
+        "color": "Фиолетовый",
+        "sizes": ["M"],
+        "priceRub": 5500,
+        "composition": "97% polyester 3% elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Леггинсы",
+    "categorySlug": "leggings",
+    "description": "Удобные леггинсы для спорта и активного образа жизни. Изготовлен из материала 80% nylon 20% spandex, который обеспечивает комфорт и хорошую посадку. Обеспечивают свободу движений и комфорт.",
+    "variations": [
+      {
+        "color": "Коричневый",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": "80% nylon 20% spandex",
+        "isAvailable": true
+      },
+      {
+        "color": "Синий",
+        "sizes": ["S"],
+        "priceRub": 3000,
+        "composition": "80% nylon 20% spandex",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Леггинсы",
+    "categorySlug": "leggings",
+    "description": "Удобные леггинсы для спорта и активного образа жизни. Изготовлен из материала 75% nylon 25% Lycra , который обеспечивает комфорт и хорошую посадку. Обеспечивают свободу движений и комфорт.",
+    "variations": [
+      {
+        "color": "Чёрный",
+        "sizes": ["L"],
+        "priceRub": 3000,
+        "composition": "75% nylon 25% Lycra",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Лонгслив",
+    "categorySlug": "tops",
+    "description": "Практичная модель для повседневной носки. Выполнен из эластичного и комфортного материала, подходящего для активной носки. Подходит для базового гардероба.",
+    "variations": [
+      {
+        "color": "Голубой",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": null,
+        "isAvailable": false
+      },
+      {
+        "color": "Оранжевый",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": null,
+        "isAvailable": false
+      }
+    ]
+  },
+  {
+    "name": "Леггинсы",
+    "categorySlug": "leggings",
+    "description": "Удобные леггинсы для спорта и активного образа жизни. Изготовлен из материала 78%polyamed 22% elastane, который обеспечивает комфорт и хорошую посадку. Обеспечивают свободу движений и комфорт.",
+    "variations": [
+      {
+        "color": "Бежевый",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": "78% polyamed 22% elastane",
+        "isAvailable": true
+      },
+      {
+        "color": "Сиреневый",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": "78% polyamed 22% elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Лонгслив",
+    "categorySlug": "tops",
+    "description": "Практичная модель для повседневной носки. Изготовлен из материала 80% nylon 20% spandex, который обеспечивает комфорт и хорошую посадку. Подходит для базового гардероба.",
+    "variations": [
+      {
+        "color": "Бежевый",
+        "sizes": ["S", "M"],
+        "priceRub": 3000,
+        "composition": "80% nylon 20% spandex",
+        "isAvailable": true
+      },
+      {
+        "color": "Оранжевый",
+        "sizes": ["S", "M"],
+        "priceRub": 3000,
+        "composition": "80% nylon 20% spandex",
+        "isAvailable": true
+      },
+      {
+        "color": "Серый",
+        "sizes": ["S", "M"],
+        "priceRub": 3000,
+        "composition": "80% nylon 20% spandex",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Сумка",
+    "categorySlug": "accessories",
+    "description": "Практичная модель для повседневной носки. Выполнен из эластичного и комфортного материала, подходящего для активной носки. Подходит для базового гардероба.",
+    "variations": [
+      {
+        "color": "Чёрный",
+        "sizes": [],
+        "priceRub": 2500,
+        "composition": null,
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Майка",
+    "categorySlug": "tops",
+    "description": "Практичная модель для повседневной носки. Изготовлен из материала 91nylon 9% elastane, который обеспечивает комфорт и хорошую посадку. Подходит для базового гардероба.",
+    "variations": [
+      {
+        "color": "Бежевый",
+        "sizes": ["M"],
+        "priceRub": 4500,
+        "composition": "91% nylon 9% elastane",
+        "isAvailable": false
+      },
+      {
+        "color": "Чёрный",
+        "sizes": ["M"],
+        "priceRub": 4500,
+        "composition": "91% nylon 9% elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Футболка",
+    "categorySlug": "tops",
+    "description": "Практичная модель для повседневной носки. Изготовлен из материала 91nylon 9% elastane, который обеспечивает комфорт и хорошую посадку. Подходит для базового гардероба.",
+    "variations": [
+      {
+        "color": "Белый",
+        "sizes": ["M"],
+        "priceRub": 4500,
+        "composition": "91% nylon 9% elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Шорты",
+    "categorySlug": "shorts",
+    "description": "Практичная модель для повседневной носки. Изготовлен из материала 91nylon 9% elastane, который обеспечивает комфорт и хорошую посадку. Подходит для базового гардероба.",
+    "variations": [
+      {
+        "color": "Белый",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": "91% nylon 9% elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Топ",
+    "categorySlug": "tops",
+    "description": "Практичный топ для повседневной носки и тренировок. Изготовлен из материала 54% nylon 34% polyester 12% spandex , который обеспечивает комфорт и хорошую посадку. Подходит для базовых и спортивных образов.",
+    "variations": [
+      {
+        "color": "Бежевый",
+        "sizes": ["S"],
+        "priceRub": 2000,
+        "composition": "54% nylon 34% polyester 12% spandex",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Леггинсы",
+    "categorySlug": "leggings",
+    "description": "Удобные леггинсы для спорта и активного образа жизни. Изготовлен из материала 54% nylon 34% polyester 12% spandex , который обеспечивает комфорт и хорошую посадку. Обеспечивают свободу движений и комфорт.",
+    "variations": [
+      {
+        "color": "Бежевый",
+        "sizes": ["S"],
+        "priceRub": 3000,
+        "composition": "54% nylon 34% polyester 12% spandex",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Топ",
+    "categorySlug": "tops",
+    "description": "Практичный топ для повседневной носки и тренировок. Изготовлен из материала 92% polyamide 8% elastane, который обеспечивает комфорт и хорошую посадку. Подходит для базовых и спортивных образов.",
+    "variations": [
+      {
+        "color": "Красный",
+        "sizes": ["M"],
+        "priceRub": 2000,
+        "composition": "92% polyamide 8% elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Леггинсы",
+    "categorySlug": "leggings",
+    "description": "Удобные леггинсы для спорта и активного образа жизни. Изготовлен из материала 92% polyamide 8% elastane, который обеспечивает комфорт и хорошую посадку. Обеспечивают свободу движений и комфорт.",
+    "variations": [
+      {
+        "color": "Красный",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": "92% polyamide 8% elastane",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Жилет",
+    "categorySlug": "outerwear",
+    "description": "Жилет для многослойных повседневных образов. Изготовлен из материала 100% cotton , который обеспечивает комфорт и хорошую посадку. Подходит для комбинирования с базовой одеждой.",
+    "variations": [
+      {
+        "color": "Красный",
+        "sizes": ["M"],
+        "priceRub": 2500,
+        "composition": "100% cotton",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Юбка",
+    "categorySlug": "skirts",
+    "description": "Юбка для повседневного гардероба с лаконичным дизайном. Изготовлен из материала 100% cotton , который обеспечивает комфорт и хорошую посадку. Хорошо сочетается с базовыми верхами.",
+    "variations": [
+      {
+        "color": "Красный",
+        "sizes": ["M"],
+        "priceRub": 3000,
+        "composition": "100% cotton",
+        "isAvailable": true
+      }
+    ]
+  },
+  {
+    "name": "Кофта на молнии",
+    "categorySlug": "tops",
+    "description": "Кофта на молнии для повседневной носки. Выполнен из эластичного и комфортного материала, подходящего для активной носки. Удобна для активного дня и многослойных образов.",
+    "variations": [
+      {
+        "color": "Чёрный",
+        "sizes": ["M", "L", "S"],
+        "priceRub": 5000,
+        "composition": null,
+        "isAvailable": false
+      }
+    ]
+  }
+]

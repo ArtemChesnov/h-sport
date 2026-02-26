@@ -1,0 +1,422 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* dark-variant из shadcn */
+@custom-variant dark (&:is(.dark *));
+
+@media screen and (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+  img{
+    height: auto;
+  }
+}
+
+/* Фиксируем ширину body чтобы избежать дергания при появлении скроллбара */
+body {
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+/* Курсор указатель для всех кликабельных элементов */
+a[href],
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+label[for],
+summary {
+  cursor: pointer;
+}
+
+@theme inline {
+  --breakpoint-wide: 1600px;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+
+  /* Цвета текста магазина (определены в .shop) */
+  --color-text-primary: var(--text-primary, #030306);
+  --color-text-secondary: var(--text-secondary, #878787);
+}
+
+/* --- БАЗА: только радиус и шрифты --- */
+
+:root {
+  --radius: 0.625rem;
+
+  /*
+   * Шрифты через next/font (CSS переменные заданы в layout.tsx)
+   * Fallbacks для совместимости с SSR и ранней загрузкой
+   */
+
+  /* Базовый шрифт по умолчанию */
+  --font-sans: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* Шрифт заголовков по умолчанию */
+  --font-heading: var(--font-inter), var(--font-sans);
+
+  --background: #F5F5F5;
+  --foreground: lab(2.75381% 0 0);
+  --card: lab(100% 0 0);
+  --card-foreground: lab(2.75381% 0 0);
+  --popover: lab(100% 0 0);
+  --popover-foreground: lab(2.75381% 0 0);
+  --primary: lab(7.78201% -0.0000149012 0);
+  --primary-foreground: lab(98.26% 0 0);
+  --secondary: lab(96.52% -0.0000298023 0.0000119209);
+  --secondary-foreground: lab(7.78201% -0.0000149012 0);
+  --muted: lab(96.52% -0.0000298023 0.0000119209);
+  --muted-foreground: lab(48.496% 0 0);
+  --accent: lab(96.52% -0.0000298023 0.0000119209);
+  --accent-foreground: lab(7.78201% -0.0000149012 0);
+  --destructive: lab(48.4493% 77.4328 61.5452);
+  --border: lab(90.952% 0 -0.0000119209);
+  --input: lab(90.952% 0 -0.0000119209);
+  --ring: lab(66.128% -0.0000298023 0.0000119209);
+  --sidebar: lab(98.26% 0 0);
+  --sidebar-foreground: lab(2.75381% 0 0);
+  --sidebar-primary: lab(7.78201% -0.0000149012 0);
+  --sidebar-primary-foreground: lab(98.26% 0 0);
+  --sidebar-accent: lab(96.52% -0.0000298023 0.0000119209);
+  --sidebar-accent-foreground: lab(7.78201% -0.0000149012 0);
+  --sidebar-border: lab(90.952% 0 -0.0000119209);
+  --sidebar-ring: lab(66.128% -0.0000298023 0.0000119209);
+  --surface: lab(97.68% -0.0000298023 0.0000119209);
+  --code-highlight: lab(95.36% 0 0);
+  --code-number: lab(48.96% 0 0);
+  --selection: lab(2.75381% 0 0);
+  --selection-foreground: lab(100% 0 0);
+}
+
+
+
+/* === ТЕМА МАГАЗИНА (SHOP) =================================== */
+/* Применяется внутри <main class="shop ..."> */
+
+.shop {
+
+
+  img{
+    height: 100%;
+  }
+  /* Шрифты магазина через next/font:
+     - текст и ссылки: Nunito Sans
+     - заголовки: Oswald
+  */
+  --font-sans: var(--font-nunito), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-heading: var(--font-oswald), var(--font-sans);
+  line-height: 120% !important;
+
+  /* ВАЖНО: реально применяем шрифт внутри .shop */
+  font-family: var(--font-sans);
+
+  --text-primary: #030306;
+  --text-secondary: #878787;
+
+  /* Применяем переменные: заголовки — primary, серый текст — secondary */
+  --muted-foreground: var(--text-secondary);
+
+  /* фон магазина */
+  --background: #F5F5F5;
+  --foreground: #1f1e1e;
+
+  --card: rgb(255 255 255);
+  --card-foreground: rgb(31 30 30);
+
+  --popover: rgb(255 255 255);
+  --popover-foreground: rgb(31 30 30);
+
+  --primary: rgb(235 96 129);
+  --primary-foreground: rgb(31 30 30);
+
+  --secondary: rgb(221, 221, 221);
+  --secondary-foreground: rgb(31 30 30);
+
+  --muted: rgb(243 241 241);
+
+  --accent: rgb(243 241 241);
+  --accent-foreground: rgb(31 30 30);
+
+  --destructive: oklch(0.577 0.245 27.325);
+
+  --border: rgb(220 220 220);
+  --input: rgb(220 220 220);
+  --ring: rgb(235 96 129);
+
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+
+  --sidebar: rgb(243 241 241);
+  --sidebar-foreground: rgb(31 30 30);
+  --sidebar-primary: rgb(235 96 129);
+  --sidebar-primary-foreground: rgb(31 30 30);
+  --sidebar-accent: rgb(243 241 241);
+  --sidebar-accent-foreground: rgb(31 30 30);
+  --sidebar-border: rgb(220 220 220);
+  --sidebar-ring: rgb(235 96 129);
+}
+
+/* Заголовки в витрине принудительно на Oswald, цвет — text-primary */
+.shop h1,
+.shop h2,
+.shop h3,
+.shop h4,
+.shop h5,
+.shop h6 {
+  font-family: var(--font-heading);
+  line-height: 120% !important;
+  color: var(--text-primary);
+}
+
+
+
+/* === ТЕМА АДМИНКИ (ADMIN) — shadcn default =================== */
+/* Применяется внутри <div class="(admin) ..."> */
+
+.admin {
+  /* для админки и текст, и заголовки — Inter (через next/font) */
+  --font-sans: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-heading: var(--font-inter), var(--font-sans);
+
+  /* тоже явно задаём шрифт */
+  font-family: var(--font-sans);
+
+  --radius: 0.65rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+/* Анимации для карточек товаров */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s ease-out forwards;
+}
+
+/* Мягкое появление блока на первом экране (чуть дольше) */
+.animate-fade-in-up-slow {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Staggered анимация для карточек каталога */
+.catalog-card {
+  opacity: 0;
+  animation: fadeInUp 0.4s ease-out forwards;
+}
+
+/* Задержки для stagger-эффекта (первые 12 карточек) */
+.catalog-card:nth-child(1) { animation-delay: 0ms; }
+.catalog-card:nth-child(2) { animation-delay: 50ms; }
+.catalog-card:nth-child(3) { animation-delay: 100ms; }
+.catalog-card:nth-child(4) { animation-delay: 150ms; }
+.catalog-card:nth-child(5) { animation-delay: 200ms; }
+.catalog-card:nth-child(6) { animation-delay: 250ms; }
+.catalog-card:nth-child(7) { animation-delay: 300ms; }
+.catalog-card:nth-child(8) { animation-delay: 350ms; }
+.catalog-card:nth-child(9) { animation-delay: 400ms; }
+.catalog-card:nth-child(10) { animation-delay: 450ms; }
+.catalog-card:nth-child(11) { animation-delay: 500ms; }
+.catalog-card:nth-child(12) { animation-delay: 550ms; }
+.catalog-card:nth-child(n+13) { animation-delay: 600ms; }
+
+/* Анимация для мозаичных блоков */
+.mosaic-block {
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.mosaic-block:nth-child(1) { animation-delay: 0ms; }
+.mosaic-block:nth-child(2) { animation-delay: 150ms; }
+.mosaic-block:nth-child(3) { animation-delay: 300ms; }
+.mosaic-block:nth-child(4) { animation-delay: 450ms; }
+
+/* Pop при toggle избранного */
+@keyframes pop {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+.animate-pop {
+  animation: pop 0.35s ease-out;
+}
+
+/* Shimmer для скелетонов */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    oklch(0.95 0 0) 0%,
+    oklch(0.97 0 0) 50%,
+    oklch(0.95 0 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-shimmer {
+    animation: none;
+  }
+  .animate-pop {
+    animation: none;
+  }
+}
+
+/* Подчёркивание ссылок при hover */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background-color: currentColor;
+  transition: width 0.2s ease-out;
+}
+.link-underline:hover::after {
+  width: 100%;
+}
+.mosaic-block:nth-child(n+5) { animation-delay: 600ms; }
+
+/* Плавный переход режима отображения */
+.view-transition {
+  transition: opacity 0.2s ease-out;
+}
+
+/* Отключаем анимации при prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .catalog-card,
+  .mosaic-block,
+  .animate-fade-in-up,
+  .animate-fade-in-up-slow {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* Скрытие scrollbar */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Кастомный скроллбар для корзины */
+.cart-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.cart-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.cart-scrollbar::-webkit-scrollbar-thumb {
+  background: #EB6081;
+  border-radius: 3px;
+}
+
+.cart-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #d9536f;
+}
+
+/* Firefox */
+.cart-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #EB6081 transparent;
+}

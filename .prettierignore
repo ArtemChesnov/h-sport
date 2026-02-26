@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Build output
+.next/
+out/
+build/
+dist/
+
+# Coverage
+coverage/
+
+# Cache
+.cache/
+
+# Logs
+logs/
+*.log
+
+# Prisma
+prisma/migrations/
+
+# Lock files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Generated
+*.gen.ts

@@ -1,0 +1,574 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  USER // обычный пользователь
+  ADMIN // администратор (доступ к админке)
+}
+
+enum OrderStatus {
+  NEW // черновик заказа (данные собраны, ещё не перешли к оплате)
+  PENDING_PAYMENT // ожидает оплаты (счёт сформирован, платёж не подтверждён)
+  PAID // успешно оплачен
+  PROCESSING // собираем заказ на складе/готовим к отправке
+  SHIPPED // передан в доставку (есть трек)
+  DELIVERED // доставлен получателю
+  CANCELED // отменён
+}
+
+enum PaymentStatus {
+  PENDING // платёж создан, ждём подтверждения
+  PAID // платёж подтверждён провайдером
+  FAILED // ошибка
+  CANCELED // отменён
+  REFUNDED // возврат проведён
+}
+
+enum PaymentProvider {
+  ROBOKASSA // провайдер — Robokassa (можно расширять)
+}
+
+enum PaymentMethod {
+  AUTO // не фиксируем метод, покупатель выбирает на платёжной странице
+  CARD // банковская карта
+  SBP // система быстрых платежей (QR/пуш)
+  BNPL //оплата долями
+}
+
+enum DeliveryMethod {
+  CDEK_PVZ // CДЭК — выдача в ПВЗ
+  CDEK_COURIER // CДЭК — курьер
+  POCHTA_PVZ
+  POCHTA_COURIER
+  PICKUP_SHOWROOM
+}
+
+enum PromoType {
+  PERCENT // скидка в процентах (1..100)
+  AMOUNT // скидка фиксированной суммой (копейки)
+}
+
+enum Size {
+  XXS // очень маленький
+  XS // extra small
+  S // small
+  M // medium
+  L // large
+  XL // extra large
+  XXL // очень большой
+  ONE_SIZE // для сумок и безразмерных позиций
+}
+
+model User {
+  id             String    @id @default(cuid())
+  role           Role      @default(USER) // роль пользователя (по умолчанию USER)
+  email          String    @unique @db.VarChar(255) // e-mail (уникальный)
+  emailVerified  DateTime? // когда почта подтверждена (null, если нет)
+  passwordHash   String?   @db.VarChar(255) // хэш пароля (для входа по email+пароль)
+  name           String?   @db.VarChar(100) // имя (опционально)
+  secondName     String?   @db.VarChar(100) // фамилия (опционально)
+  phone          String?   @db.VarChar(20) // телефон (опционально)
+  birthDate      DateTime? // дата рождения (опционально)
+  sessionVersion Int       @default(0) // версия сессии для отзыва всех сессий
+
+  addresses       Address[]
+  favorites       Favorite[]
+  orders          Order[]
+  carts           Cart[]
+  subscriptions   Subscription[]
+  productViews    ProductView[]
+  cartActions     CartAction[]
+  favoriteActions FavoriteAction[]
+  conversions     Conversion[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([email]) // для быстрого поиска по email
+  @@index([phone]) // для быстрого поиска по телефону
+}
+
+model VerificationToken {
+  identifier String // идентификатор (e-mail)
+  token      String   @unique // токен (уникальный)
+  expires    DateTime // срок действия
+
+  @@id([identifier, token]) // составной уникальный ключ
+}
+
+model PasswordResetToken {
+  id         Int      @id @default(autoincrement())
+  identifier String // идентификатор (e-mail)
+  token      String   @unique // токен сброса
+  expires    DateTime // срок действия
+  userId     String? // опциональная привязка к пользователю
+
+  @@index([identifier]) // для быстрого поиска при сбросе пароля
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique @db.VarChar(100) // название категории
+  slug      String    @unique @db.VarChar(100) // slug для URL
+  products  Product[] // связь: товары этой категории
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id         Int      @id @default(autoincrement())
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  name        String   @db.VarChar(255) // название товара
+  slug        String   @unique @db.VarChar(255) // slug товара
+  description String?  @db.Text // описание
+  composition String?  @db.Text // состав/материалы
+  images      String[] @default([]) // общие изображения товара
+  tags        String[] @default([]) // теговые метки
+
+  items           ProductItem[] // список вариантов (цвет/размер/цена/наличие)
+  favorites       Favorite[]
+  productViews    ProductView[]
+  cartActions     CartAction[]
+  favoriteActions FavoriteAction[]
+  conversions     Conversion[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId]) // индекс по категории
+  @@index([name]) // индекс по названию (поиск)
+  @@index([slug]) // индекс по slug (для быстрого поиска по slug)
+  @@index([categoryId, createdAt]) // для фильтрации по категории и сортировки по дате
+}
+
+model ProductItem {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  sku         String?  @unique @db.VarChar(100) // артикул варианта (автоматически создаёт индекс для поиска)
+  color       String   @db.VarChar(100) // цвет
+  size        Size // размер
+  price       Int      @default(0) // цена в копейках (должна быть >= 0)
+  isAvailable Boolean  @default(true) // доступен ли к покупке
+  imageUrls   String[] @default([]) // изображения конкретного варианта
+
+  cartItems CartItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([productId, color, size]) // уникальность сочетания вариант
+  @@index([price]) // индекс по цене
+  @@index([color, size]) // составной индекс для фильтрации по цвету и размеру
+  @@index([isAvailable]) // индекс для фильтрации доступных товаров
+  @@index([productId, isAvailable]) // композитный индекс для частых выборок в каталоге
+  @@index([productId, isAvailable, price]) // составной индекс для фильтрации по товару, наличию и цене (оптимизация сортировки по цене)
+  @@index([color, isAvailable]) // составной индекс для фильтрации по цвету и доступности
+  @@index([size, isAvailable]) // составной индекс для фильтрации по размеру и доступности
+  @@index([color, size, isAvailable]) // составной индекс для комплексной фильтрации по цвету, размеру и доступности
+}
+
+model Cart {
+  id     Int     @id @default(autoincrement())
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  cartToken String?    @unique // токен гостевой корзины
+  items     CartItem[] // элементы корзины
+
+  // --- агрегированные поля корзины ---
+  totalItems Int @default(0) // всего штук в корзине (сумма qty)
+  subtotal   Int @default(0) // сумма товаров без скидки (в копейках)
+  discount   Int @default(0) // размер скидки (в копейках)
+  total      Int @default(0) // итоговая сумма (subtotal - discount)
+
+  // --- применённый промокод к корзине (опционально) ---
+  promoCodeId Int?
+  promoCode   PromoCode? @relation(fields: [promoCodeId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId]) // индекс по userId (быстрый доступ к корзине пользователя)
+  @@index([promoCodeId]) // пригодится для отчётов/поиска корзин с промокодом
+}
+
+model CartItem {
+  id     Int  @id @default(autoincrement())
+  cartId Int
+  cart   Cart @relation(fields: [cartId], references: [id], onDelete: Cascade) // при удалении корзины удаляем позиции
+
+  productItemId Int
+  productItem   ProductItem @relation(fields: [productItemId], references: [id], onDelete: Restrict) // нельзя удалить вариант, если он в корзине
+
+  qty   Int // количество
+  price Int // цена в момент добавления
+
+  createdAt DateTime @default(now())
+
+  @@unique([cartId, productItemId]) // одна запись на уникальную пару (корзина + вариант)
+  @@index([cartId]) // для быстрой выборки всех позиций корзины
+  @@index([productItemId]) // для проверки доступности товара и аналитики
+}
+
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade) // при удалении юзера — чистим избранное
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade) // при удалении товара — чистим избранное
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId]) // один и тот же товар не дублируем у пользователя
+  @@index([userId, createdAt]) // для сортировки избранного по дате добавления
+}
+
+model PromoCode {
+  id         Int       @id @default(autoincrement())
+  code       String    @unique @db.VarChar(50) // промо-код (уникальный, в верхнем регистре)
+  type       PromoType // PERCENT / AMOUNT
+  value      Int       @default(0) // проценты (1..100) или сумма (в копейках, должна быть >= 0)
+  startsAt   DateTime? // дата старта действия
+  endsAt     DateTime? // дата окончания
+  minOrder   Int?      @default(0) // минимальная сумма заказа (копейки, должна быть >= 0)
+  usageLimit Int? // лимит применений (null = без ограничений, должна быть >= 0)
+  usedCount  Int       @default(0) // сколько раз применён (должна быть >= 0)
+  isActive   Boolean   @default(true)
+
+  // Заказы, где этот промокод применялся
+  orders Order[]
+
+  // Корзины, к которым сейчас подвязан этот промокод
+  carts Cart[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([startsAt, endsAt])
+}
+
+model Address {
+  id     Int    @id @default(autoincrement())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade) // адрес удаляется с пользователем
+
+  name      String? // ярлык адреса (например, "Дом" / "Офис")
+  country   String? // страна (опционально)
+  city      String // город
+  street    String // улица/дом/кв
+  zip       String? // индекс (опц.)
+  phone     String? // телефон для доставки (опц.)
+  isDefault Boolean @default(false) // адрес по умолчанию
+
+  createdAt DateTime @default(now())
+
+  @@index([userId]) // индекс по пользователю (быстрый выбор адресов)
+}
+
+model Order {
+  id  Int    @id @default(autoincrement()) // номер заказа (используем как InvId в Robokassa)
+  uid String @unique @default(cuid()) // публичный идентификатор
+
+  userId    String?
+  user      User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  cartToken String?
+
+  status   OrderStatus @default(NEW)
+  email    String
+  phone    String?
+  fullName String?
+
+  // --- промокод, применённый к заказу ---
+  promoCodeId   Int?
+  promoCode     PromoCode? @relation(fields: [promoCodeId], references: [id], onDelete: SetNull)
+  promoCodeCode String? // сам текст кода на момент покупки (на случай, если промик переименуют/удалят)
+
+  totalItems  Int @default(0)
+  subtotal    Int @default(0)
+  discount    Int @default(0)
+  deliveryFee Int @default(0)
+  total       Int @default(0)
+
+  delivery    Delivery?
+  items       OrderItem[]
+  payments    Payment[]
+  events      OrderEvent[]
+  conversions Conversion[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt]) // пригодится для статистики по периодам
+  @@index([email]) // для поиска заказов по email в админке
+  @@index([status, createdAt]) // для фильтрации по статусу и дате (дашборд, админка)
+  @@index([userId, status]) // для поиска заказов пользователя по статусу
+  @@index([userId, createdAt]) // для сортировки заказов пользователя по дате (ЛК)
+  @@index([cartToken]) // для конвертации корзины в заказ
+}
+
+model OrderItem {
+  id      Int   @id @default(autoincrement())
+  orderId Int
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade) // удаление заказа — удаляем позиции
+
+  productId       Int // FK на Product (для отчётов)
+  productName     String // имя/слуг товара на момент покупки
+  sku             String? // артикул варианта (если был)
+  color           String? // цвет варианта
+  size            String? // размер варианта (как строка, чтобы не сломаться, если enum поменяется)
+  qty             Int // количество
+  price           Int // цена за единицу
+  total           Int // qty * price
+  productImageUrl String? // ссылка на маленькое превью товара на момент покупки
+
+  @@index([orderId]) // индекс по заказу (быстрый выбор позиций)
+  @@index([productId]) // индекс по товару (для расчета популярности и аналитики)
+  @@index([orderId, productId]) // составной индекс для частых запросов заказов с товарами
+  @@index([productId, orderId]) // составной индекс для оптимизации JOIN-ов по productId (для расчета популярности)
+}
+
+model Delivery {
+  id      Int   @id @default(autoincrement())
+  orderId Int   @unique
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  method       DeliveryMethod // CDEK_PVZ | CDEK_COURIER | POCHTA_PVZ | POCHTA_COURIER | PICKUP_SHOWROOM
+  city         String?
+  address      String? // если курьер / если пвз пишем адрес пвз
+  trackingCode String? // трек-номер (вводится менеджером в админке)
+  price        Int            @default(0)
+
+  @@index([method]) // индекс по способу (отчёты/фильтры)
+  @@index([orderId])
+}
+
+model Payment {
+  id      Int   @id @default(autoincrement())
+  orderId Int
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade) // удаление заказа — удаляем платежи
+
+  provider PaymentProvider // провайдер (Robokassa)
+  method   PaymentMethod // метод (CARD/SBP/…)
+  amount   Int // сумма платежа (копейки)
+  currency String          @default("RUB") // валюта (по умолчанию RUB)
+
+  externalId String? // внешний ID операции у провайдера
+  signature  String? // входящая сигнатура/отпечаток
+  status     PaymentStatus @default(PENDING) // статус платежа
+  receiptUrl String? // URL чека об оплате (для админки)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orderId]) // индекс по заказу
+  @@index([status]) // индекс по статусу (отчёты/поиск)
+  @@index([createdAt]) // подбор платежей по диапазону дат
+}
+
+model OrderEvent {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade) // удаляем вместе с заказом
+  type      String // тип события (например, "STATUS_CHANGED", "PAYMENT_PAID")
+  payload   Json? // произвольные данные события (кто, что, когда)
+  createdAt DateTime @default(now())
+
+  @@index([orderId]) // индекс по заказу
+}
+
+// Метрики производительности API
+model ApiMetric {
+  id         Int      @id @default(autoincrement())
+  endpoint   String // путь API (например, "/api/shop/products")
+  method     String // HTTP метод (GET, POST, etc.)
+  duration   Int // время выполнения в миллисекундах
+  statusCode Int // HTTP статус код
+  createdAt  DateTime @default(now())
+
+  @@index([endpoint, method])
+  @@index([createdAt])
+  @@index([statusCode])
+}
+
+// E-commerce метрики: просмотры товаров
+model ProductView {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String? // если пользователь авторизован
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// E-commerce метрики: действия с корзиной
+model CartAction {
+  id        Int      @id @default(autoincrement())
+  action    String // "add", "remove", "update"
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int // количество товара
+  userId    String? // если пользователь авторизован
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  cartId    String? // токен корзины для гостей
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// E-commerce метрики: действия с избранным
+model FavoriteAction {
+  id        Int      @id @default(autoincrement())
+  action    String // "add", "remove"
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// E-commerce метрики: конверсии
+model Conversion {
+  id        Int      @id @default(autoincrement())
+  type      String // "view_to_cart", "cart_to_order", "view_to_order"
+  productId Int?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  orderId   Int?
+  order     Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+
+  @@index([type])
+  @@index([productId])
+  @@index([orderId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Subscription {
+  id          Int     @id @default(autoincrement())
+  email       String  @unique
+  source      String?
+  isConfirmed Boolean @default(false)
+  token       String? @unique
+  userId      String?
+  user        User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  createdAt   DateTime  @default(now())
+  confirmedAt DateTime?
+
+  @@index([createdAt])
+}
+
+// Выпуск рассылки (новости магазина)
+model NewsletterIssue {
+  id        Int      @id @default(autoincrement())
+  subject   String   @db.VarChar(500)
+  bodyHtml  String   @db.Text
+  sentAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([sentAt])
+}
+
+// Web Vitals метрики производительности
+model WebVitalsMetric {
+  id        Int      @id @default(autoincrement())
+  name      String // "CLS", "FID", "LCP", "FCP", "TTFB"
+  value     Float // значение метрики
+  delta     Float? // изменение относительно предыдущего значения
+  metricId  String? // уникальный ID метрики от web-vitals библиотеки
+  url       String // URL страницы
+  createdAt DateTime @default(now())
+
+  @@index([name])
+  @@index([createdAt])
+  @@index([url])
+}
+
+// Медленные запросы к БД
+model SlowQuery {
+  id        Int      @id @default(autoincrement())
+  query     String   @db.VarChar(500) // текст запроса (нормализованный, без параметров)
+  duration  Int // длительность выполнения в миллисекундах
+  endpoint  String?  @db.VarChar(255) // endpoint API, откуда был вызван запрос
+  userId    String? // ID пользователя (если доступен)
+  createdAt DateTime @default(now())
+
+  @@index([duration])
+  @@index([createdAt])
+  @@index([endpoint])
+}
+
+// Метрики сервера Node.js
+model ServerMetrics {
+  id        Int      @id @default(autoincrement())
+  heapUsed  BigInt // bytes
+  heapTotal BigInt // bytes
+  rss       BigInt // bytes (Resident Set Size)
+  external  BigInt // bytes
+  cpuUser   BigInt // microseconds
+  cpuSystem BigInt // microseconds
+  cpuCount  Int // количество ядер CPU
+  freemem   BigInt // bytes (свободная память системы)
+  totalmem  BigInt // bytes (общая память системы)
+  uptime    Float // seconds
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+// История инцидентов и алертов
+enum IncidentSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum IncidentStatus {
+  ACTIVE
+  RESOLVED
+}
+
+model Incident {
+  id          Int              @id @default(autoincrement())
+  fingerprint String           @unique // для дедупликации одинаковых алертов
+  source      String           // источник: "internal", "manual"
+  severity    IncidentSeverity
+  title       String           @db.VarChar(255)
+  message     String           @db.Text
+  details     Json?            // дополнительные данные в JSON формате
+  status      IncidentStatus   @default(ACTIVE)
+  createdAt   DateTime         @default(now())
+  resolvedAt  DateTime?
+
+  @@index([fingerprint])
+  @@index([severity])
+  @@index([status])
+  @@index([createdAt])
+  @@index([resolvedAt])
+}
