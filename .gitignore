@@ -48,3 +48,10 @@ next-env.d.ts
 
 /lib/generated/prisma
 node_modules
+
+# internal docs (not for public repo)
+/docs/DEPLOY_INSTRUCTIONS.md
+/docs/DEPLOY.md
+/docs/BACKUPS.md
+/docs/OPERATIONS.md
+/docs/MONITORING.md
