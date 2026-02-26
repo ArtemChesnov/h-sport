@@ -77,7 +77,7 @@ redis-cli ping   # ответ: PONG
 
 ```bash
 cd ~
-git clone https://github.com/YOUR_USER/h-sport.git
+git clone https://github.com/ArtemChesnov/h-sport.git
 cd h-sport
 ```
 
@@ -102,17 +102,41 @@ cd h-sport
    ```bash
    ssh -T git@github.com
    ```
-   Ожидаемый вывод: `Hi YOUR_USER! You've successfully authenticated...`
+   Ожидаемый вывод: `Hi ArtemChesnov! You've successfully authenticated...`
 
 5. **Если репозиторий клонировали по HTTPS** — переключить на SSH, чтобы `git pull` ходил по ключу:
    ```bash
    cd ~/h-sport
-   git remote set-url origin git@github.com:YOUR_USER/h-sport.git
+   git remote set-url origin git@github.com:ArtemChesnov/h-sport.git
    git pull origin main
    ```
-   (подставьте свой логин/организацию вместо `YOUR_USER`.)
+   (для своего форка замените `ArtemChesnov` на свой логин GitHub.)
 
 После этого `git pull` и скрипт `server-deploy.sh` будут работать без запроса пароля.
+
+### SSH на вашем ПК (Windows): что, где, зачем
+
+Если вы пушите в GitHub **со своего компьютера** по SSH (`git@github.com:...`), а не по HTTPS:
+
+- **Что делать:** один раз «доверить» хосту GitHub (добавить его ключ в `known_hosts`) и указать репозиторию адрес через SSH.
+- **Где:** на вашем ПК (не на сервере). Папка с ключами: `C:\Users\ВАШ_ЛОГИН\.ssh\` (файл `known_hosts`). Проект: папка `h-sport` на рабочем столе.
+- **Зачем:** иначе при первом `git push` или `git pull` по SSH будет ошибка «Host key verification failed» и Git не подключится.
+
+**Команды (выполнить в Git Bash или в терминале, где есть `ssh`):**
+
+```bash
+# 1. Добавить ключ GitHub в список доверенных хостов (один раз на ПК)
+ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+# 2. В папке проекта переключить remote с HTTPS на SSH
+cd /c/Users/CHE/Desktop/h-sport
+git remote set-url origin git@github.com:ArtemChesnov/h-sport.git
+
+# 3. Проверка: следующий push/pull пойдёт по SSH
+git fetch origin
+```
+
+После этого `git push` и `git pull` будут ходить в GitHub по SSH (по вашему ключу из `~/.ssh/id_ed25519` или `~/.ssh/id_rsa`). Если ключа ещё нет, создайте его (`ssh-keygen -t ed25519 -C "ваш@email"`) и добавьте публичный ключ в GitHub: Settings → SSH and GPG keys.
 
 ---
 

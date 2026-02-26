@@ -58,6 +58,7 @@ export default function GlobalError({
             Обновить страницу
           </button>
           <p style={{ marginTop: 24 }}>
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- global-error renders outside Next.js context, Link unavailable */}
             <a href="/" style={{ color: "#EB6081", textDecoration: "none" }}>
               На главную
             </a>
