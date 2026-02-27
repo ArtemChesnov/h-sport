@@ -1,7 +1,7 @@
 "use client";
 
 import { CART_ACTIONS } from "@/shared/constants";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { Loader2, Minus, Plus } from "lucide-react";
 
 interface ProductCartControlsProps {
@@ -40,9 +40,7 @@ export function ProductCartControls({
               <Minus className="h-4 w-4" />
             </button>
 
-            <span className="px-4 py-3 font-medium min-w-[3rem] text-center">
-              {currentQty}
-            </span>
+            <span className="px-4 py-3 font-medium min-w-[3rem] text-center">{currentQty}</span>
 
             <button
               onClick={onIncrease}
@@ -67,11 +65,7 @@ export function ProductCartControls({
               : "bg-muted text-muted-foreground cursor-not-allowed"
           )}
         >
-          {isCartLoading ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
-          ) : (
-            CART_ACTIONS.addToCart
-          )}
+          {isCartLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : CART_ACTIONS.addToCart}
         </button>
       )}
     </div>

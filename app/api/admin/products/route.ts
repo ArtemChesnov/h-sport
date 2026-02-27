@@ -1,17 +1,19 @@
-import {
-  buildPaginatedResponse,
-  normalizeAdminPaginationParams,
-  validateSearchQuery,
-  validateSlugQuery,
-} from "@/shared/lib";
+import { buildPaginatedResponse, normalizeAdminPaginationParams } from "@/shared/lib/pagination";
+import { validateSearchQuery, validateSlugQuery } from "@/shared/lib/validation";
 import { validateRequestSize, withErrorHandling } from "@/shared/lib/api/error-handler";
-import { createValidationErrorResponse } from "@/shared/lib/api/error-response";
+import {
+  createErrorResponse,
+  createValidationErrorResponse,
+} from "@/shared/lib/api/error-response";
 import { mapToAdminListItemDto } from "@/shared/lib/products/admin/mappers";
 import { parseAvailability, parseSort } from "@/shared/lib/products/admin/parsers";
 import { validateProductCreate } from "@/shared/lib/validation/admin-products";
 import { DTO } from "@/shared/services";
-import { createProduct, getAdminProductsList, normalizeProductPayload } from "@/shared/services/server";
-import type { ErrorResponse } from "@/shared/dto";
+import {
+  createProduct,
+  getAdminProductsList,
+  normalizeProductPayload,
+} from "@/shared/services/server";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -26,7 +28,8 @@ async function getHandler(request: NextRequest) {
   const sp = new URL(request.url).searchParams;
   const { page, perPage } = normalizeAdminPaginationParams(sp.get("page"), sp.get("perPage"));
   const categoryIdRaw = sp.get("categoryId")?.trim() || null;
-  const categoryId = categoryIdRaw && Number.isFinite(Number(categoryIdRaw)) ? Number(categoryIdRaw) : undefined;
+  const categoryId =
+    categoryIdRaw && Number.isFinite(Number(categoryIdRaw)) ? Number(categoryIdRaw) : undefined;
 
   const { products, total } = await getAdminProductsList({
     q: validateSearchQuery(sp.get("q")) ?? undefined,
@@ -66,10 +69,7 @@ async function postHandler(request: NextRequest) {
 
   const result = await createProduct(payload);
   if (!result.ok) {
-    return NextResponse.json<ErrorResponse>(
-      { success: false, message: result.message },
-      { status: result.status },
-    );
+    return createErrorResponse(result.message, result.status);
   }
 
   const { revalidatePath } = await import("next/cache");

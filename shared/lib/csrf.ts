@@ -6,12 +6,13 @@
  * 2. Клиент читает токен из cookie и отправляет в заголовке X-CSRF-Token
  * 3. Сервер проверяет, что токен в cookie совпадает с токеном в заголовке
  *
- * Это защищает от CSRF, так как сторонний сайт не может прочитать cookie
- * с другого домена (Same-Origin Policy)
+ * Защита от CSRF: сторонний сайт не может прочитать cookie с другого домена (Same-Origin Policy)
  */
 
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { createErrorResponse } from "@/shared/lib/api/error-response";
+import { env } from "@/shared/lib/config/env";
 
 export const CSRF_COOKIE_NAME = "csrf_token";
 export const CSRF_HEADER_NAME = "X-CSRF-Token";
@@ -43,8 +44,8 @@ export async function setCsrfCookie(): Promise<string> {
   if (!token) {
     token = generateCsrfToken();
     cookieStore.set(CSRF_COOKIE_NAME, token, {
-      httpOnly: false, // Клиент должен читать для отправки в заголовке
-      secure: process.env.NODE_ENV === "production",
+      httpOnly: false, // клиент должен читать для отправки в заголовке
+      secure: env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/",
       maxAge: 60 * 60 * 24, // 24 часа
@@ -87,10 +88,7 @@ export async function requireCsrf(request: NextRequest): Promise<NextResponse | 
   const isValid = await verifyCsrfToken(request);
 
   if (!isValid) {
-    return NextResponse.json(
-      { message: "Invalid or missing CSRF token" },
-      { status: 403 }
-    );
+    return createErrorResponse("Неверный или отсутствующий CSRF токен", 403);
   }
 
   return null;
@@ -104,7 +102,7 @@ export function setCsrfCookieInResponse(response: NextResponse, token?: string):
 
   response.cookies.set(CSRF_COOKIE_NAME, csrfToken, {
     httpOnly: false,
-    secure: process.env.NODE_ENV === "production",
+    secure: env.NODE_ENV === "production",
     sameSite: "strict",
     path: "/",
     maxAge: 60 * 60 * 24,

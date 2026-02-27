@@ -1,3 +1,4 @@
+import { getAppUrl } from "@/shared/lib/config/env";
 import { confirmByToken } from "@/shared/services/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -6,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
  * Подтверждение подписки по ссылке из письма. Редирект на главную с query.
  */
 export async function GET(request: NextRequest) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const baseUrl = getAppUrl();
 
   try {
     const token = request.nextUrl.searchParams.get("token") ?? "";

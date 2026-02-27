@@ -1,7 +1,7 @@
 "use client";
 
 import { CART_LABELS } from "@/shared/constants";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import type { DTO } from "@/shared/services";
 import { CartItemCard } from "./cart-item-card";
 

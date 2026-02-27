@@ -2,10 +2,8 @@
  * API endpoint для получения фильтров каталога
  */
 
-import {
-  CACHE_CONTROL_FILTERS,
-  CACHE_CONTROL_FILTERS_ERROR,
-} from "@/shared/constants";
+import { CACHE_CONTROL_FILTERS, CACHE_CONTROL_FILTERS_ERROR } from "@/shared/constants";
+import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { applyRateLimit } from "@/shared/lib/api/rate-limit-middleware";
 import { logger } from "@/shared/lib/logger";
 import {
@@ -24,8 +22,8 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export const revalidate = 21600;
 
-export async function GET(
-  request: NextRequest,
+async function getHandler(
+  request: NextRequest
 ): Promise<NextResponse<CatalogFiltersDto | ErrorResponse>> {
   const rateLimitResponse = await applyRateLimit(request, "catalog");
   if (rateLimitResponse) return rateLimitResponse;
@@ -51,7 +49,11 @@ export async function GET(
         headers: {
           "Cache-Control": CACHE_CONTROL_FILTERS_ERROR,
         },
-      },
+      }
     );
   }
+}
+
+export async function GET(request: NextRequest) {
+  return withErrorHandling(getHandler, request, "GET /api/shop/filters");
 }

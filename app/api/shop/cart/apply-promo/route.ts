@@ -1,3 +1,4 @@
+import { promoCodeApplySchema } from "@/shared/lib/api/request-body-schemas";
 import { CART_COOKIE_MAX_AGE } from "@/shared/lib/cart";
 import {
   applyPromoToCart,
@@ -9,6 +10,7 @@ import {
 } from "@/shared/services/server";
 import { validateRequestSize, withErrorHandling } from "@/shared/lib/api/error-handler";
 import { createValidationErrorResponse } from "@/shared/lib/api/error-response";
+import { validateRequestBody } from "@/shared/lib/api/validate-request-body";
 import { applyRateLimit } from "@/shared/lib/api/rate-limit-middleware";
 import { DTO } from "@/shared/services";
 import type { ErrorResponse } from "@/shared/dto";
@@ -16,7 +18,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 /** POST /api/shop/cart/apply-promo. Rate limit cart. */
 async function handler(
-  request: NextRequest,
+  request: NextRequest
 ): Promise<NextResponse<DTO.CartDto> | NextResponse<ErrorResponse>> {
   const rateLimitResponse = await applyRateLimit(request, "cart");
   if (rateLimitResponse) return rateLimitResponse;
@@ -24,15 +26,9 @@ async function handler(
   const sizeCheck = validateRequestSize(request, 10 * 1024);
   if (!sizeCheck.valid) return sizeCheck.response;
 
-  const body = (await request.json()) as DTO.PromoCodeApplyRequestDto | null;
-
-  if (!body || typeof body.code !== "string") {
-    return createValidationErrorResponse(
-      "Ошибка валидации",
-      [{ field: "code", message: "Некорректный запрос: не передан code." }],
-      400,
-    );
-  }
+  const bodyResult = await validateRequestBody(request, promoCodeApplySchema);
+  if ("error" in bodyResult) return bodyResult.error;
+  const body = bodyResult.data;
 
   const { cart, newToken } = await getOrCreateCartCore(request);
   const fullCart = await loadCartWithRelations(cart.id);
@@ -42,18 +38,18 @@ async function handler(
     return createValidationErrorResponse(
       "Ошибка валидации",
       [{ field: "_global", message: "Корзина пуста — промокод применить нельзя." }],
-      400,
+      400
     );
   }
 
   const subtotal = cartDto.subtotal ?? cartDto.total ?? 0;
-  const result = await applyPromoToCart(body.code, cart.id, subtotal, cart.userId);
+  const result = await applyPromoToCart(body.code.trim(), cart.id, subtotal, cart.userId);
 
   if (!result.ok) {
     return createValidationErrorResponse(
       "Ошибка валидации промокода",
       [{ field: result.field, message: result.message }],
-      400,
+      400
     );
   }
 
@@ -74,7 +70,7 @@ async function handler(
 }
 
 export async function POST(
-  request: NextRequest,
+  request: NextRequest
 ): Promise<NextResponse<DTO.CartDto | ErrorResponse>> {
   return withErrorHandling(handler, request, "POST /api/shop/cart/apply-promo");
 }

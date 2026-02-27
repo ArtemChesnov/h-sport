@@ -4,7 +4,7 @@
 
 import { prisma } from "@/prisma/prisma-client";
 import { DeliveryMethod, OrderStatus, Prisma } from "@prisma/client";
-import type { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 import type { DeliveryPatch, OrderUpdateData, OrderWithRelations } from "./order-types";
 import { ORDER_SELECT } from "./order-types";
 import {
@@ -16,7 +16,7 @@ import {
 } from "./order-validation";
 
 export async function syncOrderStatusIfPaid(
-  order: OrderWithRelations,
+  order: OrderWithRelations
 ): Promise<OrderWithRelations> {
   if (hasPaidPayment(order.payments) && order.status !== "PAID") {
     const previousStatus = order.status;
@@ -45,7 +45,7 @@ export async function syncOrderStatusIfPaid(
 
 export function prepareOrderUpdate(
   body: DTO.OrderAdminUpdateRequestDto,
-  existing: OrderWithRelations,
+  existing: OrderWithRelations
 ): {
   orderData: OrderUpdateData;
   deliveryPatch: DeliveryPatch;
@@ -79,7 +79,10 @@ export function prepareOrderUpdate(
         validationError: "Недопустимая смена статуса заказа",
       };
     }
-    if (STATUSES_REQUIRING_PAYMENT.includes(requestedStatus) && !hasPaidPayment(existing.payments)) {
+    if (
+      STATUSES_REQUIRING_PAYMENT.includes(requestedStatus) &&
+      !hasPaidPayment(existing.payments)
+    ) {
       return {
         orderData,
         deliveryPatch,
@@ -147,12 +150,7 @@ export function prepareOrderUpdate(
     existing.delivery?.trackingCode && existing.delivery.trackingCode.trim().length > 0;
   const hasTrackingNow =
     typeof normalizedTracking === "string" && normalizedTracking.trim().length > 0;
-  if (
-    !statusChangedExplicitly &&
-    !hadTrackingBefore &&
-    hasTrackingNow &&
-    isPaidOrProcessing
-  ) {
+  if (!statusChangedExplicitly && !hadTrackingBefore && hasTrackingNow && isPaidOrProcessing) {
     const autoNextStatus: DTO.OrderStatusDto = "SHIPPED";
     if (canChangeStatus(currentStatus, autoNextStatus)) newStatus = autoNextStatus;
   }
@@ -180,7 +178,7 @@ export function prepareOrderEvents(
   statusChangedExplicitly: boolean,
   trackingChanged: boolean,
   previousTracking: string | null,
-  newTracking: string | null | undefined,
+  newTracking: string | null | undefined
 ): Prisma.OrderEventCreateManyInput[] {
   const eventsData: Prisma.OrderEventCreateManyInput[] = [];
   if (newStatus !== currentStatus) {
@@ -215,7 +213,7 @@ export async function updateOrderInTransaction(
   deliveryPatch: DeliveryPatch,
   hasDeliveryChanges: boolean,
   existingDelivery: OrderWithRelations["delivery"],
-  deliveryFee: number | null,
+  deliveryFee: number | null
 ): Promise<OrderWithRelations> {
   const transaction: Prisma.PrismaPromise<unknown>[] = [];
   transaction.push(
@@ -247,15 +245,13 @@ export async function updateOrderInTransaction(
         }),
       },
       select: ORDER_SELECT,
-    }),
+    })
   );
   const [updatedOrder] = (await prisma.$transaction(transaction)) as [OrderWithRelations, unknown?];
   return updatedOrder;
 }
 
-export async function createOrderEvents(
-  data: Prisma.OrderEventCreateManyInput[],
-): Promise<void> {
+export async function createOrderEvents(data: Prisma.OrderEventCreateManyInput[]): Promise<void> {
   if (data.length > 0) {
     await prisma.orderEvent.createMany({ data });
   }

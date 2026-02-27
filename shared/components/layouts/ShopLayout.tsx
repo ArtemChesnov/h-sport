@@ -1,8 +1,7 @@
 import { CookieConsentBanner, Footer, Header } from "@/shared/components/common";
 import { ShopNavProvider } from "@/shared/contexts";
 import { NewsletterModalProvider } from "@/shared/contexts/newsletter-modal-context";
-import { cn } from "@/shared/lib";
-
+import { cn } from "@/shared/lib/utils";
 /**
  * Общий layout магазина: Header, Footer, провайдеры.
  * Используется в app/(shop)/layout и в app/cart, app/catalog для единого UI.

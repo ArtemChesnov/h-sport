@@ -1,13 +1,9 @@
 /**
- * Redis-клиент с ленивой инициализацией и безопасным fallback
- *
- * При наличии REDIS_URL пытается подключиться к Redis.
- * Если REDIS_URL не задан или подключиться не удалось - возвращает null.
- *
- * Поддерживает стандартный Redis через REDIS_URL.
- * Для использования с Upstash можно передать URL вида:
- * redis://default:token@host:port
+ * Redis-клиент с ленивой инициализацией и безопасным fallback.
+ * URL берётся из единого конфига (shared/lib/config). При отсутствии REDIS_URL возвращает null.
  */
+
+import { env } from "@/shared/lib/config";
 
 export interface RedisClient {
   get: (key: string) => Promise<string | null>;
@@ -39,9 +35,9 @@ async function initRedisClient(): Promise<RedisClient | null> {
 
   initAttempted = true;
 
-  const redisUrl = process.env.REDIS_URL;
+  const redisUrl = env.REDIS_URL;
 
-  // Если REDIS_URL не задан - не пытаемся подключаться
+  // Если REDIS_URL не задан — не подключаемся (rate-limit/кеш будут in-memory)
   if (!redisUrl) {
     return null;
   }
@@ -68,15 +64,19 @@ async function initRedisClient(): Promise<RedisClient | null> {
       const redisModule = await import("redis");
       // node-redis v5+ экспортирует createClient напрямую
       // Используем unknown для обхода проблем с типами
-      const createClientFunc = (redisModule as unknown as { createClient?: CreateClientFunction }).createClient;
+      const createClientFunc = (redisModule as unknown as { createClient?: CreateClientFunction })
+        .createClient;
       Redis = createClientFunc;
     } catch {
       // Если redis не установлен, возвращаем null
       // Логируем только один раз
       const { logger } = await import("./logger");
-      logger.warn("[Redis] Redis client not available. Install 'redis' package to use Redis caching.", {
-        hint: "Run: npm install redis",
-      });
+      logger.warn(
+        "[Redis] Redis client not available. Install 'redis' package to use Redis caching.",
+        {
+          hint: "Run: npm install redis",
+        }
+      );
       return null;
     }
 
@@ -103,14 +103,14 @@ async function initRedisClient(): Promise<RedisClient | null> {
       const shouldLog =
         isFirstError || // первая ошибка всегда логируется
         connectionErrorCount % ERROR_LOG_THRESHOLD === 0 || // каждые N ошибок
-        (now - lastErrorLogTime) >= ERROR_LOG_INTERVAL_MS; // или каждые 5 минут
+        now - lastErrorLogTime >= ERROR_LOG_INTERVAL_MS; // или каждые 5 минут
 
       if (shouldLog) {
         lastErrorLogTime = now;
         const { logger } = await import("./logger");
         const errorCode = (err as { code?: string }).code;
         // В development логируем как warning, если Redis не запущен (это нормально)
-        if (process.env.NODE_ENV === "development" && errorCode === "ECONNREFUSED") {
+        if (env.NODE_ENV === "development" && errorCode === "ECONNREFUSED") {
           logger.warn("[Redis] Redis server not available, using in-memory fallback", {
             hint: "To use Redis, start a Redis server or remove REDIS_URL from .env",
             errorCount: connectionErrorCount,
@@ -182,7 +182,7 @@ async function initRedisClient(): Promise<RedisClient | null> {
       },
       expire: async (key: string, seconds: number) => {
         try {
-          return await client.expire(key, seconds) ? 1 : 0;
+          return (await client.expire(key, seconds)) ? 1 : 0;
         } catch (err) {
           const { logger } = await import("./logger");
           logger.error("[Redis] EXPIRE error", err, { key });
@@ -222,14 +222,18 @@ async function initRedisClient(): Promise<RedisClient | null> {
 
     // Логируем ошибку при инициализации (учитываем порог/интервал, если счетчик уже определен)
     // Для ECONNREFUSED в development режиме логируем как warning (это нормально)
-    if (process.env.NODE_ENV === "development" && errorCode === "ECONNREFUSED") {
+    if (env.NODE_ENV === "development" && errorCode === "ECONNREFUSED") {
       logger.warn("[Redis] Redis server not available, using in-memory fallback", {
         hint: "To use Redis, start a Redis server or remove REDIS_URL from .env",
       });
     } else {
-      logger.warn("[Redis] Failed to connect, using in-memory fallback", initError as unknown as Record<string, unknown>, {
-        redisUrl: redisUrl ? "***" : undefined,
-      });
+      logger.warn(
+        "[Redis] Failed to connect, using in-memory fallback",
+        initError as unknown as Record<string, unknown>,
+        {
+          redisUrl: redisUrl ? "***" : undefined,
+        }
+      );
     }
     redisClient = null;
     return null;

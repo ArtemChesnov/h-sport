@@ -2,15 +2,15 @@
 
 import { prisma } from "@/prisma/prisma-client";
 import { PRODUCTS_LIST_CACHE_TTL_MS } from "@/shared/constants";
-import { buildPaginatedResponse, calculateSkip } from "@/shared/lib";
+import { buildPaginatedResponse, calculateSkip } from "@/shared/lib/pagination";
 import { getAsync, set } from "@/shared/lib/cache";
 import {
-    buildProductsWhere,
-    getProductsCacheKey,
-    getProductsSortedByPopularity,
-    getProductsWithMinPrice,
-    mapProductsToListDto,
-    type ProductWithRelations,
+  buildProductsWhere,
+  getProductsCacheKey,
+  getProductsSortedByPopularity,
+  getProductsWithMinPrice,
+  mapProductsToListDto,
+  type ProductWithRelations,
 } from "@/shared/lib/products";
 import type * as DTO from "@/shared/services/dto";
 
@@ -26,7 +26,10 @@ async function getCachedProducts(cacheKey: string): Promise<DTO.ProductsListResp
 /**
  * Сохраняет список товаров в кеш.
  */
-async function setProductsCache(cacheKey: string, data: DTO.ProductsListResponseDto): Promise<void> {
+async function setProductsCache(
+  cacheKey: string,
+  data: DTO.ProductsListResponseDto
+): Promise<void> {
   await set(cacheKey, data, PRODUCTS_LIST_CACHE_TTL_MS);
 }
 
@@ -123,7 +126,13 @@ export class CatalogProductsService {
       const orderBy = query.sort === "price_asc" ? "asc" : "desc";
       const skip = calculateSkip(query.page, query.perPage);
 
-      const productsWithPrice = await getProductsWithMinPrice(prisma, where, orderBy, skip, query.perPage);
+      const productsWithPrice = await getProductsWithMinPrice(
+        prisma,
+        where,
+        orderBy,
+        skip,
+        query.perPage
+      );
 
       if (productsWithPrice.length > 0) {
         const productIds = productsWithPrice.map((p) => p.productId);

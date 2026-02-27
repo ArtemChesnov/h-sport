@@ -1,8 +1,9 @@
 import { resetPassword } from "@/modules/auth/lib/db";
 import { validateRequestSize, withErrorHandling } from "@/shared/lib/api/error-handler";
 import { createErrorResponse } from "@/shared/lib/api/error-response";
+import { validateRequestBody } from "@/shared/lib/api/validate-request-body";
 import { applyRateLimit } from "@/shared/lib/api/rate-limit-middleware";
-import { passwordSchema } from "@/shared/lib/validation";
+import { resetPasswordConfirmSchema } from "@/shared/lib/validation/zod-schemas";
 import { NextRequest, NextResponse } from "next/server";
 
 async function postHandler(request: NextRequest) {
@@ -12,20 +13,9 @@ async function postHandler(request: NextRequest) {
   const sizeCheck = validateRequestSize(request, 10 * 1024);
   if (!sizeCheck.valid) return sizeCheck.response;
 
-  const body = await request.json();
-  const { token, password } = body;
-
-  if (!token || !password) {
-    return createErrorResponse("Токен и пароль обязательны", 400);
-  }
-
-  const passwordValidation = passwordSchema.safeParse(password);
-  if (!passwordValidation.success) {
-    return createErrorResponse(
-      passwordValidation.error.issues[0]?.message || "Некорректный пароль",
-      400,
-    );
-  }
+  const bodyResult = await validateRequestBody(request, resetPasswordConfirmSchema);
+  if ("error" in bodyResult) return bodyResult.error;
+  const { token, password } = bodyResult.data;
 
   const success = await resetPassword(token, password);
 

@@ -12,7 +12,7 @@ import {
 } from "@/shared/components/ui";
 import { Package } from "lucide-react";
 import { DTO } from "@/shared/services";
-import { formatMoney } from "@/shared/lib";
+import { formatMoney } from "@/shared/lib/formatters";
 import { PLACEHOLDER_PRODUCT_IMAGE } from "@/shared/lib/constants/images";
 
 type OrderItemsCardProps = {
@@ -87,7 +87,8 @@ export function OrderItemsCard({ order }: OrderItemsCardProps) {
                       )}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      Количество: <span className="font-medium">{item.qty}</span> × <span className="font-medium">{formatMoney(item.price)}</span>
+                      Количество: <span className="font-medium">{item.qty}</span> ×{" "}
+                      <span className="font-medium">{formatMoney(item.price)}</span>
                     </div>
                   </div>
 
@@ -117,7 +118,10 @@ export function OrderItemsCard({ order }: OrderItemsCardProps) {
                 <span className="flex items-center gap-2 text-muted-foreground">
                   <span>Скидка по промокоду:</span>
                   {promoCode && (
-                    <Badge variant="outline" className="text-[10px] px-2 py-0.5 border-rose-300 text-rose-700 bg-rose-50">
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] px-2 py-0.5 border-rose-300 text-rose-700 bg-rose-50"
+                    >
                       {promoCode}
                     </Badge>
                   )}

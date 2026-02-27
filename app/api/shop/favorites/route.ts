@@ -1,7 +1,10 @@
 import { CACHE_CONTROL_FAVORITES } from "@/shared/constants";
+import { favoriteProductIdSchema } from "@/shared/lib/api/request-body-schemas";
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { createErrorResponse } from "@/shared/lib/api/error-response";
+import { validateRequestBody } from "@/shared/lib/api/validate-request-body";
 import { withMetricsAuto } from "@/shared/lib/api/metrics-middleware";
+import { getSessionUserOrError } from "@/shared/lib/auth/middleware";
 import { applyRateLimit } from "@/shared/lib/api/rate-limit-middleware";
 import { DTO } from "@/shared/services";
 import { addFavorite, loadUserFavoritesList } from "@/shared/services/server";
@@ -21,20 +24,21 @@ export const GET = withMetricsAuto(
         const rateLimitResponse = await applyRateLimit(req, "cart");
         if (rateLimitResponse) return rateLimitResponse;
 
-        const { getSessionUserFromRequest } = await import("@/shared/lib/auth/session");
-        const user = await getSessionUserFromRequest(req);
-        if (!user) return createErrorResponse("Требуется авторизация", 401);
-
-        const items = await loadUserFavoritesList(user.id);
-        return NextResponse.json<DTO.FavoritesResponseDto>({ items }, {
-          status: 200,
-          headers: { "Cache-Control": CACHE_CONTROL_FAVORITES },
-        });
+        const session = await getSessionUserOrError(req);
+        if ("error" in session) return session.error;
+        const items = await loadUserFavoritesList(session.user.id);
+        return NextResponse.json<DTO.FavoritesResponseDto>(
+          { items },
+          {
+            status: 200,
+            headers: { "Cache-Control": CACHE_CONTROL_FAVORITES },
+          }
+        );
       },
       request,
-      "GET /api/shop/favorites",
+      "GET /api/shop/favorites"
     );
-  },
+  }
 );
 
 /**
@@ -49,29 +53,23 @@ export const POST = withMetricsAuto(
         const rateLimitResponse = await applyRateLimit(req, "cart");
         if (rateLimitResponse) return rateLimitResponse;
 
-        const { getSessionUserFromRequest } = await import("@/shared/lib/auth/session");
-        const user = await getSessionUserFromRequest(req);
-        if (!user) return createErrorResponse("Требуется авторизация", 401);
+        const session = await getSessionUserOrError(req);
+        if ("error" in session) return session.error;
 
-        let body: { productId: number };
-        try {
-          body = (await req.json()) as { productId: number };
-        } catch {
-          return createErrorResponse("Invalid JSON body", 400);
-        }
+        const bodyResult = await validateRequestBody(req, favoriteProductIdSchema);
+        if ("error" in bodyResult) return bodyResult.error;
+        const { productId } = bodyResult.data;
 
-        const productId = Number(body.productId);
-        if (!Number.isInteger(productId) || productId <= 0) {
-          return createErrorResponse("Invalid productId", 400);
-        }
+        const result = await addFavorite(session.user.id, productId);
+        if (result == null) return createErrorResponse("Товар не найден", 404);
 
-        const result = await addFavorite(user.id, productId);
-        if (result == null) return createErrorResponse("Product not found", 404);
-
-        return NextResponse.json<DTO.FavoritesResponseDto>({ items: result.items }, { status: 200 });
+        return NextResponse.json<DTO.FavoritesResponseDto>(
+          { items: result.items },
+          { status: 200 }
+        );
       },
       request,
-      "POST /api/shop/favorites",
+      "POST /api/shop/favorites"
     );
-  },
+  }
 );

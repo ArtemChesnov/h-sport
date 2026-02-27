@@ -3,6 +3,8 @@
  * Бесплатная альтернатива Sentry для мониторинга ошибок
  */
 
+import { env } from "@/shared/lib/config/env";
+
 // fs и path импортируются динамически только на сервере
 let fs: typeof import("fs") | null = null;
 let path: typeof import("path") | null = null;
@@ -16,9 +18,7 @@ function initModules(): boolean {
 
   try {
     // Используем динамический require чтобы webpack не пытался разрешить модули на клиенте
-    const requireFn = typeof __webpack_require__ === "function"
-      ? __non_webpack_require__
-      : require;
+    const requireFn = typeof __webpack_require__ === "function" ? __non_webpack_require__ : require;
     fs = requireFn("fs");
     path = requireFn("path");
     return true;
@@ -167,10 +167,7 @@ function updateStats(entry: AlertEntry): void {
     existing.count++;
     existing.lastSeen = now;
     if (entry.endpoint) {
-      existing.endpoints.set(
-        entry.endpoint,
-        (existing.endpoints.get(entry.endpoint) || 0) + 1
-      );
+      existing.endpoints.set(entry.endpoint, (existing.endpoints.get(entry.endpoint) || 0) + 1);
     }
   } else {
     const endpoints = new Map<string, number>();
@@ -228,7 +225,7 @@ export function alert5xx(params: {
   updateStats(entry);
 
   // Отправляем уведомления (webhook/email) для всех 5xx ошибок в production
-  if (process.env.NODE_ENV === "production") {
+  if (env.NODE_ENV === "production") {
     sendAlertNotification(entry).catch(() => {
       // Игнорируем ошибки отправки
     });
@@ -262,7 +259,7 @@ export function alertCritical(params: {
   updateStats(entry);
 
   // Отправляем уведомление в production
-  if (process.env.NODE_ENV === "production") {
+  if (env.NODE_ENV === "production") {
     sendAlertNotification(entry).catch(() => {
       // Игнорируем ошибки отправки
     });
@@ -274,7 +271,7 @@ export function alertCritical(params: {
  * Не более 1 письма на endpoint каждые 15 минут
  */
 async function sendEmailAlert(entry: AlertEntry): Promise<void> {
-  const alertEmail = process.env.ALERT_EMAIL;
+  const alertEmail = env.ALERT_EMAIL;
 
   if (!alertEmail) {
     return; // Email для алертов не настроен
@@ -317,18 +314,26 @@ async function sendEmailAlert(entry: AlertEntry): Promise<void> {
             <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9; font-weight: bold;">Time:</td>
             <td style="padding: 8px; border: 1px solid #ddd;">${entry.timestamp}</td>
           </tr>
-          ${entry.ip ? `
+          ${
+            entry.ip
+              ? `
           <tr>
             <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9; font-weight: bold;">IP:</td>
             <td style="padding: 8px; border: 1px solid #ddd;">${entry.ip}</td>
           </tr>
-          ` : ""}
-          ${entry.userId ? `
+          `
+              : ""
+          }
+          ${
+            entry.userId
+              ? `
           <tr>
             <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9; font-weight: bold;">User ID:</td>
             <td style="padding: 8px; border: 1px solid #ddd;">${entry.userId}</td>
           </tr>
-          ` : ""}
+          `
+              : ""
+          }
         </table>
         <h3 style="color: #dc2626; margin-top: 20px;">Message:</h3>
         <div style="padding: 12px; background-color: #f5f5f5; border-left: 4px solid #dc2626; margin: 10px 0;">
@@ -342,9 +347,13 @@ async function sendEmailAlert(entry: AlertEntry): Promise<void> {
         <div style="padding: 12px; background-color: #f5f5f5; border-left: 4px solid #dc2626; margin: 10px 0;">
           <p><strong>Name:</strong> ${entry.error.name}</p>
           <p><strong>Message:</strong> ${entry.error.message}</p>
-          ${entry.error.stack ? `
+          ${
+            entry.error.stack
+              ? `
           <pre style="background-color: #1f1f1f; color: #f0f0f0; padding: 12px; overflow-x: auto; border-radius: 4px; font-size: 12px; white-space: pre-wrap; word-wrap: break-word;">${entry.error.stack}</pre>
-          ` : ""}
+          `
+              : ""
+          }
         </div>
       `;
     }
@@ -378,7 +387,7 @@ async function sendEmailAlert(entry: AlertEntry): Promise<void> {
  */
 async function sendAlertNotification(entry: AlertEntry): Promise<void> {
   // Отправляем webhook (если настроен)
-  const webhookUrl = process.env.ALERT_WEBHOOK_URL;
+  const webhookUrl = env.ALERT_WEBHOOK_URL;
   if (webhookUrl) {
     try {
       const payload = {

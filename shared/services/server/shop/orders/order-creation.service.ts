@@ -1,8 +1,11 @@
 import { prisma } from "@/prisma/prisma-client";
 import { DEFAULT_DELIVERY_FEE, FREE_DELIVERY_THRESHOLD_KOPECKS } from "@/shared/constants";
-import { createErrorResponse, createValidationErrorResponse } from "@/shared/lib/api/error-response";
+import {
+  createErrorResponse,
+  createValidationErrorResponse,
+} from "@/shared/lib/api/error-response";
 import { calculatePromoDiscount } from "@/shared/lib/promo";
-import { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 import { hasEmailUsedPromo } from "@/shared/services/server/shop/promo/promo.service";
 import { DeliveryMethod } from "@prisma/client";
 
@@ -61,7 +64,7 @@ export interface OrderCreationFullResult extends OrderCreationResult {
  * Возвращает данные заказа + emailData (без дополнительного запроса к БД).
  */
 export async function createOrderFromCart(
-  params: OrderCreationParams,
+  params: OrderCreationParams
 ): Promise<OrderCreationFullResult> {
   const { userId, phone, fullName, cartToken, delivery, idempotencyKey } = params;
   const email = params.email.trim().toLowerCase();
@@ -109,7 +112,7 @@ export async function createOrderFromCart(
             message: `Товар "${item.productItem.product.name}" (${item.productItem.color}, ${item.productItem.size}) недоступен для заказа`,
           },
         ],
-        400,
+        400
       );
     }
   }
@@ -147,7 +150,7 @@ export async function createOrderFromCart(
               "Промокод на первый заказ уже был использован для этого email. Снимите промокод в корзине или оформите заказ без скидки.",
           },
         ],
-        400,
+        400
       );
     }
   }
@@ -155,29 +158,26 @@ export async function createOrderFromCart(
   const orderSum = subtotal - discount;
   const isPickup = delivery.method === "PICKUP_SHOWROOM";
   const isCdek = delivery.method === "CDEK_PVZ" || delivery.method === "CDEK_COURIER";
-  const isRussianPost =
-    delivery.method === "POCHTA_PVZ" || delivery.method === "POCHTA_COURIER";
+  const isRussianPost = delivery.method === "POCHTA_PVZ" || delivery.method === "POCHTA_COURIER";
 
   let deliveryFee = 0;
   if (cart.items.length > 0 && !isPickup && orderSum < FREE_DELIVERY_THRESHOLD_KOPECKS) {
     if (isCdek && delivery.city) {
-      const { calculateCDEKTariff } = await import(
-        "@/modules/shipping/lib/pickupPoints/providers/cdek"
-      );
+      const { calculateCDEKTariff } =
+        await import("@/modules/shipping/lib/pickupPoints/providers/cdek");
       const mode = delivery.method === "CDEK_PVZ" ? "pvz" : "courier";
       const tariff = await calculateCDEKTariff(delivery.city, mode as "pvz" | "courier");
       deliveryFee = tariff?.deliverySum ?? DEFAULT_DELIVERY_FEE;
     } else if (isRussianPost && delivery.city) {
-      const { calculateRussianPostTariff } = await import(
-        "@/modules/shipping/lib/pickupPoints/providers/russianpost"
-      );
+      const { calculateRussianPostTariff } =
+        await import("@/modules/shipping/lib/pickupPoints/providers/russianpost");
       const mode = delivery.method === "POCHTA_PVZ" ? "pvz" : "courier";
       const valuationRub = Math.max(1, Math.round(orderSum / 100));
       const tariff = await calculateRussianPostTariff(
         delivery.city,
         mode as "pvz" | "courier",
         1000,
-        valuationRub,
+        valuationRub
       );
       deliveryFee = tariff?.deliverySum ?? DEFAULT_DELIVERY_FEE;
     } else {
@@ -237,9 +237,7 @@ export async function createOrderFromCart(
               price: cartItem.price,
               total: cartItem.qty * cartItem.price,
               productImageUrl:
-                cartItem.productItem.imageUrls[0] ??
-                cartItem.productItem.product.images[0] ??
-                null,
+                cartItem.productItem.imageUrls[0] ?? cartItem.productItem.product.images[0] ?? null,
             })),
           },
         },
@@ -268,7 +266,7 @@ export async function createOrderFromCart(
       });
 
       return created;
-    }),
+    })
   );
 
   const emailData: OrderEmailData = {

@@ -5,8 +5,8 @@
 
 import { createPasswordResetToken } from "@/modules/auth/lib/db";
 import { validateRequestSize, withErrorHandling } from "@/shared/lib/api/error-handler";
-import { createErrorResponse } from "@/shared/lib/api/error-response";
-import { isValidEmail } from "@/shared/lib/validation";
+import { validateRequestBody } from "@/shared/lib/api/validate-request-body";
+import { resetPasswordRequestSchema } from "@/shared/lib/validation/zod-schemas";
 import { applyRateLimit } from "@/shared/lib/api/rate-limit-middleware";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -17,23 +17,14 @@ async function handler(request: NextRequest) {
   const sizeCheck = validateRequestSize(request, 10 * 1024);
   if (!sizeCheck.valid) return sizeCheck.response;
 
-  const body = await request.json();
-  const { email } = body;
+  const bodyResult = await validateRequestBody(request, resetPasswordRequestSchema);
+  if ("error" in bodyResult) return bodyResult.error;
 
-  if (!email) {
-    return createErrorResponse("Email обязателен", 400);
-  }
-
-  if (!isValidEmail(email)) {
-    return createErrorResponse("Некорректный email", 400);
-  }
-
-  await createPasswordResetToken(email);
+  await createPasswordResetToken(bodyResult.data.email);
 
   return NextResponse.json({
     success: true,
-    message:
-      "Если пользователь с таким email существует, на него отправлено письмо с инструкциями",
+    message: "Если пользователь с таким email существует, на него отправлено письмо с инструкциями",
   });
 }
 

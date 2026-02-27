@@ -7,6 +7,7 @@
  */
 
 import { CACHE_CLEANUP_INTERVAL_MS } from "@/shared/constants";
+import { env } from "@/shared/lib/config/env";
 
 interface CacheEntry<T> {
   value: T;
@@ -22,9 +23,8 @@ const globalForCache = globalThis as typeof globalThis & {
 };
 
 // Глобальный cache store (защищён от HMR)
-const cache: Map<string, CacheEntry<unknown>> =
-  globalForCache.__cacheStore ||
-  (globalForCache.__cacheStore = new Map());
+const cache: Map<string, CacheEntry<unknown>> = globalForCache.__cacheStore ||
+(globalForCache.__cacheStore = new Map());
 
 const MAX_CACHE_SIZE = 10000; // Максимальное количество записей
 const CLEANUP_INTERVAL_MS = CACHE_CLEANUP_INTERVAL_MS;
@@ -61,10 +61,16 @@ function cleanup() {
       const entryB = cache.get(b.key) as CacheEntry<unknown>;
 
       // Сначала удаляем записи с малым количеством обращений
-      if (entryA.accessCount < ACCESS_COUNT_THRESHOLD && entryB.accessCount >= ACCESS_COUNT_THRESHOLD) {
+      if (
+        entryA.accessCount < ACCESS_COUNT_THRESHOLD &&
+        entryB.accessCount >= ACCESS_COUNT_THRESHOLD
+      ) {
         return -1;
       }
-      if (entryA.accessCount >= ACCESS_COUNT_THRESHOLD && entryB.accessCount < ACCESS_COUNT_THRESHOLD) {
+      if (
+        entryA.accessCount >= ACCESS_COUNT_THRESHOLD &&
+        entryB.accessCount < ACCESS_COUNT_THRESHOLD
+      ) {
         return 1;
       }
 
@@ -99,7 +105,7 @@ export function get<T>(key: string): T | null {
   const entry = cache.get(key) as CacheEntry<T> | undefined;
   if (!entry) {
     // При наличии REDIS_URL и на сервере: асинхронно проверяем Redis (не блокируя)
-    if (typeof window === "undefined" && process.env.REDIS_URL) {
+    if (typeof window === "undefined" && env.REDIS_URL) {
       // Не блокируем, просто запускаем в фоне
       getFromRedis(key).catch(() => {
         // Игнорируем ошибки фонового чтения
@@ -128,7 +134,7 @@ export function get<T>(key: string): T | null {
  */
 export async function getAsync<T>(key: string): Promise<T | null> {
   // Redis доступен только на сервере
-  if (typeof window === "undefined" && process.env.REDIS_URL) {
+  if (typeof window === "undefined" && env.REDIS_URL) {
     try {
       const redisValue = await getFromRedis<T>(key);
       if (redisValue !== null) {
@@ -205,7 +211,7 @@ export function set<T>(key: string, value: T, ttlMs: number): void {
   });
 
   // При наличии REDIS_URL и на сервере: также пишем в Redis (не блокируя)
-  if (typeof window === "undefined" && process.env.REDIS_URL) {
+  if (typeof window === "undefined" && env.REDIS_URL) {
     setToRedis(key, value, Math.ceil(ttlMs / 1000)).catch(() => {
       // Игнорируем ошибки фоновой записи
     });
@@ -258,7 +264,7 @@ export async function delAsync(key: string): Promise<void> {
   cache.delete(key);
 
   // Удаляем из Redis (если доступен)
-  if (typeof window === "undefined" && process.env.REDIS_URL) {
+  if (typeof window === "undefined" && env.REDIS_URL) {
     try {
       const { redisDel } = await import("./redis");
       await redisDel(REDIS_KEY_PREFIX + key);

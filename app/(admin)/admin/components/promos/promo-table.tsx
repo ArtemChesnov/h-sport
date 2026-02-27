@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -12,12 +11,8 @@ import {
   TableRow,
 } from "@/shared/components/ui";
 import { DTO } from "@/shared/services";
-import { formatMoney } from "@/shared/lib";
-import {
-  formatPromoType,
-  formatPromoValue,
-  formatPromoPeriod,
-} from "../../lib/promos";
+import { formatMoney } from "@/shared/lib/formatters";
+import { formatPromoType, formatPromoValue, formatPromoPeriod } from "../../lib/promos";
 import { Loader2 } from "lucide-react";
 
 type PromoTableProps = {
@@ -39,19 +34,32 @@ export function PromoTable(props: PromoTableProps) {
     <div className="overflow-x-auto rounded-lg border border-border/50 bg-background">
       <Table>
         <TableHeader>
-            <TableRow className="bg-muted/30 hover:bg-muted/40 border-b border-border/50">
-              <TableHead className="font-semibold text-xs h-12 align-middle pl-4 pr-4">Код</TableHead>
-              <TableHead className="font-semibold text-xs h-12 align-middle pl-4 pr-4">Тип</TableHead>
-              <TableHead className="font-semibold text-xs h-12 align-middle pl-4 pr-4">Значение</TableHead>
-              <TableHead className="font-semibold text-xs h-12 align-middle pl-4 pr-4">Ограничения</TableHead>
-              <TableHead className="font-semibold text-xs h-12 align-middle pl-4 pr-4">Период</TableHead>
-              <TableHead className="text-right font-semibold text-xs h-12 align-middle pl-4 pr-4">Активен</TableHead>
-              <TableHead className="text-right font-semibold text-xs h-12 align-middle pl-4 pr-4">Действия</TableHead>
-            </TableRow>
+          <TableRow className="bg-muted/30 hover:bg-muted/40 border-b border-border/50">
+            <TableHead className="font-semibold text-xs h-12 align-middle pl-4 pr-4">Код</TableHead>
+            <TableHead className="font-semibold text-xs h-12 align-middle pl-4 pr-4">Тип</TableHead>
+            <TableHead className="font-semibold text-xs h-12 align-middle pl-4 pr-4">
+              Значение
+            </TableHead>
+            <TableHead className="font-semibold text-xs h-12 align-middle pl-4 pr-4">
+              Ограничения
+            </TableHead>
+            <TableHead className="font-semibold text-xs h-12 align-middle pl-4 pr-4">
+              Период
+            </TableHead>
+            <TableHead className="text-right font-semibold text-xs h-12 align-middle pl-4 pr-4">
+              Активен
+            </TableHead>
+            <TableHead className="text-right font-semibold text-xs h-12 align-middle pl-4 pr-4">
+              Действия
+            </TableHead>
+          </TableRow>
         </TableHeader>
         <TableBody>
           {items.map((promo) => (
-            <TableRow key={promo.id} className="group border-b border-border/30 transition-all hover:bg-gradient-to-r hover:from-amber-50/50 hover:to-orange-50/50 hover:shadow-sm">
+            <TableRow
+              key={promo.id}
+              className="group border-b border-border/30 transition-all hover:bg-gradient-to-r hover:from-amber-50/50 hover:to-orange-50/50 hover:shadow-sm"
+            >
               <TableCell className="font-semibold text-sm h-14 align-middle pl-4 pr-4">
                 <span className="inline-flex items-center rounded-md bg-gradient-to-r from-amber-100 to-orange-100 px-2.5 py-1 text-xs font-bold text-amber-900 border border-amber-200/50 shadow-sm">
                   {promo.code}
@@ -106,9 +114,7 @@ export function PromoTable(props: PromoTableProps) {
                   )}
                   <Switch
                     checked={promo.isActive}
-                    onCheckedChange={(next) =>
-                      onToggleActive(promo, next)
-                    }
+                    onCheckedChange={(next) => onToggleActive(promo, next)}
                     disabled={isDeleting || (isToggling && togglingPromoId === promo.id)}
                     className={isToggling && togglingPromoId === promo.id ? "opacity-60" : ""}
                   />
@@ -134,4 +140,3 @@ export function PromoTable(props: PromoTableProps) {
     </div>
   );
 }
-

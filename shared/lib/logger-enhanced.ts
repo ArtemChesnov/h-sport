@@ -5,6 +5,8 @@
  * ВАЖНО: Этот модуль работает только на сервере. fs/path импортируются лениво.
  */
 
+import { env } from "@/shared/lib/config/env";
+
 // fs и path импортируются динамически только на сервере
 let fs: typeof import("fs") | null = null;
 let path: typeof import("path") | null = null;
@@ -17,9 +19,7 @@ function initModules(): boolean {
 
   try {
     // Используем динамический require чтобы webpack не пытался разрешить модули на клиенте
-    const requireFn = typeof __webpack_require__ === "function"
-      ? __non_webpack_require__
-      : require;
+    const requireFn = typeof __webpack_require__ === "function" ? __non_webpack_require__ : require;
     fs = requireFn("fs");
     path = requireFn("path");
 
@@ -32,7 +32,10 @@ function initModules(): boolean {
       } catch (mkdirError) {
         // Если не удалось создать директорию (нет прав, диск полон и т.п.),
         // логируем в консоль, но не падаем - логгер продолжит работать только в консоль
-        console.warn("[Logger] Failed to create logs directory, file logging disabled:", mkdirError);
+        console.warn(
+          "[Logger] Failed to create logs directory, file logging disabled:",
+          mkdirError
+        );
         // Возвращаем false, чтобы файловое логирование не использовалось
         return false;
       }
@@ -41,7 +44,10 @@ function initModules(): boolean {
   } catch (error) {
     // При любой другой ошибке инициализации (например, не удалось загрузить fs/path)
     // логируем в консоль и продолжаем работу без файлового логирования
-    console.warn("[Logger] Failed to initialize file logging modules, file logging disabled:", error);
+    console.warn(
+      "[Logger] Failed to initialize file logging modules, file logging disabled:",
+      error
+    );
     return false;
   }
 }
@@ -158,7 +164,7 @@ function createLogEntry(
   level: LogLevel,
   message: string,
   error?: unknown,
-  meta?: Record<string, unknown>,
+  meta?: Record<string, unknown>
 ): LogEntry {
   return {
     level,
@@ -184,7 +190,7 @@ function outputLog(entry: LogEntry): void {
     }
   } else if (entry.level === "warn") {
     console.warn(prefix, message, entry.meta || "");
-  } else if (entry.level === "debug" && process.env.NODE_ENV === "development") {
+  } else if (entry.level === "debug" && env.NODE_ENV === "development") {
     console.debug(prefix, message, entry.meta || "");
   } else {
     console.log(prefix, message, entry.meta || "");
@@ -199,7 +205,7 @@ function outputLog(entry: LogEntry): void {
       writeToFile(entry, errorLogFile);
     }
     // В production записываем только важные логи
-    if (process.env.NODE_ENV === "production") {
+    if (env.NODE_ENV === "production") {
       if ((entry.level === "error" || entry.level === "warn") && infoLogFile) {
         writeToFile(entry, infoLogFile);
       }
@@ -244,7 +250,7 @@ export const loggerEnhanced = {
    * Отладочное сообщение (только в development)
    */
   debug: (message: string, meta?: Record<string, unknown>): void => {
-    if (process.env.NODE_ENV === "development") {
+    if (env.NODE_ENV === "development") {
       const entry = createLogEntry("debug", message, undefined, meta);
       outputLog(entry);
     }

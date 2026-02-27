@@ -7,7 +7,10 @@ import { toast } from "sonner";
 
 import { formToProductCreateDto } from "@/app/(admin)/admin/lib/products";
 import { useCategoriesQuery, useCreateProductMutation } from "@/shared/hooks";
-import { extractBackendErrorPayload, useServerNestedFormErrors } from "@/shared/lib";
+import {
+  extractBackendErrorPayload,
+  useServerNestedFormErrors,
+} from "@/shared/lib/validation/use-server-form-errors";
 import type { AdminProductFormValues } from "@/shared/services/dto";
 import dynamic from "next/dynamic";
 

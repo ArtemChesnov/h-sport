@@ -10,7 +10,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui/popover";
 import { INPUT_FIELD_CLASS } from "@/shared/constants";
 import { usePickupPointsQuery } from "@/shared/hooks/shipping/usePickupPoints";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { ChevronsUpDown } from "lucide-react";
 import React from "react";
 

@@ -4,6 +4,7 @@
  */
 
 import { POPULARITY_CACHE_TTL_MS } from "@/shared/constants";
+import { env } from "@/shared/lib/config/env";
 import type { PrismaClient } from "@prisma/client";
 import { Prisma, Size } from "@prisma/client";
 
@@ -30,14 +31,14 @@ const REDIS_KEY_PREFIX = "popularity:";
  * ```
  */
 export async function getProductsPopularityMap(
-  prismaOrTx: PrismaClient | Prisma.TransactionClient,
+  prismaOrTx: PrismaClient | Prisma.TransactionClient
 ): Promise<Record<number, number>> {
   const cacheKey = "popularity_map";
   const redisKey = REDIS_KEY_PREFIX + cacheKey;
   const now = Date.now();
 
   // Гибридная логика: сначала проверяем Redis (если доступен), затем in-memory
-  if (process.env.REDIS_URL) {
+  if (env.REDIS_URL) {
     try {
       const { redisGet } = await import("@/shared/lib/redis");
       const redisCached = await redisGet<Record<number, number>>(redisKey);
@@ -82,7 +83,7 @@ export async function getProductsPopularityMap(
   popularityCache.set(cacheKey, { data: popularity, timestamp: now });
 
   // При наличии Redis также сохраняем в Redis
-  if (process.env.REDIS_URL) {
+  if (env.REDIS_URL) {
     try {
       const { redisSet } = await import("@/shared/lib/redis");
       await redisSet(redisKey, popularity, CACHE_TTL_SECONDS);
@@ -114,7 +115,7 @@ export async function getProductsSortedByPopularity(
   prismaOrTx: PrismaClient | Prisma.TransactionClient,
   where: Prisma.ProductWhereInput,
   skip: number,
-  take: number,
+  take: number
 ): Promise<
   Array<{
     id: number;
@@ -259,7 +260,7 @@ export async function getProductIdsSortedByPopularity(
   prismaOrTx: PrismaClient | Prisma.TransactionClient,
   where: Prisma.ProductWhereInput,
   skip: number,
-  take: number,
+  take: number
 ): Promise<number[]> {
   // Сначала получаем ID товаров, соответствующих фильтрам
   const filteredProducts = await prismaOrTx.product.findMany({
@@ -294,7 +295,7 @@ export async function getProductIdsSortedByPopularity(
       GROUP BY p.id, p."createdAt"
       ORDER BY COALESCE(SUM(oi.qty), 0) DESC, p."createdAt" DESC
       LIMIT ${take} OFFSET ${skip}
-    `,
+    `
   );
 
   return productsWithPopularity.map((p) => p.id);

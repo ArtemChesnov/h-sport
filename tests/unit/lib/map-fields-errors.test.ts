@@ -7,8 +7,7 @@ import {
   FieldError,
   mapFieldErrorsToForm,
   mapFieldErrorsToNestedFormErrors,
-} from "../../../shared/lib";
-
+} from "../../../shared/lib/validation";
 
 describe("mapFieldErrorsToForm", () => {
   it("should return empty object for empty array", () => {
@@ -31,9 +30,7 @@ describe("mapFieldErrorsToForm", () => {
   });
 
   it("should handle _global errors", () => {
-    const errors: FieldError[] = [
-      { field: "_global", message: "Что-то пошло не так" },
-    ];
+    const errors: FieldError[] = [{ field: "_global", message: "Что-то пошло не так" }];
 
     const result = mapFieldErrorsToForm(errors);
     expect(result).toEqual({
@@ -62,9 +59,7 @@ describe("mapFieldErrorsToNestedFormErrors", () => {
   });
 
   it("should map simple field errors", () => {
-    const errors: FieldError[] = [
-      { field: "name", message: "Название обязательно" },
-    ];
+    const errors: FieldError[] = [{ field: "name", message: "Название обязательно" }];
 
     const result = mapFieldErrorsToNestedFormErrors(errors);
     expect(result).toEqual({
@@ -94,9 +89,7 @@ describe("mapFieldErrorsToNestedFormErrors", () => {
   });
 
   it("should handle _global errors", () => {
-    const errors: FieldError[] = [
-      { field: "_global", message: "Общая ошибка" },
-    ];
+    const errors: FieldError[] = [{ field: "_global", message: "Общая ошибка" }];
 
     const result = mapFieldErrorsToNestedFormErrors(errors);
     expect(result).toEqual({

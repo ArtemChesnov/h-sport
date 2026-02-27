@@ -6,7 +6,7 @@ import { DEFAULT_DELIVERY_FEE, FREE_DELIVERY_THRESHOLD_KOPECKS } from "@/shared/
 import { useCartQuery } from "@/shared/hooks";
 import { useCheckoutAddress } from "@/shared/hooks/checkout/checkout.hooks";
 import { useDeliveryCost } from "@/shared/hooks/shipping/useDeliveryCost";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { getDeliveryMethodFlags } from "@/shared/lib/checkout";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -80,9 +80,7 @@ export const CheckoutSummaryCard: React.FC = () => {
           {items.map((item, index) => (
             <div key={item.id}>
               <CheckoutSummaryItem item={item} disabled={isSuccessStep} />
-              {index < items.length - 1 && (
-                <div className="w-full h-0.75 bg-primary my-4" />
-              )}
+              {index < items.length - 1 && <div className="w-full h-0.75 bg-primary my-4" />}
             </div>
           ))}
         </>

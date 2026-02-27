@@ -2,7 +2,7 @@
  * Утилиты для конвертации периодов времени
  */
 
-import { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 
 /**
  * Конвертирует период в дни

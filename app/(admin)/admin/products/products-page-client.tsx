@@ -5,26 +5,26 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import {
-    useAdminProductsQuery,
-    useCategoriesQuery,
-    useDeleteProductMutation,
+  useAdminProductsQuery,
+  useCategoriesQuery,
+  useDeleteProductMutation,
 } from "@/shared/hooks";
 import { DTO } from "@/shared/services";
 
 import {
-    Button,
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-    Separator,
-    Skeleton,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Separator,
+  Skeleton,
 } from "@/shared/components/ui";
 
 import { TOAST } from "@/shared/constants";
-import { buildSearchString, ProductsSearchParams } from "@/shared/lib";
+import { buildSearchString, type ProductsSearchParams } from "@/shared/lib/search";
 import { Package } from "lucide-react";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";

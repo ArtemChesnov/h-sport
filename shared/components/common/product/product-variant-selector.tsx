@@ -1,7 +1,6 @@
 "use client";
 
-import { cn } from "@/shared/lib";
-
+import { cn } from "@/shared/lib/utils";
 interface ProductVariantSelectorProps {
   title: string;
   options: string[];
@@ -22,9 +21,7 @@ export function ProductVariantSelector({
 
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-        {title}
-      </h3>
+      <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{title}</h3>
       <div className="flex flex-wrap gap-2">
         {options.map((option) => (
           <button

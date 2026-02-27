@@ -1,19 +1,16 @@
 /**
  * Админка: список пользователей, деталка, обновление роли.
+ * Привилегированный пользователь (jaksan37@gmail.com) не показывается в списке и с него нельзя снять админку.
  */
 
 import { prisma } from "@/prisma/prisma-client";
 import { OrderStatus } from "@prisma/client";
-import { getExcludePrivilegedUserWhere } from "@/shared/lib/auth/privileged";
-import { buildPaginatedResponse, calculateSkip } from "@/shared/lib";
-import type { DTO } from "@/shared/services";
+import { AppError } from "@/shared/lib/errors/custom-errors";
+import { getExcludePrivilegedUserWhere, isPrivilegedEmail } from "@/shared/lib/auth/privileged";
+import { buildPaginatedResponse, calculateSkip } from "@/shared/lib/pagination";
+import type * as DTO from "@/shared/services/dto";
 
-const PURCHASE_STATUSES: OrderStatus[] = [
-  "PAID",
-  "PROCESSING",
-  "SHIPPED",
-  "DELIVERED",
-];
+const PURCHASE_STATUSES: OrderStatus[] = ["PAID", "PROCESSING", "SHIPPED", "DELIVERED"];
 
 export type AdminUsersListParams = {
   search: string;
@@ -25,7 +22,7 @@ export type AdminUsersListParams = {
  * Список пользователей с пагинацией и агрегатами заказов.
  */
 export async function getAdminUsersList(
-  params: AdminUsersListParams,
+  params: AdminUsersListParams
 ): Promise<DTO.AdminUsersListResponseDto> {
   const searchWhere =
     params.search.length > 0
@@ -102,9 +99,7 @@ export async function getAdminUsersList(
 /**
  * Деталка пользователя по id с заказами и метриками.
  */
-export async function getAdminUserById(
-  id: string,
-): Promise<DTO.AdminUserDetailDto | null> {
+export async function getAdminUserById(id: string): Promise<DTO.AdminUserDetailDto | null> {
   const user = await prisma.user.findUnique({
     where: { id },
     select: {
@@ -176,11 +171,26 @@ export async function getAdminUserById(
 
 /**
  * Обновление роли пользователя.
+ * Запрещено снимать админку с привилегированного пользователя.
  */
 export async function updateAdminUserRole(
   id: string,
-  role: DTO.UserRoleDto,
+  role: DTO.UserRoleDto
 ): Promise<DTO.AdminUserUpdateResponseDto> {
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: { email: true },
+  });
+  if (!user) {
+    throw new AppError("Пользователь не найден", 404, "NOT_FOUND");
+  }
+  if (isPrivilegedEmail(user.email) && role !== "ADMIN") {
+    throw new AppError(
+      "Снятие роли администратора с этого пользователя запрещено",
+      403,
+      "FORBIDDEN"
+    );
+  }
   const updated = await prisma.user.update({
     where: { id },
     data: { role },

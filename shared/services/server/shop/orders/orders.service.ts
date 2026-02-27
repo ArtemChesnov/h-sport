@@ -1,11 +1,11 @@
 /** Заказы: список пользователя, деталка, отмена, оплата; репозиторий + маппинг в DTO. */
 
 import {
-    OrdersRepository,
-    type OrderDetailSelectResult,
-    type OrderShortSelectResult,
+  OrdersRepository,
+  type OrderDetailSelectResult,
+  type OrderShortSelectResult,
 } from "@/shared/repositories/orders.repository";
-import { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 
 const CANCELABLE_STATUSES: readonly string[] = ["NEW", "PENDING_PAYMENT"];
 const PAYABLE_STATUSES: readonly string[] = ["NEW", "PENDING_PAYMENT"];
@@ -15,21 +15,14 @@ export class OrdersService {
   static async getUserOrders(
     userId: string,
     page: number = 1,
-    perPage: number = 10,
+    perPage: number = 10
   ): Promise<DTO.OrdersListResponseDto> {
-    const { orders, total } = await OrdersRepository.findByUserId(
-      userId,
-      page,
-      perPage,
-    );
+    const { orders, total } = await OrdersRepository.findByUserId(userId, page, perPage);
     return this.mapToListResponse(orders, total, page, perPage);
   }
 
   /** Деталка заказа по uid (опционально с проверкой userId). */
-  static async getOrderDetail(
-    uid: string,
-    userId?: string,
-  ): Promise<DTO.OrderDetailDto | null> {
+  static async getOrderDetail(uid: string, userId?: string): Promise<DTO.OrderDetailDto | null> {
     const order = await OrdersRepository.findByUid(uid, userId);
     if (!order) return null;
     return this.mapToDetailDto(order);
@@ -37,7 +30,7 @@ export class OrdersService {
 
   /** Заказ по idempotency key или null. */
   static async findByIdempotencyKey(
-    idempotencyKey: string,
+    idempotencyKey: string
   ): Promise<DTO.OrderCreateResponseDto | null> {
     const order = await OrdersRepository.findByIdempotencyKey(idempotencyKey);
     if (!order) return null;
@@ -55,8 +48,10 @@ export class OrdersService {
   /** Отмена заказа пользователем. Возвращает DTO или объект с ошибкой. */
   static async cancelOrder(
     uid: string,
-    userId: string,
-  ): Promise<{ ok: true; data: DTO.OrderCancelResponseDto } | { ok: false; status: number; message: string }> {
+    userId: string
+  ): Promise<
+    { ok: true; data: DTO.OrderCancelResponseDto } | { ok: false; status: number; message: string }
+  > {
     const order = await OrdersRepository.findForCancel(uid, userId);
     if (!order) return { ok: false, status: 404, message: "Заказ не найден" };
 
@@ -78,7 +73,7 @@ export class OrdersService {
   /** Находит заказ для оплаты. Возвращает данные или объект с ошибкой. */
   static async getPayableOrder(
     uid: string,
-    userId: string,
+    userId: string
   ): Promise<
     | { ok: true; data: { id: number; total: number; email: string } }
     | { ok: false; status: number; message: string }
@@ -97,7 +92,7 @@ export class OrdersService {
     orders: OrderShortSelectResult[],
     total: number,
     page: number,
-    perPage: number,
+    perPage: number
   ): DTO.OrdersListResponseDto {
     const pages = Math.max(Math.ceil(total / perPage), 1);
     const safePage = Math.min(page, pages);
@@ -121,8 +116,7 @@ export class OrdersService {
         totalItems: order.totalItems,
         itemsCount: order.items.length,
         firstItemName: order.items[0]?.productName ?? "Заказ без товаров",
-        deliveryMethod:
-          (delivery?.method as DTO.DeliveryMethodDto) ?? null,
+        deliveryMethod: (delivery?.method as DTO.DeliveryMethodDto) ?? null,
         deliveryAddress,
         trackingCode: delivery?.trackingCode ?? null,
         itemImageUrls,

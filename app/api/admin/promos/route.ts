@@ -1,12 +1,13 @@
-import { buildPaginatedResponse, calculateSkip, normalizeAdminPaginationParams } from "@/shared/lib";
+import {
+  buildPaginatedResponse,
+  calculateSkip,
+  normalizeAdminPaginationParams,
+} from "@/shared/lib/pagination";
 import { validateRequestSize, withErrorHandling } from "@/shared/lib/api/error-handler";
+import { createValidationErrorResponse } from "@/shared/lib/api/error-response";
 import { createPromo, getPromosList, type CreatePromoInput } from "@/shared/services/server";
-import type { ErrorField, ErrorResponse } from "@/shared/dto";
+import type { ErrorResponse } from "@/shared/dto";
 import { NextRequest, NextResponse } from "next/server";
-
-function buildValidationError(errors: ErrorField[], message = "Ошибка валидации промокода", status = 400) {
-  return NextResponse.json<ErrorResponse>({ success: false, message, errors }, { status });
-}
 
 async function getHandler(request: NextRequest) {
   const { requireAdmin } = await import("@/shared/lib/auth/middleware");
@@ -45,7 +46,7 @@ async function postHandler(request: NextRequest) {
   const result = await createPromo(body);
 
   if (!result.ok) {
-    return buildValidationError(result.errors);
+    return createValidationErrorResponse("Ошибка валидации промокода", result.errors, 400);
   }
 
   return NextResponse.json(result.promo, { status: 201 });

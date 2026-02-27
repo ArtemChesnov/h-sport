@@ -2,13 +2,10 @@
  * Валидация и проверки для админских заказов
  */
 
-import type { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 import { PaymentStatus } from "@prisma/client";
 
-export function canChangeStatus(
-  current: DTO.OrderStatusDto,
-  next: DTO.OrderStatusDto,
-): boolean {
+export function canChangeStatus(current: DTO.OrderStatusDto, next: DTO.OrderStatusDto): boolean {
   if (current === next) return true;
   if (current === "DELIVERED" || current === "CANCELED") return false;
   if (next === "NEW") return false;
@@ -21,9 +18,7 @@ export function normalizeNullableString(value: unknown): string | null {
   return trimmed.length === 0 ? null : trimmed;
 }
 
-export function hasPaidPayment(
-  payments: Array<{ status: PaymentStatus }>,
-): boolean {
+export function hasPaidPayment(payments: Array<{ status: PaymentStatus }>): boolean {
   return payments.some((p) => p.status === PaymentStatus.PAID);
 }
 

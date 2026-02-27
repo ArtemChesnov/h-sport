@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import React, { useEffect, useRef } from "react";
 
 type ScrollFadeInProps = {
@@ -18,7 +18,11 @@ export function ScrollFadeIn({ children, className, start = "top 88%" }: ScrollF
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (
+      typeof window === "undefined" ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
     const el = ref.current;
     if (!el) return;
 

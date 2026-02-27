@@ -1,6 +1,8 @@
 import { sendNewsletterConfirmationEmailAsync } from "@/modules/auth/lib/email";
+import { newsletterSubscribeSchema } from "@/shared/lib/api/request-body-schemas";
 import { validateRequestSize, withErrorHandling } from "@/shared/lib/api/error-handler";
 import { createErrorResponse } from "@/shared/lib/api/error-response";
+import { validateRequestBody } from "@/shared/lib/api/validate-request-body";
 import { applyRateLimit } from "@/shared/lib/api/rate-limit-middleware";
 import { getSubscriptionToken, subscribe } from "@/shared/services/server";
 import type { ErrorResponse } from "@/shared/dto";
@@ -13,18 +15,11 @@ async function postHandler(request: NextRequest) {
   const sizeCheck = validateRequestSize(request, 10 * 1024);
   if (!sizeCheck.valid) return sizeCheck.response;
 
-  const body = (await request.json()) as { email?: string; consent?: boolean; source?: string };
-  const email = typeof body.email === "string" ? body.email.trim() : "";
-  const consent = Boolean(body.consent);
+  const bodyResult = await validateRequestBody(request, newsletterSubscribeSchema);
+  if ("error" in bodyResult) return bodyResult.error;
+  const { email, source } = bodyResult.data;
 
-  if (!consent) {
-    return createErrorResponse("Необходимо согласие на получение рассылки", 400);
-  }
-
-  const result = await subscribe({
-    email,
-    source: body.source ?? "footer",
-  });
+  const result = await subscribe({ email: email.trim(), source });
 
   if (!result.ok) {
     return createErrorResponse(result.message, 400);
@@ -44,12 +39,12 @@ async function postHandler(request: NextRequest) {
         ? "На указанный email отправлено письмо для подтверждения подписки."
         : "Вы уже подписаны на рассылку.",
     },
-    { status: 200 },
+    { status: 200 }
   );
 }
 
 export async function POST(
-  request: NextRequest,
+  request: NextRequest
 ): Promise<NextResponse<ErrorResponse | { success: true; message: string }>> {
   return withErrorHandling(postHandler, request, "POST /api/shop/newsletter/subscribe");
 }

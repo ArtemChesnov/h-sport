@@ -1,10 +1,7 @@
 "use client";
 
-import {
-  SUMMARY_CARD_CONTAINER_CLASS,
-  SUMMARY_CARD_TITLE_CLASS,
-} from "@/shared/constants";
-import { cn } from "@/shared/lib";
+import { SUMMARY_CARD_CONTAINER_CLASS, SUMMARY_CARD_TITLE_CLASS } from "@/shared/constants";
+import { cn } from "@/shared/lib/utils";
 import React from "react";
 
 export type SummaryCardLayoutProps = {

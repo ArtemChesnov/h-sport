@@ -3,8 +3,8 @@
  */
 
 import { prisma } from "@/prisma/prisma-client";
-import { buildPaginatedResponse, calculateSkip } from "@/shared/lib";
-import type { DTO } from "@/shared/services";
+import { buildPaginatedResponse, calculateSkip } from "@/shared/lib/pagination";
+import type * as DTO from "@/shared/services/dto";
 import { mapOrderToDetailDto } from "./order-mappers";
 import { loadOrderById } from "./order-loaders";
 import {
@@ -39,14 +39,18 @@ export type AdminOrdersListParams = {
  * Список заказов с фильтрами и пагинацией.
  */
 export async function getAdminOrdersList(
-  params: AdminOrdersListParams,
+  params: AdminOrdersListParams
 ): Promise<DTO.AdminOrdersListResponseDto> {
   const where: {
     status?: DTO.OrderStatusDto;
     email?: { contains: string; mode: "insensitive" };
     phone?: { contains: string; mode: "insensitive" };
     uid?: string;
-    OR?: Array<{ uid?: { contains: string; mode: "insensitive" }; email?: { contains: string; mode: "insensitive" }; phone?: { contains: string; mode: "insensitive" } }>;
+    OR?: Array<{
+      uid?: { contains: string; mode: "insensitive" };
+      email?: { contains: string; mode: "insensitive" };
+      phone?: { contains: string; mode: "insensitive" };
+    }>;
   } = {};
 
   if (params.status) where.status = params.status;
@@ -111,9 +115,7 @@ export async function getAdminOrdersList(
 /**
  * Деталка заказа по id (с автосинхронизацией статуса при оплате).
  */
-export async function getAdminOrderDetail(
-  id: number,
-): Promise<DTO.OrderDetailDto | null> {
+export async function getAdminOrderDetail(id: number): Promise<DTO.OrderDetailDto | null> {
   const order = await loadOrderById(id);
   if (!order) return null;
   const synced = await syncOrderStatusIfPaid(order);
@@ -125,11 +127,8 @@ export async function getAdminOrderDetail(
  */
 export async function updateAdminOrder(
   id: number,
-  body: DTO.OrderAdminUpdateRequestDto,
-): Promise<
-  | { ok: true; order: DTO.OrderDetailDto }
-  | { ok: false; validationError: string }
-> {
+  body: DTO.OrderAdminUpdateRequestDto
+): Promise<{ ok: true; order: DTO.OrderDetailDto } | { ok: false; validationError: string }> {
   const existing = await loadOrderById(id);
   if (!existing) {
     return { ok: false, validationError: "Заказ не найден" };
@@ -164,7 +163,7 @@ export async function updateAdminOrder(
     statusChangedExplicitly,
     trackingChanged,
     syncedExisting.delivery?.trackingCode ?? null,
-    deliveryPatch.trackingCode,
+    deliveryPatch.trackingCode
   );
 
   const updatedOrder = await updateOrderInTransaction(
@@ -173,7 +172,7 @@ export async function updateAdminOrder(
     deliveryPatch,
     hasDeliveryChanges,
     syncedExisting.delivery,
-    syncedExisting.deliveryFee,
+    syncedExisting.deliveryFee
   );
 
   await createOrderEvents(eventsData);
@@ -193,10 +192,7 @@ export async function updateAdminOrder(
       });
     } catch (emailError) {
       const { logger } = await import("@/shared/lib/logger");
-      logger.error(
-        "updateAdminOrder: Ошибка при отправке email об изменении статуса",
-        emailError,
-      );
+      logger.error("updateAdminOrder: Ошибка при отправке email об изменении статуса", emailError);
     }
   }
 

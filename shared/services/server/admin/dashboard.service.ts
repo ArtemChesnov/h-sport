@@ -1,7 +1,7 @@
 /** Дашборд админки: сводка, графики, топ товаров по периоду. */
 
 import { prisma } from "@/prisma/prisma-client";
-import type { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 import { OrderStatus } from "@prisma/client";
 
 /** Статусы заказов, учитываемые в выручке */
@@ -65,7 +65,7 @@ export function getDateRange(period: DTO.AdminDashboardPeriodDto): { from: Date;
 export async function getSummary(
   from: Date,
   to: Date,
-  period: DTO.AdminDashboardPeriodDto,
+  period: DTO.AdminDashboardPeriodDto
 ): Promise<DTO.AdminDashboardSummaryDto> {
   const where = {
     createdAt: { gte: from, lte: to },
@@ -101,7 +101,7 @@ export async function getSummary(
  */
 export async function getChartData(
   from: Date,
-  to: Date,
+  to: Date
 ): Promise<DTO.AdminDashboardChartPointDto[]> {
   const where = {
     createdAt: { gte: from, lte: to },
@@ -152,7 +152,7 @@ export async function getChartData(
  */
 export async function getTopProducts(
   from: Date,
-  to: Date,
+  to: Date
 ): Promise<DTO.AdminDashboardTopProductDto[]> {
   const orderItems = await prisma.orderItem.groupBy({
     by: ["productId", "productName"],
@@ -199,7 +199,7 @@ export async function getTopProducts(
  * Получает полные данные дашборда
  */
 export async function getDashboardData(
-  period: DTO.AdminDashboardPeriodDto,
+  period: DTO.AdminDashboardPeriodDto
 ): Promise<DTO.AdminDashboardResponseDto> {
   const { from, to } = getDateRange(period);
 

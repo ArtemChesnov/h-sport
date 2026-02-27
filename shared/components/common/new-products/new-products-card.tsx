@@ -1,7 +1,7 @@
 "use client";
 
 import { ProductCardTextBlock } from "@/shared/components/common/product/product-card-text-block";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -29,12 +29,18 @@ export const NewProductsCard: React.FC<Props> = ({
   const href = `/product/${slug}`;
 
   return (
-    <Link href={href} target="_blank" rel="noopener noreferrer" prefetch={false} className="block w-full min-w-0 h-full group">
+    <Link
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      prefetch={false}
+      className="block w-full min-w-0 h-full group"
+    >
       <div className={cn("w-full min-w-0 overflow-hidden flex flex-col h-full", className)}>
         <div
           className={cn(
             "relative w-full flex-1 min-h-0 overflow-hidden",
-            !fillHeight && "aspect-[607/1014]",
+            !fillHeight && "aspect-[607/1014]"
           )}
         >
           <Image

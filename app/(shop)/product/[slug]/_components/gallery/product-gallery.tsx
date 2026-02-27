@@ -2,8 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { cn } from "@/shared/lib";
-
+import { cn } from "@/shared/lib/utils";
 interface ProductGalleryProps {
   images: string[];
   activeImage: string | null;
@@ -19,21 +18,26 @@ export function ProductGallery({
   images,
   activeImage,
   onImageSelect,
-  className
+  className,
 }: ProductGalleryProps) {
   const [imageLoadingStates, setImageLoadingStates] = useState<Record<string, boolean>>({});
 
   const handleImageLoad = (src: string) => {
-    setImageLoadingStates(prev => ({ ...prev, [src]: false }));
+    setImageLoadingStates((prev) => ({ ...prev, [src]: false }));
   };
 
   const handleImageLoadStart = (src: string) => {
-    setImageLoadingStates(prev => ({ ...prev, [src]: true }));
+    setImageLoadingStates((prev) => ({ ...prev, [src]: true }));
   };
 
   if (!images || images.length === 0) {
     return (
-      <div className={cn("relative aspect-3/4 w-full overflow-hidden rounded-2xl bg-muted/40", className)}>
+      <div
+        className={cn(
+          "relative aspect-3/4 w-full overflow-hidden rounded-2xl bg-muted/40",
+          className
+        )}
+      >
         <div className="flex h-full items-center justify-center">
           <span className="text-muted-foreground">Изображение недоступно</span>
         </div>
@@ -74,7 +78,7 @@ export function ProductGallery({
               onClick={() => onImageSelect(image)}
               className={cn(
                 "relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200",
-                (activeImage === image || (!activeImage && index === 0))
+                activeImage === image || (!activeImage && index === 0)
                   ? "border-primary ring-2 ring-primary/20"
                   : "border-muted hover:border-muted-foreground/50"
               )}

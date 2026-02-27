@@ -3,10 +3,10 @@
 import { SEVEN_DAYS_MS } from "@/shared/constants";
 import { getAsync, set } from "@/shared/lib/cache";
 import {
-    CategoriesRepository,
-    type CategorySelectResult,
+  CategoriesRepository,
+  type CategorySelectResult,
 } from "@/shared/repositories/categories.repository";
-import { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 
 const CACHE_KEY = "categories_list";
 
@@ -31,9 +31,7 @@ export class CategoriesService {
     return response;
   }
 
-  private static mapToResponse(
-    categories: CategorySelectResult[],
-  ): DTO.CategoriesResponseDto {
+  private static mapToResponse(categories: CategorySelectResult[]): DTO.CategoriesResponseDto {
     const items: DTO.CategoryDto[] = categories.map((category) => ({
       id: category.id,
       name: category.name,

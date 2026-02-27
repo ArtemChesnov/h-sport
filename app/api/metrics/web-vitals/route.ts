@@ -1,5 +1,5 @@
 import { validateRequestSize, withErrorHandling } from "@/shared/lib/api/error-handler";
-import { createErrorResponse } from "@/shared/lib/api/error-response";
+import { validateRequestBody } from "@/shared/lib/api/validate-request-body";
 import { applyRateLimit } from "@/shared/lib/api/rate-limit-middleware";
 import { logger } from "@/shared/lib/logger";
 import { NextRequest, NextResponse } from "next/server";
@@ -21,14 +21,9 @@ async function postHandler(request: NextRequest) {
   const sizeCheck = validateRequestSize(request, 10 * 1024);
   if (!sizeCheck.valid) return sizeCheck.response;
 
-  const rawBody = await request.json();
-
-  const parseResult = WebVitalsPayloadSchema.safeParse(rawBody);
-  if (!parseResult.success) {
-    return createErrorResponse("Некорректные данные метрики", 400);
-  }
-
-  const body = parseResult.data;
+  const bodyResult = await validateRequestBody(request, WebVitalsPayloadSchema);
+  if ("error" in bodyResult) return bodyResult.error;
+  const body = bodyResult.data;
 
   try {
     const { addWebVitalsMetricToBuffer } = await import("@/shared/lib/metrics");
@@ -37,7 +32,7 @@ async function postHandler(request: NextRequest) {
       body.value,
       body.delta ?? null,
       body.id ?? null,
-      body.url,
+      body.url
     );
   } catch (error) {
     logger.error("Failed to import metrics-batch or save Web Vitals metric", error);

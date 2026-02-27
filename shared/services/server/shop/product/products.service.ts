@@ -5,14 +5,14 @@ import { POPULARITY_CACHE_TTL_MS } from "@/shared/constants";
 import { get, set } from "@/shared/lib/cache";
 import { logger } from "@/shared/lib/logger";
 import {
-    buildProductsWhere,
-    getProductsSortedByPopularity,
-    mapProductsToListDto,
-    mapProductToDetailDto,
-    type ProductDetailWithRelations,
+  buildProductsWhere,
+  getProductsSortedByPopularity,
+  mapProductsToListDto,
+  mapProductToDetailDto,
+  type ProductDetailWithRelations,
 } from "@/shared/lib/products";
 import { retryWithBackoff } from "@/shared/lib/retry";
-import type { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 
 const PRODUCT_LIST_SELECT = {
   id: true,
@@ -42,9 +42,7 @@ const PRODUCT_LIST_SELECT = {
 } as const;
 
 /** Новинки (limit штук), с in-memory кэшем и retry. */
-export async function getNewProducts(
-  limit: number = 3,
-): Promise<DTO.ProductListItemDto[]> {
+export async function getNewProducts(limit: number = 3): Promise<DTO.ProductListItemDto[]> {
   const cacheKey = `new-products:${limit}`;
   const cached = get<DTO.ProductListItemDto[]>(cacheKey);
   if (cached) {
@@ -82,7 +80,7 @@ export async function getNewProducts(
           }
           return false;
         },
-      },
+      }
     );
 
     const result = mapProductsToListDto(products);
@@ -95,9 +93,7 @@ export async function getNewProducts(
 }
 
 /** Популярные товары (limit штук) для блоков «Вам понравится» и др. Кэш по ключу popular:{limit}. */
-export async function getPopularProducts(
-  limit: number,
-): Promise<DTO.ProductListItemDto[]> {
+export async function getPopularProducts(limit: number): Promise<DTO.ProductListItemDto[]> {
   const cacheKey = `popular:${limit}`;
   const cached = get<DTO.ProductListItemDto[]>(cacheKey);
   if (cached) {
@@ -125,7 +121,7 @@ export async function getPopularProducts(
           }
           return false;
         },
-      },
+      }
     );
     const result = mapProductsToListDto(products);
     set(cacheKey, result, POPULARITY_CACHE_TTL_MS);
@@ -139,19 +135,17 @@ export async function getPopularProducts(
 /** Рекомендации «Вам понравится»: популярные товары без текущего, до displayLimit штук. */
 export async function getYouMightLikeProducts(
   excludeProductId: number,
-  displayLimit: number = 4,
+  displayLimit: number = 4
 ): Promise<DTO.ProductListItemDto[]> {
   const fetchLimit = Math.max(displayLimit + 4, 12);
   const popular = await getPopularProducts(fetchLimit);
-  return popular
-    .filter((p) => p.id !== excludeProductId)
-    .slice(0, displayLimit);
+  return popular.filter((p) => p.id !== excludeProductId).slice(0, displayLimit);
 }
 
 /** Бестселлеры по популярности (SQL JOIN), с кэшем. _fetchLimit — legacy. */
 export async function getBestSellers(
   limit: number = 4,
-  _fetchLimit?: number,
+  _fetchLimit?: number
 ): Promise<DTO.ProductListItemDto[]> {
   const cacheKey = `bestsellers:${limit}`;
   const cached = get<DTO.ProductListItemDto[]>(cacheKey);
@@ -180,7 +174,7 @@ export async function getBestSellers(
           }
           return false;
         },
-      },
+      }
     );
     const result = mapProductsToListDto(products);
     set(cacheKey, result, POPULARITY_CACHE_TTL_MS);
@@ -192,9 +186,7 @@ export async function getBestSellers(
 }
 
 /** Первая страница каталога без фильтров (SSR). */
-export async function getInitialCatalogProducts(
-  perPage: number = 24,
-): Promise<{
+export async function getInitialCatalogProducts(perPage: number = 24): Promise<{
   items: DTO.ProductListItemDto[];
   meta: DTO.PaginationMetaDto;
 }> {
@@ -232,7 +224,7 @@ export async function getInitialCatalogProducts(
           }
           return false;
         },
-      },
+      }
     );
 
     const items = mapProductsToListDto(products);
@@ -305,7 +297,9 @@ export async function getProductBySlug(slug: string): Promise<DTO.ProductDetailD
 /**
  * Список slug товаров для generateStaticParams (pre-render при ENABLE_PRODUCT_PRE_RENDER=true).
  */
-export async function getProductSlugsForPreRender(limit: number = 100): Promise<{ slug: string }[]> {
+export async function getProductSlugsForPreRender(
+  limit: number = 100
+): Promise<{ slug: string }[]> {
   const topProducts = await defaultPrisma.product.findMany({
     select: { slug: true },
     orderBy: { createdAt: "desc" },

@@ -1,5 +1,6 @@
 import { createErrorResponse } from "@/shared/lib/api/error-response";
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
+import { getSessionUserOrError } from "@/shared/lib/auth/middleware";
 import { applyRateLimit } from "@/shared/lib/api/rate-limit-middleware";
 import { DTO } from "@/shared/services";
 import { removeFavorite } from "@/shared/services/server";
@@ -15,29 +16,28 @@ type RouteContext = RouteParams<{ productId: string }>;
  */
 export async function DELETE(
   request: NextRequest,
-  context: RouteContext,
+  context: RouteContext
 ): Promise<NextResponse<DTO.FavoritesResponseDto | ErrorResponse>> {
   return withErrorHandling(
     async (req) => {
       const rateLimitResponse = await applyRateLimit(req, "cart");
       if (rateLimitResponse) return rateLimitResponse;
 
-      const { getSessionUserFromRequest } = await import("@/shared/lib/auth/session");
-      const user = await getSessionUserFromRequest(req);
-      if (!user) return createErrorResponse("Требуется авторизация", 401);
+      const session = await getSessionUserOrError(req);
+      if ("error" in session) return session.error;
 
       const { productId: productIdParam } = await context.params;
       const productId = Number(productIdParam);
       if (!Number.isInteger(productId) || productId <= 0) {
-        return createErrorResponse("Invalid productId", 400);
+        return createErrorResponse("Недопустимый productId", 400);
       }
 
-      const result = await removeFavorite(user.id, productId);
-      if (result == null) return createErrorResponse("Product not found", 404);
+      const result = await removeFavorite(session.user.id, productId);
+      if (result == null) return createErrorResponse("Товар не найден", 404);
 
       return NextResponse.json<DTO.FavoritesResponseDto>({ items: result.items }, { status: 200 });
     },
     request,
-    "DELETE /api/shop/favorites/[productId]",
+    "DELETE /api/shop/favorites/[productId]"
   );
 }

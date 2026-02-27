@@ -1,8 +1,9 @@
 /**
- * Server service: health and readiness checks.
+ * Сервис проверки здоровья и готовности приложения
  */
 
 import { prisma } from "@/prisma/prisma-client";
+import { env } from "@/shared/lib/config/env";
 import { getRedisClient } from "@/shared/lib/redis";
 import { logger } from "@/shared/lib/logger";
 
@@ -17,10 +18,10 @@ export type HealthCheckResult = {
 export type ReadinessResult = { ready: true } | { ready: false; reason: string };
 
 /**
- * Checks Redis availability. Returns "disabled" if REDIS_URL not set.
+ * Проверка доступности Redis. Возвращает "disabled", если REDIS_URL не задан.
  */
 export async function checkRedis(): Promise<"ok" | "error" | "disabled"> {
-  if (!process.env.REDIS_URL) return "disabled";
+  if (!env.REDIS_URL) return "disabled";
   try {
     const client = await getRedisClient();
     if (!client) return "error";
@@ -71,7 +72,7 @@ export async function runReadinessCheck(): Promise<ReadinessResult> {
     return { ready: false, reason: "database" };
   }
 
-  if (process.env.NODE_ENV === "production" && process.env.REDIS_URL) {
+  if (env.NODE_ENV === "production" && env.REDIS_URL) {
     try {
       const client = await getRedisClient();
       if (!client) return { ready: false, reason: "redis" };

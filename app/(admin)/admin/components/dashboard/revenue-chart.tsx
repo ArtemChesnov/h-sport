@@ -14,7 +14,7 @@ import {
   Skeleton,
 } from "@/shared/components/ui";
 import { DTO } from "@/shared/services";
-import { formatMoney } from "@/shared/lib";
+import { formatMoney } from "@/shared/lib/formatters";
 import {
   Area,
   AreaChart,

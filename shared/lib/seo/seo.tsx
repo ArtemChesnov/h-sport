@@ -2,6 +2,7 @@
  * Утилиты для SEO и мета-тегов
  */
 
+import { getAppUrl } from "@/shared/lib/config/env";
 import { Metadata } from "next";
 
 interface SEOConfig {
@@ -24,7 +25,7 @@ export function generateMetadata(config: SEOConfig): Metadata {
     type = "website",
   } = config;
 
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const siteUrl = getAppUrl();
   const fullImageUrl = image.startsWith("http") ? image : `${siteUrl}${image}`;
   const fullUrl = url ? `${siteUrl}${url}` : siteUrl;
 

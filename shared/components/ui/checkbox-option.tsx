@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { Check } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -16,17 +16,9 @@ interface CheckboxOptionProps {
  * Кастомный чекбокс с розовым акцентом.
  * Используется в "Запомнить меня", согласиях и т.д.
  */
-export function CheckboxOption({
-  checked,
-  onChange,
-  label,
-  name,
-  className,
-}: CheckboxOptionProps) {
+export function CheckboxOption({ checked, onChange, label, name, className }: CheckboxOptionProps) {
   return (
-    <label
-      className={cn("flex cursor-pointer items-center gap-2 group", className)}
-    >
+    <label className={cn("flex cursor-pointer items-center gap-2 group", className)}>
       <div className="relative flex items-center justify-center">
         <input
           type="checkbox"

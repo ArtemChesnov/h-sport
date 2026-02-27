@@ -3,15 +3,8 @@
  * Централизованное место для всех стилей статусов
  */
 
-import type { DTO } from "@/shared/services";
-import {
-    CheckCircle,
-    Clock,
-    Package,
-    Truck,
-    XCircle,
-    type LucideIcon,
-} from "lucide-react";
+import type * as DTO from "@/shared/services/dto";
+import { CheckCircle, Clock, Package, Truck, XCircle, type LucideIcon } from "lucide-react";
 
 /** Единый источник меток статусов заказа (краткая форма для таблиц/бейджей) */
 export const ORDER_STATUS_LABELS: Record<DTO.OrderStatusDto, string> = {
@@ -36,12 +29,17 @@ export const ORDER_STATUS_LABELS_FORM: Record<DTO.OrderStatusDto, string> = {
 export function getOrderStatusBadgeStyles(status: DTO.OrderStatusDto): string {
   const styles: Record<DTO.OrderStatusDto, string> = {
     NEW: "bg-gradient-to-r from-slate-100 to-zinc-100 text-slate-700 border border-slate-200/60 shadow-sm",
-    PENDING_PAYMENT: "bg-gradient-to-r from-amber-100 to-orange-100 text-amber-800 border border-amber-200/60 shadow-sm",
+    PENDING_PAYMENT:
+      "bg-gradient-to-r from-amber-100 to-orange-100 text-amber-800 border border-amber-200/60 shadow-sm",
     PAID: "bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-800 border border-emerald-200/60 shadow-sm",
-    PROCESSING: "bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 border border-blue-200/60 shadow-sm",
-    SHIPPED: "bg-gradient-to-r from-indigo-100 to-violet-100 text-indigo-800 border border-indigo-200/60 shadow-sm",
-    DELIVERED: "bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200/60 shadow-sm",
-    CANCELED: "bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border border-red-200/60 shadow-sm",
+    PROCESSING:
+      "bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 border border-blue-200/60 shadow-sm",
+    SHIPPED:
+      "bg-gradient-to-r from-indigo-100 to-violet-100 text-indigo-800 border border-indigo-200/60 shadow-sm",
+    DELIVERED:
+      "bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200/60 shadow-sm",
+    CANCELED:
+      "bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border border-red-200/60 shadow-sm",
   };
   return styles[status] ?? styles.NEW;
 }
@@ -60,10 +58,7 @@ export type OrderStatusInfo = {
   icon: LucideIcon;
 };
 
-const ORDER_STATUS_INFO: Record<
-  DTO.OrderStatusDto,
-  { color: string; icon: LucideIcon }
-> = {
+const ORDER_STATUS_INFO: Record<DTO.OrderStatusDto, { color: string; icon: LucideIcon }> = {
   NEW: { color: "text-blue-600 bg-blue-50 border-blue-200", icon: Clock },
   PENDING_PAYMENT: {
     color: "text-orange-600 bg-orange-50 border-orange-200",
@@ -117,9 +112,7 @@ export const DELIVERY_METHOD_LABELS: Record<DTO.DeliveryMethodDto, string> = {
 /**
  * Возвращает метку способа доставки.
  */
-export function getDeliveryMethodLabel(
-  method?: DTO.DeliveryMethodDto | null,
-): string {
+export function getDeliveryMethodLabel(method?: DTO.DeliveryMethodDto | null): string {
   if (!method) return "Способ доставки не задан";
   return DELIVERY_METHOD_LABELS[method] ?? method;
 }
@@ -130,10 +123,14 @@ export function getDeliveryMethodLabel(
 export function getPaymentStatusBadgeStyles(status: DTO.PaymentStatusDto): string {
   const styles: Record<DTO.PaymentStatusDto, string> = {
     PAID: "bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-800 border border-emerald-200/60 shadow-sm",
-    PENDING: "bg-gradient-to-r from-slate-100 to-zinc-100 text-slate-700 border border-slate-200/60 shadow-sm",
-    FAILED: "bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border border-red-200/60 shadow-sm",
-    CANCELED: "bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border border-red-200/60 shadow-sm",
-    REFUNDED: "bg-gradient-to-r from-amber-100 to-orange-100 text-amber-800 border border-amber-200/60 shadow-sm",
+    PENDING:
+      "bg-gradient-to-r from-slate-100 to-zinc-100 text-slate-700 border border-slate-200/60 shadow-sm",
+    FAILED:
+      "bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border border-red-200/60 shadow-sm",
+    CANCELED:
+      "bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border border-red-200/60 shadow-sm",
+    REFUNDED:
+      "bg-gradient-to-r from-amber-100 to-orange-100 text-amber-800 border border-amber-200/60 shadow-sm",
   };
   return styles[status] ?? styles.PENDING;
 }

@@ -14,7 +14,7 @@ import {
   Skeleton,
 } from "@/shared/components/ui";
 import { DTO } from "@/shared/services";
-import { formatMoney } from "@/shared/lib";
+import { formatMoney } from "@/shared/lib/formatters";
 import Link from "next/link";
 import { Trophy } from "lucide-react";
 
@@ -83,13 +83,16 @@ export function TopProductsCard({ topProducts, isLoading }: TopProductsCardProps
                       <span className="text-sm font-medium block truncate">{item.name}</span>
                     )}
                     <p className="text-xs text-muted-foreground">
-                      {item.totalQty} {item.totalQty === 1 ? "шт" : item.totalQty < 5 ? "шт" : "шт"} · {formatMoney(item.totalRevenue)}
+                      {item.totalQty} {item.totalQty === 1 ? "шт" : item.totalQty < 5 ? "шт" : "шт"}{" "}
+                      · {formatMoney(item.totalRevenue)}
                     </p>
                   </div>
                 </div>
                 <div className="text-right shrink-0 ml-4">
                   <p className="text-sm font-semibold">{formatMoney(item.totalRevenue)}</p>
-                  <p className="text-xs text-muted-foreground">{item.totalQty} {item.totalQty === 1 ? "шт" : item.totalQty < 5 ? "шт" : "шт"}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {item.totalQty} {item.totalQty === 1 ? "шт" : item.totalQty < 5 ? "шт" : "шт"}
+                  </p>
                 </div>
               </div>
             ))}

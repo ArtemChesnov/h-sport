@@ -2,7 +2,7 @@
 
 import { prisma } from "@/prisma/prisma-client";
 import { validatePromoFields } from "@/shared/lib/promo/validate-promo";
-import type { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 import type { Prisma, PromoCode } from "@prisma/client";
 
 type FieldError = { field: string; message: string };
@@ -47,13 +47,12 @@ export function toDateOrNull(value: unknown): Date | null {
  * Получает список промокодов с пагинацией
  */
 export async function getPromosList(filters: {
-    code?: string;
-    isActive?: boolean;
-    page: number;
-    perPage: number;
-    skip: number;
-  },
-): Promise<{ items: DTO.AdminPromoCodeDto[]; total: number }> {
+  code?: string;
+  isActive?: boolean;
+  page: number;
+  perPage: number;
+  skip: number;
+}): Promise<{ items: DTO.AdminPromoCodeDto[]; total: number }> {
   const where: Prisma.PromoCodeWhereInput = {};
 
   if (filters.code) {
@@ -87,13 +86,15 @@ export async function getPromosList(filters: {
 
   // Асинхронное обновление истёкших
   if (expiredIds.length > 0) {
-    prisma.promoCode.updateMany({
-      where: { id: { in: expiredIds } },
-      data: { isActive: false },
-    }).catch((err) => {
-      // Логируем ошибку, но не блокируем основной поток
-      console.error("[admin-promos.service] Failed to deactivate expired promos:", err);
-    });
+    prisma.promoCode
+      .updateMany({
+        where: { id: { in: expiredIds } },
+        data: { isActive: false },
+      })
+      .catch((err) => {
+        // Логируем ошибку, но не блокируем основной поток
+        console.error("[admin-promos.service] Failed to deactivate expired promos:", err);
+      });
   }
 
   return {
@@ -180,11 +181,7 @@ export function mapPromoToDto(promo: PromoCode): DTO.AdminPromoCodeDto {
  * Проверяет, является ли ошибка P2002 (unique constraint)
  */
 export function isUniqueConstraintError(error: unknown): boolean {
-  return (
-    error instanceof Error &&
-    "code" in error &&
-    (error as { code: string }).code === "P2002"
-  );
+  return error instanceof Error && "code" in error && (error as { code: string }).code === "P2002";
 }
 
 /**
@@ -192,7 +189,7 @@ export function isUniqueConstraintError(error: unknown): boolean {
  */
 export async function updatePromo(
   id: number,
-  data: Prisma.PromoCodeUpdateInput,
+  data: Prisma.PromoCodeUpdateInput
 ): Promise<DTO.AdminPromoCodeDto> {
   const now = new Date();
   const updateData = { ...data };
@@ -221,10 +218,9 @@ export async function updatePromo(
  */
 export async function patchPromo(
   id: number,
-  raw: DTO.AdminPromoCodeUpdateDto,
+  raw: DTO.AdminPromoCodeUpdateDto
 ): Promise<
-  | { ok: true; promo: DTO.AdminPromoCodeDto }
-  | { ok: false; error: string; status: number }
+  { ok: true; promo: DTO.AdminPromoCodeDto } | { ok: false; error: string; status: number }
 > {
   const updateData: Prisma.PromoCodeUpdateInput = {};
 
@@ -287,8 +283,7 @@ export async function patchPromo(
 }
 
 function parseOptionalDate(input: unknown): Date | null {
-  if (input === null || typeof input === "undefined" || input === "")
-    return null;
+  if (input === null || typeof input === "undefined" || input === "") return null;
   if (typeof input !== "string") return null;
   const d = new Date(input);
   return Number.isNaN(d.getTime()) ? null : d;

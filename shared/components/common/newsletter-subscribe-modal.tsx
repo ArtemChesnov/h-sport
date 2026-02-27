@@ -3,20 +3,20 @@
 import { DesignButton, Input, Spinner } from "@/shared/components/ui";
 import { CheckboxOption } from "@/shared/components/ui/checkbox-option";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
 } from "@/shared/components/ui/dialog";
 import {
-    INPUT_LABEL_CLASS,
-    SHOP_MODAL_BODY_GAP,
-    SHOP_MODAL_CONTENT_CLASS,
-    SHOP_MODAL_DESCRIPTION_CLASS,
-    SHOP_MODAL_TITLE_CLASS,
+  INPUT_LABEL_CLASS,
+  SHOP_MODAL_BODY_GAP,
+  SHOP_MODAL_CONTENT_CLASS,
+  SHOP_MODAL_DESCRIPTION_CLASS,
+  SHOP_MODAL_TITLE_CLASS,
 } from "@/shared/constants";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import Link from "next/link";
 import React, { useState } from "react";
 import { toast } from "sonner";
@@ -77,9 +77,10 @@ export function NewsletterSubscribeModal({
           source: "footer",
         }),
       });
-      const data: { success?: boolean; message?: string } = res.ok || res.status === 400
-        ? await res.json()
-        : { success: false, message: "Ошибка сервера. Попробуйте позже." };
+      const data: { success?: boolean; message?: string } =
+        res.ok || res.status === 400
+          ? await res.json()
+          : { success: false, message: "Ошибка сервера. Попробуйте позже." };
       if (data.success) {
         toast.success(data.message ?? "Готово");
         setEmail("");
@@ -99,13 +100,12 @@ export function NewsletterSubscribeModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={cn("shop", SHOP_MODAL_CONTENT_CLASS, className)}>
         <DialogHeader className="pb-4">
-          <DialogTitle className={SHOP_MODAL_TITLE_CLASS}>
-            Подписаться на новости
-          </DialogTitle>
+          <DialogTitle className={SHOP_MODAL_TITLE_CLASS}>Подписаться на новости</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className={cn("flex flex-col", SHOP_MODAL_BODY_GAP)}>
           <DialogDescription className={SHOP_MODAL_DESCRIPTION_CLASS}>
-            Узнавайте первыми о новинках, акциях и скидках. Укажите email и подтвердите подписку в письме.
+            Узнавайте первыми о новинках, акциях и скидках. Укажите email и подтвердите подписку в
+            письме.
           </DialogDescription>
           <label htmlFor="newsletter-email" className="flex flex-col gap-2">
             <span className={INPUT_LABEL_CLASS}>Email</span>

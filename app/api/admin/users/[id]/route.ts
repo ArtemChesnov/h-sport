@@ -1,4 +1,6 @@
+import { adminUserUpdateRoleSchema } from "@/shared/lib/api/request-body-schemas";
 import { createErrorResponse } from "@/shared/lib/api/error-response";
+import { validateRequestBody } from "@/shared/lib/api/validate-request-body";
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { isPrivilegedEmail } from "@/shared/lib/auth/privileged";
 import { DTO } from "@/shared/services";
@@ -13,7 +15,7 @@ type RouteContext = RouteParams<{ id: string }>;
  */
 export async function GET(
   _request: NextRequest,
-  context: RouteContext,
+  context: RouteContext
 ): Promise<NextResponse<DTO.AdminUserDetailDto | ErrorResponse>> {
   return withErrorHandling(
     async (req) => {
@@ -36,7 +38,7 @@ export async function GET(
       return NextResponse.json(dto, { status: 200 });
     },
     _request,
-    "GET /api/admin/users/[id]",
+    "GET /api/admin/users/[id]"
   );
 }
 
@@ -45,7 +47,7 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  context: RouteContext,
+  context: RouteContext
 ): Promise<NextResponse<DTO.AdminUserUpdateResponseDto | ErrorResponse>> {
   return withErrorHandling(
     async (req) => {
@@ -58,16 +60,8 @@ export async function PATCH(
         return createErrorResponse("Некорректный идентификатор пользователя", 400);
       }
 
-      let body: DTO.AdminUserUpdateRequestDto;
-      try {
-        body = (await req.json()) as DTO.AdminUserUpdateRequestDto;
-      } catch {
-        return createErrorResponse("Некорректное тело запроса", 400);
-      }
-
-      if (body.role !== "USER" && body.role !== "ADMIN") {
-        return createErrorResponse("Некорректная роль", 400);
-      }
+      const bodyResult = await validateRequestBody(req, adminUserUpdateRoleSchema);
+      if ("error" in bodyResult) return bodyResult.error;
 
       const existing = await getAdminUserById(id);
       if (!existing) {
@@ -77,10 +71,10 @@ export async function PATCH(
         return createErrorResponse("Действие запрещено", 403);
       }
 
-      const updated = await updateAdminUserRole(id, body.role);
+      const updated = await updateAdminUserRole(id, bodyResult.data.role);
       return NextResponse.json<DTO.AdminUserUpdateResponseDto>(updated, { status: 200 });
     },
     request,
-    "PATCH /api/admin/users/[id]",
+    "PATCH /api/admin/users/[id]"
   );
 }

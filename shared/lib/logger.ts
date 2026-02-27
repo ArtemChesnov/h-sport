@@ -2,6 +2,8 @@
  * Структурированное логирование с поддержкой контекста и фильтрации чувствительных данных
  */
 
+import { env } from "@/shared/lib/config/env";
+
 type LogLevel = "info" | "warn" | "error" | "debug" | "trace";
 
 interface LogEntry {
@@ -76,15 +78,14 @@ function sanitizeData(data: unknown, depth: number = 0): unknown {
  * Получает уровень логирования из переменной окружения
  */
 function getLogLevel(): LogLevel {
-  const envLevel = process.env.LOG_LEVEL?.toLowerCase();
+  const envLevel = env.LOG_LEVEL?.toLowerCase();
   const validLevels: LogLevel[] = ["trace", "debug", "info", "warn", "error"];
 
   if (envLevel && validLevels.includes(envLevel as LogLevel)) {
     return envLevel as LogLevel;
   }
 
-  // По умолчанию: debug в development, info в production
-  return process.env.NODE_ENV === "development" ? "debug" : "info";
+  return env.NODE_ENV === "development" ? "debug" : "info";
 }
 
 /**
@@ -109,8 +110,12 @@ function outputLog(entry: LogEntry): void {
   }
 
   // Санитизируем метаданные и контекст
-  const sanitizedMeta = entry.meta ? (sanitizeData(entry.meta) as Record<string, unknown>) : undefined;
-  const sanitizedContext = entry.context ? (sanitizeData(entry.context) as Record<string, unknown>) : undefined;
+  const sanitizedMeta = entry.meta
+    ? (sanitizeData(entry.meta) as Record<string, unknown>)
+    : undefined;
+  const sanitizedContext = entry.context
+    ? (sanitizeData(entry.context) as Record<string, unknown>)
+    : undefined;
 
   // Объединяем метаданные и контекст
   const allMeta = {
@@ -122,7 +127,7 @@ function outputLog(entry: LogEntry): void {
   const message = entry.message;
 
   // Структурированный вывод для production
-  const isProduction = process.env.NODE_ENV === "production";
+  const isProduction = env.NODE_ENV === "production";
   const structuredLog = isProduction
     ? JSON.stringify({
         timestamp: entry.timestamp,
@@ -170,8 +175,9 @@ function outputLog(entry: LogEntry): void {
   }
 
   // Запись в файл (в production всегда, в development — по переменной окружения)
-  const shouldWriteToFile = typeof window === "undefined" &&
-    (process.env.NODE_ENV === "production" || process.env.ENABLE_FILE_LOGGING === "true");
+  const shouldWriteToFile =
+    typeof window === "undefined" &&
+    (env.NODE_ENV === "production" || env.ENABLE_FILE_LOGGING === true);
   if (shouldWriteToFile) {
     // Динамический импорт вместо require для ESM совместимости
     import("./logger-enhanced")
@@ -200,7 +206,7 @@ function createLogEntry(
   message: string,
   error?: unknown,
   meta?: Record<string, unknown>,
-  context?: Record<string, unknown>,
+  context?: Record<string, unknown>
 ): LogEntry {
   return {
     level,
@@ -220,7 +226,11 @@ export const logger = {
   /**
    * Информационное сообщение
    */
-  info: (message: string, meta?: Record<string, unknown>, context?: Record<string, unknown>): void => {
+  info: (
+    message: string,
+    meta?: Record<string, unknown>,
+    context?: Record<string, unknown>
+  ): void => {
     const entry = createLogEntry("info", message, undefined, meta, context);
     outputLog(entry);
   },
@@ -228,7 +238,11 @@ export const logger = {
   /**
    * Предупреждение
    */
-  warn: (message: string, meta?: Record<string, unknown>, context?: Record<string, unknown>): void => {
+  warn: (
+    message: string,
+    meta?: Record<string, unknown>,
+    context?: Record<string, unknown>
+  ): void => {
     const entry = createLogEntry("warn", message, undefined, meta, context);
     outputLog(entry);
   },
@@ -237,7 +251,12 @@ export const logger = {
    * Ошибка
    * Автоматически извлекает контекст из AppError, если это кастомная ошибка
    */
-  error: (message: string, error?: unknown, meta?: Record<string, unknown>, context?: Record<string, unknown>): void => {
+  error: (
+    message: string,
+    error?: unknown,
+    meta?: Record<string, unknown>,
+    context?: Record<string, unknown>
+  ): void => {
     // Если ошибка - это AppError, извлекаем её контекст
     let errorContext = context;
     if (error && typeof error === "object" && "context" in error) {
@@ -251,7 +270,11 @@ export const logger = {
   /**
    * Отладочное сообщение
    */
-  debug: (message: string, meta?: Record<string, unknown>, context?: Record<string, unknown>): void => {
+  debug: (
+    message: string,
+    meta?: Record<string, unknown>,
+    context?: Record<string, unknown>
+  ): void => {
     const entry = createLogEntry("debug", message, undefined, meta, context);
     outputLog(entry);
   },
@@ -259,7 +282,11 @@ export const logger = {
   /**
    * Трассировочное сообщение (самый детальный уровень)
    */
-  trace: (message: string, meta?: Record<string, unknown>, context?: Record<string, unknown>): void => {
+  trace: (
+    message: string,
+    meta?: Record<string, unknown>,
+    context?: Record<string, unknown>
+  ): void => {
     const entry = createLogEntry("trace", message, undefined, meta, context);
     outputLog(entry);
   },

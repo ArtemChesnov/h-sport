@@ -1,7 +1,8 @@
+import { cartUpdateItemSchema } from "@/shared/lib/api/request-body-schemas";
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { createErrorResponse } from "@/shared/lib/api/error-response";
+import { validateRequestBody } from "@/shared/lib/api/validate-request-body";
 import { applyRateLimit } from "@/shared/lib/api/rate-limit-middleware";
-import { MAX_CART_ITEM_QUANTITY } from "@/shared/lib/cart";
 import type { DTO } from "@/shared/services";
 import {
   CART_COOKIE_NAME,
@@ -21,11 +22,11 @@ type CartRecord = NonNullable<Awaited<ReturnType<typeof getCartByToken>>>;
 type CartItemRecord = NonNullable<Awaited<ReturnType<typeof findCartItem>>>;
 
 async function resolveCartAndItem(
-    request: NextRequest,
-    rawId: string,
+  request: NextRequest,
+  rawId: string
 ): Promise<
-    | { type: "ok"; cart: CartRecord; item: CartItemRecord }
-    | { type: "error"; response: NextResponse<ErrorResponse> }
+  | { type: "ok"; cart: CartRecord; item: CartItemRecord }
+  | { type: "error"; response: NextResponse<ErrorResponse> }
 > {
   // Приводим id из params (string) к числу
   const cartItemId = Number(rawId);
@@ -76,7 +77,7 @@ async function resolveCartAndItem(
  */
 export async function PATCH(
   request: NextRequest,
-  context: RouteContext,
+  context: RouteContext
 ): Promise<NextResponse<DTO.CartDto | ErrorResponse>> {
   return withErrorHandling(
     async (req) => {
@@ -84,19 +85,9 @@ export async function PATCH(
       if (rateLimitResponse) return rateLimitResponse;
 
       const { id } = await context.params;
-      let body: DTO.CartUpdateItemDto;
-      try {
-        body = (await req.json()) as DTO.CartUpdateItemDto;
-      } catch {
-        return createErrorResponse("Некорректный формат данных", 400);
-      }
-
-      if (!Number.isInteger(body.qty) || body.qty <= 0) {
-        return createErrorResponse("Количество должно быть положительным целым числом", 400);
-      }
-      if (body.qty > MAX_CART_ITEM_QUANTITY) {
-        return createErrorResponse(`Максимальное количество товара одной позиции — ${MAX_CART_ITEM_QUANTITY} штук`, 400);
-      }
+      const bodyResult = await validateRequestBody(req, cartUpdateItemSchema);
+      if ("error" in bodyResult) return bodyResult.error;
+      const body = bodyResult.data;
 
       const resolved = await resolveCartAndItem(req, id);
       if (resolved.type === "error") return resolved.response;
@@ -115,7 +106,7 @@ export async function PATCH(
       return NextResponse.json<DTO.CartDto>(dto, { status: 200 });
     },
     request,
-    "PATCH /api/shop/cart/items/[id]",
+    "PATCH /api/shop/cart/items/[id]"
   );
 }
 
@@ -130,7 +121,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  context: RouteContext,
+  context: RouteContext
 ): Promise<NextResponse<DTO.CartDto | ErrorResponse>> {
   return withErrorHandling(
     async (req) => {
@@ -152,6 +143,6 @@ export async function DELETE(
       return NextResponse.json<DTO.CartDto>(dto, { status: 200 });
     },
     request,
-    "DELETE /api/shop/cart/items/[id]",
+    "DELETE /api/shop/cart/items/[id]"
   );
 }

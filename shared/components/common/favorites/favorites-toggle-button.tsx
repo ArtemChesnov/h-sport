@@ -10,12 +10,12 @@
 import { AuthRequiredDialog } from "@/shared/components/common";
 import { FavoritesFilledIcon, FavoritesIcon } from "@/shared/components/icons";
 import {
-    useAddFavoriteMutation,
-    useAuthCheck,
-    useFavoritesQuery,
-    useRemoveFavoriteMutation,
+  useAddFavoriteMutation,
+  useAuthCheck,
+  useFavoritesQuery,
+  useRemoveFavoriteMutation,
 } from "@/shared/hooks";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import React from "react";
 
 type FavoriteToggleButtonProps = {
@@ -64,8 +64,7 @@ export function FavoriteToggleButton({
   // До гидратации кнопка всегда enabled (как на сервере), после — учитываем isLoading
   const isBusy = mounted && (isLoading || addFavorite.isPending || removeFavorite.isPending);
   // На мобилках иконка избранного 28×28, на десктопе — по size
-  const buttonSize =
-    size === "md" ? "h-7 w-7 md:h-10 md:w-10" : "h-7 w-7 md:h-9 md:w-9";
+  const buttonSize = size === "md" ? "h-7 w-7 md:h-10 md:w-10" : "h-7 w-7 md:h-9 md:w-9";
 
   function handleClick(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
@@ -106,20 +105,14 @@ export function FavoriteToggleButton({
           "disabled:opacity-60 disabled:pointer-events-none",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
           buttonSize,
-          className,
+          className
         )}
       >
         <span className={cn("inline-flex", shouldPop && "animate-pop")}>
           {isFavorite ? (
-            <FavoritesFilledIcon
-              className="h-full w-full"
-              pathClassName="fill-[#EB6081]"
-            />
+            <FavoritesFilledIcon className="h-full w-full" pathClassName="fill-[#EB6081]" />
           ) : (
-            <FavoritesIcon
-              className="h-full w-full"
-              pathClassName="stroke-[#EB6081]"
-            />
+            <FavoritesIcon className="h-full w-full" pathClassName="stroke-[#EB6081]" />
           )}
         </span>
       </button>

@@ -2,7 +2,7 @@
  * Утилиты для работы с продуктами
  */
 
-import { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 import type { Size as PrismaSize } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import type { ParsedProductsQuery } from "./validation.lib";
@@ -288,7 +288,7 @@ export function mapProductsToListDto(products: ProductWithRelations[]): DTO.Prod
 export function sortProducts(
   products: DTO.ProductListItemDto[],
   sort: DTO.ProductsQueryDto["sort"],
-  popularityMap?: Record<number, number>,
+  popularityMap?: Record<number, number>
 ): DTO.ProductListItemDto[] {
   if (sort === "price_asc") {
     return [...products].sort((a, b) => a.price - b.price);
@@ -322,7 +322,7 @@ export function sortProducts(
 export function paginateProducts(
   products: DTO.ProductListItemDto[],
   page: number,
-  perPage: number,
+  perPage: number
 ): { items: DTO.ProductListItemDto[]; meta: DTO.PaginationMetaDto } {
   const total = products.length;
   const pages = Math.max(Math.ceil(total / perPage), 1);
@@ -522,7 +522,7 @@ function buildSqlParts(where: Prisma.ProductWhereInput): {
           if ("isAvailable" in itemsSome && itemsSome.isAvailable === true) {
             // Товары с доступными вариантами
             whereConditions.push(
-              Prisma.sql`EXISTS (SELECT 1 FROM "ProductItem" pi_avail WHERE pi_avail."productId" = p.id AND pi_avail."isAvailable" = true)`,
+              Prisma.sql`EXISTS (SELECT 1 FROM "ProductItem" pi_avail WHERE pi_avail."productId" = p.id AND pi_avail."isAvailable" = true)`
             );
           }
         }
@@ -535,7 +535,7 @@ function buildSqlParts(where: Prisma.ProductWhereInput): {
           if ("isAvailable" in itemsNone && itemsNone.isAvailable === true) {
             // Товары без доступных вариантов
             whereConditions.push(
-              Prisma.sql`NOT EXISTS (SELECT 1 FROM "ProductItem" pi_avail WHERE pi_avail."productId" = p.id AND pi_avail."isAvailable" = true)`,
+              Prisma.sql`NOT EXISTS (SELECT 1 FROM "ProductItem" pi_avail WHERE pi_avail."productId" = p.id AND pi_avail."isAvailable" = true)`
             );
           }
         }
@@ -622,7 +622,7 @@ export async function getProductsWithMinPrice(
   where: Prisma.ProductWhereInput,
   orderBy: "asc" | "desc",
   skip: number,
-  take: number,
+  take: number
 ): Promise<Array<{ productId: number; minPrice: number }>> {
   // Строим SQL части из Prisma where
   const { needsCategoryJoin, whereConditions } = buildSqlParts(where);
@@ -688,7 +688,7 @@ export async function getProductsWithMaxPrice(
   where: Prisma.ProductWhereInput,
   orderBy: "asc" | "desc",
   skip: number,
-  take: number,
+  take: number
 ): Promise<Array<{ productId: number; maxPrice: number }>> {
   // Строим SQL части из Prisma where
   const { needsCategoryJoin, whereConditions } = buildSqlParts(where);

@@ -1,9 +1,17 @@
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/ui";
-import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui";
+import {
+  Button,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui";
 import { DTO } from "@/shared/services";
-import { ProductsSearchParams } from "@/shared/lib";
+import type { ProductsSearchParams } from "@/shared/lib/search";
 import { Filter } from "lucide-react";
 
 type SortValue = NonNullable<DTO.ProductsQueryDto["sort"]>;
@@ -43,9 +51,7 @@ export function ProductsFiltersCard(props: ProductsFiltersCardProps) {
           <Filter className="h-5 w-5 text-teal-600" />
           <CardTitle className="text-base font-semibold">Фильтры</CardTitle>
         </div>
-        <CardDescription className="text-xs">
-          Поиск, категория, сортировка
-        </CardDescription>
+        <CardDescription className="text-xs">Поиск, категория, сортировка</CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -91,11 +97,7 @@ export function ProductsFiltersCard(props: ProductsFiltersCardProps) {
               >
                 <SelectTrigger className="cursor-pointer" id="categorySlug">
                   <SelectValue
-                    placeholder={
-                      isCategoriesLoading
-                        ? "Загрузка категорий..."
-                        : "Все категории"
-                    }
+                    placeholder={isCategoriesLoading ? "Загрузка категорий..." : "Все категории"}
                   />
                 </SelectTrigger>
                 <SelectContent>
@@ -103,11 +105,7 @@ export function ProductsFiltersCard(props: ProductsFiltersCardProps) {
                     Все категории
                   </SelectItem>
                   {categories.map((category) => (
-                    <SelectItem
-                      className="cursor-pointer"
-                      key={category.id}
-                      value={category.slug}
-                    >
+                    <SelectItem className="cursor-pointer" key={category.id} value={category.slug}>
                       {category.name}
                     </SelectItem>
                   ))}
@@ -126,8 +124,7 @@ export function ProductsFiltersCard(props: ProductsFiltersCardProps) {
               <Select
                 value={sort ?? "new"}
                 onValueChange={(value: string) => {
-                  const sortValue =
-                    (value as DTO.ProductsQueryDto["sort"]) ?? "new";
+                  const sortValue = (value as DTO.ProductsQueryDto["sort"]) ?? "new";
                   onFilterChange({
                     page: 1,
                     perPage: 20,
@@ -172,6 +169,3 @@ export function ProductsFiltersCard(props: ProductsFiltersCardProps) {
     </Card>
   );
 }
-
-
-

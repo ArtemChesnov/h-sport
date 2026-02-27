@@ -1,11 +1,11 @@
 "use client";
 
 import {
-    ProductCartControls,
-    ProductInfoSection,
-    ProductVariantSelector,
+  ProductCartControls,
+  ProductInfoSection,
+  ProductVariantSelector,
 } from "@/shared/components/common/product";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { DTO } from "@/shared/services";
 
 interface ProductInfoProps {
@@ -65,9 +65,7 @@ export function ProductInfo({
       {/* Описание */}
       {product.description && (
         <ProductInfoSection title="Описание">
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            {product.description}
-          </p>
+          <p className="text-sm leading-relaxed text-muted-foreground">{product.description}</p>
         </ProductInfoSection>
       )}
 

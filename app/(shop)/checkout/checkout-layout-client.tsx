@@ -2,7 +2,7 @@
 
 import { Container, ShopBreadcrumbs } from "@/shared/components/common";
 import { CheckoutAddressProvider } from "@/shared/hooks/checkout/checkout-address-provider";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { usePathname } from "next/navigation";
 import React, { Suspense } from "react";
 import { CheckoutPageSkeleton } from "./_components/checkout-skeletons";
@@ -31,7 +31,9 @@ export function CheckoutLayoutClient({ children }: CheckoutLayoutClientProps) {
           <div
             className={cn(
               "mt-[60px] flex justify-between gap-10",
-              isPaymentPage ? "max-[1280px]:flex-col max-[1280px]:gap-[60px]" : "max-[1600px]:flex-col max-[1600px]:gap-[60px]"
+              isPaymentPage
+                ? "max-[1280px]:flex-col max-[1280px]:gap-[60px]"
+                : "max-[1600px]:flex-col max-[1600px]:gap-[60px]"
             )}
           >
             {/* Левая колонка: шаги и контент */}

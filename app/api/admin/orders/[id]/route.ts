@@ -4,17 +4,19 @@
  */
 
 import { createErrorResponse } from "@/shared/lib/api/error-response";
+import { validateRequestBody } from "@/shared/lib/api/validate-request-body";
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { DTO } from "@/shared/services";
 import { getAdminOrderDetail, updateAdminOrder } from "@/shared/services/server";
 import type { ErrorResponse, RouteParams } from "@/shared/dto";
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 
 type RouteContext = RouteParams<{ id: string }>;
 
 export async function GET(
   _request: NextRequest,
-  context: RouteContext,
+  context: RouteContext
 ): Promise<NextResponse<DTO.OrderDetailDto | ErrorResponse>> {
   return withErrorHandling(
     async (req) => {
@@ -37,13 +39,13 @@ export async function GET(
       return NextResponse.json<DTO.OrderDetailDto>(order, { status: 200 });
     },
     _request,
-    "GET /api/admin/orders/[id]",
+    "GET /api/admin/orders/[id]"
   );
 }
 
 export async function PATCH(
   request: NextRequest,
-  context: RouteContext,
+  context: RouteContext
 ): Promise<NextResponse<DTO.OrderAdminUpdateResponseDto | ErrorResponse>> {
   return withErrorHandling(
     async (req) => {
@@ -58,12 +60,9 @@ export async function PATCH(
         return createErrorResponse("Некорректный идентификатор заказа", 400);
       }
 
-      let body: DTO.OrderAdminUpdateRequestDto;
-      try {
-        body = (await req.json()) as DTO.OrderAdminUpdateRequestDto;
-      } catch {
-        return createErrorResponse("Некорректное тело запроса", 400);
-      }
+      const bodyResult = await validateRequestBody(req, z.object({}).passthrough());
+      if ("error" in bodyResult) return bodyResult.error;
+      const body = bodyResult.data as DTO.OrderAdminUpdateRequestDto;
 
       const result = await updateAdminOrder(id, body);
 
@@ -76,6 +75,6 @@ export async function PATCH(
       });
     },
     request,
-    "PATCH /api/admin/orders/[id]",
+    "PATCH /api/admin/orders/[id]"
   );
 }

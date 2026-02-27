@@ -3,41 +3,6 @@ import { RawProduct } from "./types";
 
 import clientProductsJson from "./data/raw_products_from_client.json";
 
-/** Заглушки изображений; фото добавляются вручную в админке */
-const PRODUCT_IMAGES = [
-  "/assets/images/fitness.webp",
-  "/assets/images/yoga.webp",
-  "/assets/images/tennis.webp",
-  "/assets/images/running.webp",
-  "/assets/images/pilates.webp",
-  "/assets/images/paddle.webp",
-  "/assets/images/gimnastic.webp",
-  "/assets/images/dance.webp",
-  "/assets/images/aerobic.webp",
-  "/assets/images/top-leggings-set-black.webp",
-  "/assets/images/top-leggings-set-green.webp",
-  "/assets/images/top-leggings-set-rose.webp",
-  "/assets/images/placeholder-product.webp",
-];
-
-export function getImage(index: number): string {
-  return PRODUCT_IMAGES[index % PRODUCT_IMAGES.length];
-}
-
-const MIN_IMAGES_PER_PRODUCT = 4;
-
-export function getImagesForProduct(productIndex: number): string[] {
-  const result: string[] = [];
-  const startIdx = (productIndex * MIN_IMAGES_PER_PRODUCT) % PRODUCT_IMAGES.length;
-
-  for (let i = 0; i < MIN_IMAGES_PER_PRODUCT; i++) {
-    const idx = (startIdx + i) % PRODUCT_IMAGES.length;
-    result.push(PRODUCT_IMAGES[idx]);
-  }
-
-  return result;
-}
-
 type ClientVariation = {
   color: string;
   sizes: string[];
@@ -55,9 +20,7 @@ type ClientProduct = {
 
 function normalizeComposition(c: string | null): string {
   if (!c || !c.trim()) return "";
-  let s = c
-    .replace(/polyamed/gi, "polyamide")
-    .replace(/\b91nylon\b/gi, "91% nylon");
+  let s = c.replace(/polyamed/gi, "polyamide").replace(/\b91nylon\b/gi, "91% nylon");
   s = s
     .replace(/\bnylon\b/gi, "нейлон")
     .replace(/\belastane\b/gi, "эластан")

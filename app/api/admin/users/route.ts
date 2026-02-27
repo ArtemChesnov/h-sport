@@ -1,4 +1,5 @@
-import { validateSearchQuery, normalizeAdminPaginationParams } from "@/shared/lib";
+import { normalizeAdminPaginationParams } from "@/shared/lib/pagination";
+import { validateSearchQuery } from "@/shared/lib/validation";
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { DTO } from "@/shared/services";
 import { getAdminUsersList } from "@/shared/services/server";
@@ -11,7 +12,7 @@ import { NextRequest, NextResponse } from "next/server";
  * Список пользователей + агрегированные метрики.
  */
 async function getHandler(
-  request: NextRequest,
+  request: NextRequest
 ): Promise<NextResponse<DTO.AdminUsersListResponseDto>> {
   const { requireAdmin } = await import("@/shared/lib/auth/middleware");
   const authError = await requireAdmin(request);
@@ -20,7 +21,7 @@ async function getHandler(
   const { searchParams } = new URL(request.url);
   const { page, perPage } = normalizeAdminPaginationParams(
     searchParams.get("page"),
-    searchParams.get("perPage"),
+    searchParams.get("perPage")
   );
   const search = validateSearchQuery(searchParams.get("search")) ?? "";
 
@@ -29,7 +30,7 @@ async function getHandler(
 }
 
 export async function GET(
-  request: NextRequest,
+  request: NextRequest
 ): Promise<NextResponse<DTO.AdminUsersListResponseDto | ErrorResponse>> {
   return withErrorHandling(getHandler, request, "GET /api/admin/users");
 }

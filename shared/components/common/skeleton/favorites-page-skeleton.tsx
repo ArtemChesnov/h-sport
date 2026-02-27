@@ -3,7 +3,7 @@
  * Используется на /favorites и /account/favorites.
  */
 import { Skeleton } from "@/shared/components/ui/skeleton";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { FavoritesCardSkeleton } from "./favorites-card-skeleton";
 
 type FavoritesPageSkeletonProps = {
@@ -21,7 +21,7 @@ export function FavoritesPageSkeleton({ variant = "full", className }: Favorites
         variant === "account"
           ? "space-y-6 max-[576px]:space-y-6 min-[873px]:space-y-8 min-[1024px]:space-y-10"
           : "space-y-6 max-[576px]:space-y-6 min-[768px]:space-y-8 min-[1024px]:space-y-10 mt-8 min-[768px]:mt-12 min-[1024px]:mt-15",
-        className,
+        className
       )}
       data-account-favorites-section={variant === "account" ? true : undefined}
     >
@@ -44,7 +44,11 @@ export function FavoritesPageSkeleton({ variant = "full", className }: Favorites
         {Array.from({ length: cardCount }, (_, i) => (
           <div
             key={i}
-            className={variant === "account" ? "rounded-lg border border-neutral-100 bg-white overflow-hidden" : undefined}
+            className={
+              variant === "account"
+                ? "rounded-lg border border-neutral-100 bg-white overflow-hidden"
+                : undefined
+            }
           >
             <FavoritesCardSkeleton />
           </div>

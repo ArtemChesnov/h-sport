@@ -3,7 +3,8 @@
 import { Button } from "@/shared/components/ui";
 import { getColorHex } from "@/shared/constants";
 import { useCartItemActions } from "@/shared/hooks/cart/use-cart-item-actions";
-import { cn, formatMoney } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
+import { formatMoney } from "@/shared/lib/formatters";
 import { PLACEHOLDER_PRODUCT_IMAGE } from "@/shared/lib/constants/images";
 import type { DTO } from "@/shared/services";
 import { Loader2, Trash2 } from "lucide-react";
@@ -89,7 +90,9 @@ export function OrderItemDisplay({
           <div className="flex flex-col gap-2">
             {color && (
               <div className="flex gap-2.5 items-center">
-                <p className="text-[16px] max-[1024px]:text-[14px] max-[576px]:text-[13px]">Цвет:</p>
+                <p className="text-[16px] max-[1024px]:text-[14px] max-[576px]:text-[13px]">
+                  Цвет:
+                </p>
                 <div className="flex items-center gap-2 text-left">
                   <div
                     className="w-4 h-4 rounded-full transition-all duration-150 shrink-0"
@@ -103,7 +106,9 @@ export function OrderItemDisplay({
             )}
             {size && (
               <div className="flex items-center gap-2.5">
-                <p className="text-[16px] max-[1024px]:text-[14px] max-[576px]:text-[13px]">Размер:</p>
+                <p className="text-[16px] max-[1024px]:text-[14px] max-[576px]:text-[13px]">
+                  Размер:
+                </p>
                 <span className="px-2 py-1 bg-[#FFFFFF] rounded-[10px] text-text-secondary text-[16px] max-[1024px]:text-[14px] max-[576px]:text-[13px]">
                   {size}
                 </span>

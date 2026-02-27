@@ -2,7 +2,7 @@
  * Маппинг продукта в детальную DTO
  */
 
-import { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 import type { Prisma } from "@prisma/client";
 
 /**

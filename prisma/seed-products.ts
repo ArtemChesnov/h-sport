@@ -1,6 +1,6 @@
 import { PrismaClient, Size } from "@prisma/client";
 import { generateSku } from "../shared/lib/generators";
-import { RAW_PRODUCTS, getImage, getImagesForProduct } from "./constants";
+import { RAW_PRODUCTS } from "./constants";
 import { RawProduct } from "./types";
 
 /**
@@ -56,102 +56,27 @@ function generateTags(product: RawProduct, index: number): string[] {
 }
 
 /**
- * Доп. небольшой набор demo-комплектов.
- * Подключаем только если категория "top-leggings-sets" существует.
- */
-const RAW_SET_PRODUCTS: RawProduct[] = [
-  {
-    name: "Комплект топ и леггинсы",
-    categorySlug: "top-leggings-sets",
-    description: "Комплект из спортивного топа и леггинсов зелёного цвета. Идеален для тренировок и активного отдыха.",
-    variations: [
-      {
-        color: "Зелёный",
-        sizes: [Size.S, Size.M, Size.L],
-        priceRub: 5800,
-        composition: "85% полиамид, 15% эластан",
-        isAvailable: true,
-      },
-    ],
-  },
-  {
-    name: "Комплект топ и леггинсы",
-    categorySlug: "top-leggings-sets",
-    description: "Классический комплект из чёрного топа и леггинсов. Универсальный вариант для любых тренировок.",
-    variations: [
-      {
-        color: "Чёрный",
-        sizes: [Size.S, Size.M, Size.L],
-        priceRub: 6200,
-        composition: "85% полиамид, 15% эластан",
-        isAvailable: true,
-      },
-    ],
-  },
-  {
-    name: "Комплект топ и леггинсы",
-    categorySlug: "top-leggings-sets",
-    description: "Элегантный бежевый комплект для тренировок. Нежный цвет и комфортный крой.",
-    variations: [
-      {
-        color: "Бежевый",
-        sizes: [Size.S, Size.M, Size.L],
-        priceRub: 5800,
-        composition: "85% полиамид, 15% эластан",
-        isAvailable: true,
-      },
-    ],
-  },
-  {
-    name: "Комплект топ и леггинсы",
-    categorySlug: "top-leggings-sets",
-    description: "Яркий розовый комплект для активных тренировок. Стильный дизайн и функциональность.",
-    variations: [
-      {
-        color: "Розовый",
-        sizes: [Size.S, Size.M],
-        priceRub: 6000,
-        composition: "85% полиамид, 15% эластан",
-        isAvailable: true,
-      },
-    ],
-  },
-];
-
-/**
- * Сидинг товаров:
- * - создаём продукты и варианты (items)
- * - генерируем SKU на каждый вариант
- *
- * Важное правило для размеров:
- * - Если variation.sizes пустой (например, аксессуары) → считаем это ONE_SIZE.
- *
- * ВАЖНО: ВСЕ картинки жёстко захардкожены в DEMO_IMAGE.
- * Любые imageUrls / images из RAW_PRODUCTS игнорируются.
+ * Сидинг товаров из данных клиента (raw_products_from_client.json).
+ * - Создаём продукты и варианты (items), генерируем SKU.
+ * - Размеры: пустой sizes → ONE_SIZE.
+ * - Фото не подставляем: images и imageUrls — пустые массивы (добавление вручную в админке).
+ * - Состав: при отсутствии в данных не пишем (null).
  */
 export async function seedProducts(prisma: PrismaClient) {
   const categories = await prisma.category.findMany();
-  const categoryIdBySlug = new Map<string, number>(
-      categories.map((c) => [c.slug, c.id]),
-  );
+  const categoryIdBySlug = new Map<string, number>(categories.map((c) => [c.slug, c.id]));
 
   const allProducts: RawProduct[] = [...RAW_PRODUCTS];
 
-  // Добавляем демо-комплекты только если категория реально есть в БД.
-  if (categoryIdBySlug.has("top-leggings-sets")) {
-    allProducts.push(...RAW_SET_PRODUCTS);
-  }
-
   let productIndex = 1;
-  let imageIndex = 0;
 
   for (const rawProduct of allProducts) {
     const categoryId = categoryIdBySlug.get(rawProduct.categorySlug);
 
     if (!categoryId) {
       console.warn(
-          `[seedProducts] Категория с slug="${rawProduct.categorySlug}" не найдена. ` +
-          `Товар "${rawProduct.name}" пропущен.`,
+        `[seedProducts] Категория с slug="${rawProduct.categorySlug}" не найдена. ` +
+          `Товар "${rawProduct.name}" пропущен.`
       );
       continue;
     }
@@ -176,7 +101,7 @@ export async function seedProducts(prisma: PrismaClient) {
 
     if (variationsByComposition.size === 0) {
       console.warn(
-          `[seedProducts] Для товара "${rawProduct.name}" нет ни одной вариации. Пропускаю.`,
+        `[seedProducts] Для товара "${rawProduct.name}" нет ни одной вариации. Пропускаю.`
       );
       continue;
     }
@@ -197,17 +122,15 @@ export async function seedProducts(prisma: PrismaClient) {
       for (const variation of variations) {
         // Если sizes пустой — это ONE_SIZE (аксессуары и т.п.)
         const sizesToUse: Size[] =
-            variation.sizes && variation.sizes.length > 0
-                ? variation.sizes
-                : [Size.ONE_SIZE];
+          variation.sizes && variation.sizes.length > 0 ? variation.sizes : [Size.ONE_SIZE];
 
         for (const productSize of sizesToUse) {
           const key = `${variation.color}__${productSize}`;
 
           if (usedColorSizeKeys.has(key)) {
             console.warn(
-                `[seedProducts] Дубликат варианта color="${variation.color}", size="${productSize}" ` +
-                `в товаре "${rawProduct.name}" (composition="${composition}"). Пропускаю дубликат.`,
+              `[seedProducts] Дубликат варианта color="${variation.color}", size="${productSize}" ` +
+                `в товаре "${rawProduct.name}" (composition="${composition}"). Пропускаю дубликат.`
             );
             continue;
           }
@@ -220,21 +143,12 @@ export async function seedProducts(prisma: PrismaClient) {
             size: productSize,
           });
 
-          // Минимум 4 изображения на каждый вариант (для разных цветов — разные наборы)
-          const variantImages = [
-            getImage(imageIndex),
-            getImage(imageIndex + 1),
-            getImage(imageIndex + 2),
-            getImage(imageIndex + 3),
-          ];
-          imageIndex += 1;
-
           productItemsToCreate.push({
             color: variation.color,
             size: productSize,
             price: variation.priceRub * 100, // в копейках
             isAvailable: variation.isAvailable,
-            imageUrls: variantImages,
+            imageUrls: [], // фото добавляются вручную в админке
             sku,
           });
 
@@ -244,15 +158,12 @@ export async function seedProducts(prisma: PrismaClient) {
 
       if (productItemsToCreate.length === 0) {
         console.warn(
-            `[seedProducts] Для товара "${rawProduct.name}" и состава "${composition}" нет валидных вариаций. Пропускаю.`,
+          `[seedProducts] Для товара "${rawProduct.name}" и состава "${composition}" нет валидных вариаций. Пропускаю.`
         );
         continue;
       }
 
       const slug = `product-${String(productIndex).padStart(3, "0")}`;
-
-      // Минимум 4 изображения на товар (обложка + дополнительные)
-      const productImages = getImagesForProduct(productIndex);
 
       productIndex += 1;
 
@@ -266,7 +177,7 @@ export async function seedProducts(prisma: PrismaClient) {
           categoryId,
           description: rawProduct.description ?? null,
           composition: composition === "—" ? null : composition,
-          images: productImages,
+          images: [], // фото добавляются вручную в админке
           tags,
           items: {
             create: productItemsToCreate,
@@ -276,7 +187,5 @@ export async function seedProducts(prisma: PrismaClient) {
     }
   }
 
-  console.log(
-      `[seedProducts] Закончено. Создано продуктов: ${productIndex - 1}`,
-  );
+  console.log(`[seedProducts] Закончено. Создано продуктов: ${productIndex - 1}`);
 }

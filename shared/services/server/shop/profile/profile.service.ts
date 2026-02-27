@@ -1,8 +1,8 @@
 /** Профиль пользователя: get/update, адрес по умолчанию. */
 
 import { prisma } from "@/prisma/prisma-client";
-import { isValidEmail } from "@/shared/lib";
-import type { DTO } from "@/shared/services";
+import { isValidEmail } from "@/shared/lib/validation";
+import type * as DTO from "@/shared/services/dto";
 
 /** Результат получения профиля */
 export type GetProfileResult =
@@ -75,7 +75,7 @@ export async function getUserProfile(userId: string): Promise<GetProfileResult> 
 /** Обновление профиля и адреса по умолчанию. */
 export async function updateUserProfile(
   userId: string,
-  data: DTO.UserProfileUpdateDto,
+  data: DTO.UserProfileUpdateDto
 ): Promise<UpdateProfileResult> {
   // Валидация email
   if (data.email !== undefined) {
@@ -132,7 +132,7 @@ export async function updateUserProfile(
  */
 async function validateEmailUpdate(
   email: string,
-  userId: string,
+  userId: string
 ): Promise<{ ok: true } | { ok: false; status: number; message: string }> {
   if (!email.trim()) {
     return { ok: false, status: 400, message: "E-mail не может быть пустым" };
@@ -162,7 +162,7 @@ async function validateEmailUpdate(
  */
 async function upsertDefaultAddress(
   userId: string,
-  addressData: DTO.UserProfileUpdateDto["address"],
+  addressData: DTO.UserProfileUpdateDto["address"]
 ): Promise<AddressData | null> {
   if (addressData === undefined) {
     // Возвращаем текущий адрес
@@ -227,7 +227,7 @@ function mapUserToProfileDto(
     birthDate: Date | null;
     role: string;
   },
-  address: AddressData | null,
+  address: AddressData | null
 ): DTO.UserProfileDto {
   return {
     id: user.id,

@@ -1,8 +1,6 @@
 "use client";
 
-import { cn } from "@/shared/lib";
-
-
+import { cn } from "@/shared/lib/utils";
 type FormFieldErrorProps = {
   /**
    * Имя поля, по которому ищем ошибку в errors.
@@ -48,13 +46,19 @@ type FormFieldErrorProps = {
 export function FormFieldError(props: FormFieldErrorProps) {
   const { name, errors, message, className } = props;
 
-  const text = message ?? (name && errors && Object.prototype.hasOwnProperty.call(errors, name) ? errors[name] : undefined);
+  const text =
+    message ??
+    (name && errors && Object.prototype.hasOwnProperty.call(errors, name)
+      ? errors[name]
+      : undefined);
 
   if (!text) {
     return null;
   }
 
-  return <p className={cn("mt-1 text-xs text-destructive whitespace-pre-line", className)}>{text}</p>;
+  return (
+    <p className={cn("mt-1 text-xs text-destructive whitespace-pre-line", className)}>{text}</p>
+  );
 }
 
 /**

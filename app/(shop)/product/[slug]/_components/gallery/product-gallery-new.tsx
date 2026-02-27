@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -161,10 +161,7 @@ export function ProductGalleryNew({
   if (!images || images.length === 0) {
     return (
       <div
-        className={cn(
-          "relative aspect-[880/920] w-full overflow-hidden bg-muted/40",
-          className
-        )}
+        className={cn("relative aspect-[880/920] w-full overflow-hidden bg-muted/40", className)}
       >
         <div className="flex h-full items-center justify-center">
           <span className="text-muted-foreground">Изображение недоступно</span>

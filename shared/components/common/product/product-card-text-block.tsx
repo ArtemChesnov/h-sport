@@ -1,5 +1,5 @@
-import { cn, formatMoney } from "@/shared/lib";
-
+import { cn } from "@/shared/lib/utils";
+import { formatMoney } from "@/shared/lib/formatters";
 export type ProductCardTextBlockProps = {
   name: string;
   price: number;

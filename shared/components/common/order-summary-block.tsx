@@ -1,7 +1,7 @@
 "use client";
 
 import { SUMMARY_LABELS, SUMMARY_LABEL_CLASS, SUMMARY_VALUE_CLASS } from "@/shared/constants";
-import { formatMoney } from "@/shared/lib";
+import { formatMoney } from "@/shared/lib/formatters";
 import { formatDiscountDisplay } from "@/shared/lib/promo/format-discount-display";
 import React from "react";
 
@@ -79,12 +79,15 @@ export function OrderSummaryBlock({
                       : formatMoney(deliveryCost)
                     : "при оформлении"}
                 </h4>
-                {isDeliveryKnown && deliveryCost !== undefined && deliveryCost > 0 && (() => {
-                  const period = formatDeliveryPeriod(deliveryPeriodMin, deliveryPeriodMax);
-                  return period ? (
-                    <span className="text-[14px] text-muted-foreground mt-0.5">{period}</span>
-                  ) : null;
-                })()}
+                {isDeliveryKnown &&
+                  deliveryCost !== undefined &&
+                  deliveryCost > 0 &&
+                  (() => {
+                    const period = formatDeliveryPeriod(deliveryPeriodMin, deliveryPeriodMax);
+                    return period ? (
+                      <span className="text-[14px] text-muted-foreground mt-0.5">{period}</span>
+                    ) : null;
+                  })()}
               </div>
             </div>
 

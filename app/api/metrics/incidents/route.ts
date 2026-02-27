@@ -4,6 +4,7 @@
  */
 
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
+import { validateRequestBody } from "@/shared/lib/api/validate-request-body";
 import { requireAdmin } from "@/shared/lib/auth/middleware";
 import {
   listIncidents,
@@ -40,7 +41,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(result, { status: 200 });
     },
     request,
-    "GET /api/metrics/incidents",
+    "GET /api/metrics/incidents"
   );
 }
 
@@ -49,12 +50,13 @@ export async function POST(request: NextRequest) {
     async (req) => {
       const authError = await requireAdmin(req);
       if (authError) return authError;
-      const body = await req.json();
-      const validatedData = CreateIncidentSchema.parse(body) as CreateIncidentInput;
+      const bodyResult = await validateRequestBody(req, CreateIncidentSchema);
+      if ("error" in bodyResult) return bodyResult.error;
+      const validatedData = bodyResult.data as CreateIncidentInput;
       const { incident, created } = await createOrUpdateIncident(validatedData);
       return NextResponse.json(incident, { status: created ? 201 : 200 });
     },
     request,
-    "POST /api/metrics/incidents",
+    "POST /api/metrics/incidents"
   );
 }

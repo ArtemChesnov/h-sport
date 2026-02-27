@@ -2,18 +2,18 @@
 
 import { DesignButton } from "@/shared/components/ui/design-button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
 } from "@/shared/components/ui/dialog";
 import {
-    SHOP_MODAL_CONTENT_CLASS,
-    SHOP_MODAL_DESCRIPTION_CLASS,
-    SHOP_MODAL_TITLE_CLASS,
+  SHOP_MODAL_CONTENT_CLASS,
+  SHOP_MODAL_DESCRIPTION_CLASS,
+  SHOP_MODAL_TITLE_CLASS,
 } from "@/shared/constants";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import Link from "next/link";
 
 type AuthRequiredDialogProps = {
@@ -37,12 +37,8 @@ export function AuthRequiredDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={cn("shop", SHOP_MODAL_CONTENT_CLASS)}>
         <DialogHeader className="pb-4 text-left">
-          <DialogTitle className={cn(SHOP_MODAL_TITLE_CLASS, "text-left")}>
-            {title}
-          </DialogTitle>
-          <DialogDescription
-            className={cn(SHOP_MODAL_DESCRIPTION_CLASS, "mt-2 text-left text-sm")}
-          >
+          <DialogTitle className={cn(SHOP_MODAL_TITLE_CLASS, "text-left")}>{title}</DialogTitle>
+          <DialogDescription className={cn(SHOP_MODAL_DESCRIPTION_CLASS, "mt-2 text-left text-sm")}>
             {description}
           </DialogDescription>
         </DialogHeader>

@@ -11,7 +11,7 @@ import {
 } from "@/shared/components/ui";
 import { CreditCard } from "lucide-react";
 import { DTO } from "@/shared/services";
-import { formatMoney } from "@/shared/lib";
+import { formatMoney } from "@/shared/lib/formatters";
 import {
   getPaymentStatusBadgeStyles,
   getPaymentStatusLabel,
@@ -39,9 +39,7 @@ export function OrderPaymentsCard({ order }: OrderPaymentsCardProps) {
           <CreditCard className="h-5 w-5 text-violet-600" />
           <CardTitle className="text-base font-semibold">Платежи</CardTitle>
         </div>
-        <CardDescription className="text-xs">
-          Информация о платежах по заказу
-        </CardDescription>
+        <CardDescription className="text-xs">Информация о платежах по заказу</CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -53,14 +51,14 @@ export function OrderPaymentsCard({ order }: OrderPaymentsCardProps) {
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="space-y-1 flex-1">
-                  <div className="text-sm font-semibold">
-                    Платеж #{payment.id}
-                  </div>
+                  <div className="text-sm font-semibold">Платеж #{payment.id}</div>
                   <div className="text-xs text-muted-foreground">
                     {new Date(payment.createdAt).toLocaleString("ru-RU")}
                   </div>
                 </div>
-                <span className={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide shadow-sm ${getPaymentStatusBadgeStyles(payment.status)}`}>
+                <span
+                  className={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide shadow-sm ${getPaymentStatusBadgeStyles(payment.status)}`}
+                >
                   {getPaymentStatusLabel(payment.status)}
                 </span>
               </div>
@@ -87,11 +85,7 @@ export function OrderPaymentsCard({ order }: OrderPaymentsCardProps) {
                     size="sm"
                     className="w-full cursor-pointer hover:bg-violet-50 hover:border-violet-200 hover:text-violet-700 transition-all"
                   >
-                    <a
-                      href={payment.receiptUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                    <a href={payment.receiptUrl} target="_blank" rel="noopener noreferrer">
                       Открыть чек об оплате
                     </a>
                   </Button>

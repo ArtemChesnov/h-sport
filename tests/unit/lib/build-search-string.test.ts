@@ -8,8 +8,8 @@ import { buildSearchString } from "@/shared/lib/search/build-search-string";
 describe("buildSearchString", () => {
   it("should return empty string for default params", () => {
     expect(buildSearchString({})).toBe("");
-    // CATALOG_DEFAULT_PER_PAGE = 24
-    expect(buildSearchString({ page: 1, perPage: 24, sort: "new" })).toBe("");
+    // CATALOG_DEFAULT_PER_PAGE = 12
+    expect(buildSearchString({ page: 1, perPage: 12, sort: "new" })).toBe("");
   });
 
   it("should include page when > 1", () => {

@@ -1,6 +1,7 @@
 import { queueEmail } from "@/modules/auth/lib/email-queue";
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { createErrorResponse } from "@/shared/lib/api/error-response";
+import { getAppUrl } from "@/shared/lib/config/env";
 import {
   getIssueAndConfirmedEmails,
   markIssueSent,
@@ -11,12 +12,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 const UNSUBSCRIBE_PLACEHOLDER = "{{unsubscribe_link}}";
 const SHOP_URL_PLACEHOLDER = "{{shop_url}}";
-const baseUrl = () => process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 function replacePlaceholders(html: string, unsubscribeUrl: string, shopUrl: string): string {
   let out = html;
   if (out.includes(UNSUBSCRIBE_PLACEHOLDER)) {
-    out = out.replace(new RegExp(UNSUBSCRIBE_PLACEHOLDER.replace(/[{}]/g, "\\$&"), "g"), unsubscribeUrl);
+    out = out.replace(
+      new RegExp(UNSUBSCRIBE_PLACEHOLDER.replace(/[{}]/g, "\\$&"), "g"),
+      unsubscribeUrl
+    );
   }
   if (out.includes(SHOP_URL_PLACEHOLDER)) {
     out = out.replace(new RegExp(SHOP_URL_PLACEHOLDER.replace(/[{}]/g, "\\$&"), "g"), shopUrl);
@@ -35,7 +38,7 @@ type RouteContext = RouteParams<{ id: string }>;
 
 export async function POST(
   request: NextRequest,
-  context: RouteContext,
+  context: RouteContext
 ): Promise<NextResponse<ErrorResponse | { success: true; sentCount: number }>> {
   return withErrorHandling(
     async (req) => {
@@ -58,7 +61,7 @@ export async function POST(
         return createErrorResponse("Нет подтверждённых подписчиков для отправки", 400);
       }
 
-      const origin = baseUrl();
+      const origin = getAppUrl();
 
       for (const sub of subscribers) {
         const token = await setUnsubscribeToken(sub.id);
@@ -72,10 +75,10 @@ export async function POST(
 
       return NextResponse.json(
         { success: true as const, sentCount: subscribers.length },
-        { status: 200 },
+        { status: 200 }
       );
     },
     request,
-    "POST /api/admin/newsletter/issues/[id]/send",
+    "POST /api/admin/newsletter/issues/[id]/send"
   );
 }

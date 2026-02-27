@@ -1,10 +1,10 @@
+import { normalizeAdminPaginationParams } from "@/shared/lib/pagination";
 import {
-  normalizeAdminPaginationParams,
   validateEmailQuery,
   validatePhoneQuery,
-  validateUidQuery,
   validateSearchQuery,
-} from "@/shared/lib";
+  validateUidQuery,
+} from "@/shared/lib/validation";
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { DTO } from "@/shared/services";
 import { getAdminOrdersList } from "@/shared/services/server";
@@ -15,7 +15,7 @@ import { NextRequest, NextResponse } from "next/server";
  * GET /api/(admin)/orders
  */
 async function getHandler(
-  request: NextRequest,
+  request: NextRequest
 ): Promise<NextResponse<DTO.AdminOrdersListResponseDto>> {
   const { requireAdmin } = await import("@/shared/lib/auth/middleware");
   const authError = await requireAdmin(request);
@@ -26,7 +26,7 @@ async function getHandler(
   const { searchParams } = new URL(request.url);
   const { page, perPage } = normalizeAdminPaginationParams(
     searchParams.get("page"),
-    searchParams.get("perPage"),
+    searchParams.get("perPage")
   );
 
   const status = searchParams.get("status") as DTO.OrderStatusDto | null;
@@ -49,7 +49,7 @@ async function getHandler(
 }
 
 export async function GET(
-  request: NextRequest,
+  request: NextRequest
 ): Promise<NextResponse<DTO.AdminOrdersListResponseDto | ErrorResponse>> {
   return withErrorHandling(getHandler, request, "GET /api/admin/orders");
 }

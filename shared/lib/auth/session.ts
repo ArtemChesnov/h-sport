@@ -4,6 +4,7 @@
 
 import { SignJWT, jwtVerify } from "jose";
 import { NextRequest, NextResponse } from "next/server";
+import { env } from "@/shared/lib/config/env";
 
 /**
  * Минимальная длина AUTH_SECRET для безопасного HS256
@@ -14,19 +15,18 @@ const MIN_SECRET_LENGTH = 32;
  * Получает секретный ключ для JWT (только на сервере)
  */
 function getSecret(): Uint8Array {
-  // Проверяем, что мы на сервере
   if (typeof window !== "undefined") {
-    throw new Error("getSecret() can only be called on the server");
+    throw new Error("getSecret() можно вызывать только на сервере");
   }
 
-  const SECRET_KEY = process.env.AUTH_SECRET;
+  const SECRET_KEY = env.AUTH_SECRET;
   if (!SECRET_KEY) {
-    throw new Error("AUTH_SECRET is not set. Please configure environment variable.");
+    throw new Error("AUTH_SECRET не задан. Настройте переменную окружения.");
   }
 
   if (SECRET_KEY.length < MIN_SECRET_LENGTH) {
     throw new Error(
-      `AUTH_SECRET is too short. Minimum length is ${MIN_SECRET_LENGTH} characters for secure HS256 signing.`
+      `AUTH_SECRET слишком короткий. Минимум ${MIN_SECRET_LENGTH} символов для HS256.`
     );
   }
 
@@ -96,9 +96,7 @@ export async function verifySession(token: string): Promise<SessionUser | null> 
       id: userId,
       email: payload.email as string,
       role: payload.role as "USER" | "ADMIN",
-      emailVerified: payload.emailVerified
-        ? new Date(payload.emailVerified as string)
-        : null,
+      emailVerified: payload.emailVerified ? new Date(payload.emailVerified as string) : null,
       sessionVersion,
     };
   } catch {
@@ -125,9 +123,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
 /**
  * Получает пользователя из сессии из запроса (для API routes)
  */
-export async function getSessionUserFromRequest(
-  request: NextRequest,
-): Promise<SessionUser | null> {
+export async function getSessionUserFromRequest(request: NextRequest): Promise<SessionUser | null> {
   const token = request.cookies.get("session")?.value;
 
   if (!token) {
@@ -151,7 +147,7 @@ export async function getSessionUserFromRequest(
 export function setSessionCookie(response: NextResponse, token: string): void {
   response.cookies.set("session", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: env.NODE_ENV === "production",
     sameSite: "strict",
     maxAge: SESSION_TTL_SECONDS,
     path: "/",

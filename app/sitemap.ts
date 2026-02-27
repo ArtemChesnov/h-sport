@@ -3,11 +3,12 @@
  * Данные получает через server-service (без прямого prisma в app).
  */
 
+import { getAppUrl } from "@/shared/lib/config/env";
 import { getSitemapEntries } from "@/shared/services/server/sitemap/sitemap.service";
 import type { MetadataRoute } from "next";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const baseUrl = getAppUrl();
 
   if (!process.env.DATABASE_URL) {
     return [
@@ -33,7 +34,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     logger.error("Error generating sitemap", error);
     return [
       { url: baseUrl, lastModified: new Date(), changeFrequency: "daily", priority: 1 },
-      { url: `${baseUrl}/catalog`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
+      {
+        url: `${baseUrl}/catalog`,
+        lastModified: new Date(),
+        changeFrequency: "daily",
+        priority: 0.9,
+      },
     ];
   }
 }

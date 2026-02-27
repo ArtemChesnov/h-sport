@@ -1,4 +1,4 @@
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -25,7 +25,7 @@ export const InfoBlock: React.FC<Props> = ({
     <div
       className={cn(
         className,
-        "mx-auto my-auto flex w-full max-w-[560px] items-center justify-between gap-12",
+        "mx-auto my-auto flex w-full max-w-[560px] items-center justify-between gap-12"
       )}
     >
       <div className="flex flex-col">
@@ -50,13 +50,7 @@ export const InfoBlock: React.FC<Props> = ({
       </div>
 
       {imageUrl && (
-        <Image
-          src={imageUrl}
-          alt={title}
-          width={300}
-          height={300}
-          priority={priority}
-        />
+        <Image src={imageUrl} alt={title} width={300} height={300} priority={priority} />
       )}
     </div>
   );

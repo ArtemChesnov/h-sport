@@ -1,7 +1,7 @@
 "use client";
 
 import { FavoriteToggleButton } from "@/shared/components/common";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { DTO } from "@/shared/services";
 import Image from "next/image";
 import Link from "next/link";
@@ -50,24 +50,16 @@ function ProductCardComponent({
         className={cn(
           "block cursor-pointer group",
           imageFill && "h-full w-full min-h-0",
-          className,
+          className
         )}
       >
-        <div
-          className={cn(
-            "relative bg-neutral-100",
-            imageFill && "flex flex-col h-full min-h-0",
-          )}
-        >
+        <div className={cn("relative bg-neutral-100", imageFill && "flex flex-col h-full min-h-0")}>
           <div className={imageContainerClass}>
             <Image
               src={previewImage || "/assets/images/fitness.webp"}
               alt={name}
               fill
-              sizes={
-                imageSizes ??
-                "(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-              }
+              sizes={imageSizes ?? "(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"}
               className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
               loading={priority ? "eager" : "lazy"}
               priority={priority}
@@ -92,7 +84,13 @@ function ProductCardComponent({
         className
       )}
     >
-      <Link href={href} target="_blank" rel="noopener noreferrer" prefetch={false} className="flex h-full flex-col">
+      <Link
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        prefetch={false}
+        className="flex h-full flex-col"
+      >
         <div className="relative h-full w-full">
           <Image
             src={previewImage || "/assets/images/fitness.webp"}

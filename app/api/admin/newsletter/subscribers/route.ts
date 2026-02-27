@@ -1,4 +1,8 @@
-import { buildPaginatedResponse, calculateSkip, normalizeAdminPaginationParams } from "@/shared/lib";
+import {
+  buildPaginatedResponse,
+  calculateSkip,
+  normalizeAdminPaginationParams,
+} from "@/shared/lib/pagination";
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { getSubscribersList } from "@/shared/services/server";
 import type { ErrorResponse } from "@/shared/dto";
@@ -30,7 +34,7 @@ async function getHandler(request: NextRequest) {
 }
 
 export async function GET(
-  request: NextRequest,
+  request: NextRequest
 ): Promise<NextResponse<ErrorResponse | ReturnType<typeof buildPaginatedResponse>>> {
   return withErrorHandling(getHandler, request, "GET /api/admin/newsletter/subscribers");
 }

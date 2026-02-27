@@ -2,7 +2,7 @@
 
 import { ErrorFallbackBlock, ProductCard, StoreEmptyBlock } from "@/shared/components/common";
 import { CTA } from "@/shared/constants";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { DTO } from "@/shared/services";
 import { Heart } from "lucide-react";
 import React from "react";
@@ -62,7 +62,7 @@ export function FavoritesLayout({
     <div
       className={cn(
         "space-y-6 min-h-100 max-[576px]:space-y-6 min-[768px]:space-y-8 min-[1024px]:space-y-10 mt-8 max-[768px]:mt-0 min-[768px]:mt-12 min-[1024px]:mt-15",
-        className,
+        className
       )}
       {...(dataAccountSection ? { "data-account-favorites-section": true } : {})}
     >

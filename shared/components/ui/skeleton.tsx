@@ -1,5 +1,4 @@
-import { cn } from "@/shared/lib"
-
+import { cn } from "@/shared/lib/utils";
 function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -7,7 +6,7 @@ function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
       className={cn("rounded-md animate-shimmer motion-reduce:animate-pulse", className)}
       {...props}
     />
-  )
+  );
 }
 
-export { Skeleton }
+export { Skeleton };

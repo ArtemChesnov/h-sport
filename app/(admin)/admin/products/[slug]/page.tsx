@@ -2,22 +2,40 @@
 
 import { TOAST } from "@/shared/constants";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState, } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { useAdminProductQuery, useDeleteProductMutation, useUpdateProductMutation, } from "@/shared/hooks";
+import {
+  useAdminProductQuery,
+  useDeleteProductMutation,
+  useUpdateProductMutation,
+} from "@/shared/hooks";
 import type { DTO } from "@/shared/services";
 
-import { Button, Card, CardContent, CardFooter, CardHeader, Separator, Skeleton, } from "@/shared/components/ui";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  Separator,
+  Skeleton,
+} from "@/shared/components/ui";
 
-import { extractBackendErrorPayload, useServerNestedFormErrors, } from "@/shared/lib";
+import {
+  extractBackendErrorPayload,
+  useServerNestedFormErrors,
+} from "@/shared/lib/validation/use-server-form-errors";
 import type { AdminProductFormValues } from "@/shared/services/dto";
 import dynamic from "next/dynamic";
 import { formToProductUpdateDto } from "../../lib/products";
 
 // Динамический импорт для тяжелой формы товара - загружается только при открытии страницы
 const AdminProductForm = dynamic(
-  () => import("../../components/products/admin-product-form").then((mod) => ({ default: mod.AdminProductForm })),
+  () =>
+    import("../../components/products/admin-product-form").then((mod) => ({
+      default: mod.AdminProductForm,
+    })),
   {
     ssr: false,
     loading: () => (
@@ -44,15 +62,13 @@ export default function AdminProductEditPage() {
   const updateMutation = useUpdateProductMutation(slug);
   const deleteMutation = useDeleteProductMutation();
 
-  const { errorsTree, resetFormErrors, handleServerError } =
-    useServerNestedFormErrors();
+  const { errorsTree, resetFormErrors, handleServerError } = useServerNestedFormErrors();
 
   /**
    * Снапшот ответа бэка после успешного save.
    * Нужен, чтобы сразу показать сгенерённые SKU/ID без ожидания refetch.
    */
-  const [savedSnapshot, setSavedSnapshot] =
-    useState<DTO.ProductDetailDto | null>(null);
+  const [savedSnapshot, setSavedSnapshot] = useState<DTO.ProductDetailDto | null>(null);
 
   /**
    * Ключ для перемонтирования формы (чтобы локальный state формы обновился из initialValues).
@@ -61,8 +77,7 @@ export default function AdminProductEditPage() {
   const [formKey, setFormKey] = useState(0);
 
   // Сбрасывать savedSnapshot в useEffect не нужно — просто не используем, если slug поменялся.
-  const snapshotForThisSlug =
-    savedSnapshot?.slug === slug ? savedSnapshot : null;
+  const snapshotForThisSlug = savedSnapshot?.slug === slug ? savedSnapshot : null;
 
   // Ошибки формы сбросим при смене slug (это ок — тут нет setState напрямую).
   useEffect(() => {
@@ -147,22 +162,19 @@ export default function AdminProductEditPage() {
 
           toast.error(TOAST.ERROR.FAILED_TO_SAVE_PRODUCT, {
             description:
-              message ||
-              (err instanceof Error
-                ? err.message
-                : "Попробуй ещё раз чуть позже."),
+              message || (err instanceof Error ? err.message : "Попробуй ещё раз чуть позже."),
           });
         },
       });
     },
-    [data, updateMutation, resetFormErrors, router, handleServerError],
+    [data, updateMutation, resetFormErrors, router, handleServerError]
   );
 
   const handleDelete = useCallback(() => {
     if (!data) return;
 
     const confirmed = window.confirm(
-      `Удалить товар «${data.name}» и все его варианты? Это действие нельзя отменить.`,
+      `Удалить товар «${data.name}» и все его варианты? Это действие нельзя отменить.`
     );
     if (!confirmed) return;
 
@@ -175,8 +187,7 @@ export default function AdminProductEditPage() {
       },
       onError: (err) => {
         toast.error(TOAST.ERROR.FAILED_TO_DELETE_PRODUCT, {
-          description:
-            err instanceof Error ? err.message : "Попробуй ещё раз чуть позже.",
+          description: err instanceof Error ? err.message : "Попробуй ещё раз чуть позже.",
         });
       },
     });
@@ -261,13 +272,9 @@ export default function AdminProductEditPage() {
       <div className="flex-1 space-y-6 p-4 pt-6 md:p-8">
         <div className="space-y-4">
           <p className="text-sm text-destructive">
-            Не удалось загрузить товар. Попробуй обновить страницу или вернуться к
-            списку.
+            Не удалось загрузить товар. Попробуй обновить страницу или вернуться к списку.
           </p>
-          <Button
-            variant="outline"
-            onClick={() => router.push("/admin/products")}
-          >
+          <Button variant="outline" onClick={() => router.push("/admin/products")}>
             Назад к списку
           </Button>
         </div>
@@ -279,13 +286,8 @@ export default function AdminProductEditPage() {
     return (
       <div className="flex-1 space-y-6 p-4 pt-6 md:p-8">
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Товар не найден или был удалён.
-          </p>
-          <Button
-            variant="outline"
-            onClick={() => router.push("/admin/products")}
-          >
+          <p className="text-sm text-muted-foreground">Товар не найден или был удалён.</p>
+          <Button variant="outline" onClick={() => router.push("/admin/products")}>
             Назад к списку
           </Button>
         </div>
@@ -297,12 +299,8 @@ export default function AdminProductEditPage() {
     <div className="flex-1 space-y-6 p-4 pt-6 md:p-8">
       <header>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Редактирование товара
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Изменение информации о товаре
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">Редактирование товара</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Изменение информации о товаре</p>
         </div>
       </header>
 

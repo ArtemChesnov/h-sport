@@ -2,8 +2,7 @@
 
 import { CartItemDisplay } from "@/shared/components/common/cart/cart-item-display";
 import type { DTO } from "@/shared/services";
-import { cn } from "@/shared/lib";
-
+import { cn } from "@/shared/lib/utils";
 type CartItemCardProps = {
   item: DTO.CartItemDto;
   className?: string;

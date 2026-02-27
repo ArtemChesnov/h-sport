@@ -1,7 +1,8 @@
 /** Админка: создание товара, список с фильтрами и сортировкой, get/update/delete по slug. */
 
 import { prisma } from "@/prisma/prisma-client";
-import { calculateSkip, slugify } from "@/shared/lib";
+import { calculateSkip } from "@/shared/lib/pagination";
+import { slugify } from "@/shared/lib/generators";
 import { generateProductSku, generateVariantSku } from "@/shared/lib/generators";
 import {
   ensureUniqueSlug,
@@ -10,7 +11,7 @@ import {
   getProductsWithMinPrice,
   mapProductToDetailDto,
 } from "@/shared/lib/products";
-import type { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 import type { Prisma } from "@prisma/client";
 import type { Size as PrismaSize } from "@prisma/client";
 
@@ -38,9 +39,7 @@ export function normalizeProductPayload(raw: DTO.ProductCreateDto): DTO.ProductC
 /**
  * Создаёт товар с вариантами в транзакции
  */
-export async function createProduct(
-  payload: DTO.ProductCreateDto,
-): Promise<CreateProductResult> {
+export async function createProduct(payload: DTO.ProductCreateDto): Promise<CreateProductResult> {
   const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     // Проверяем категорию
     const category = await tx.category.findUnique({
@@ -70,14 +69,12 @@ export async function createProduct(
 
     // Генерируем базовый SKU
     const baseSku =
-      payload.sku?.trim() ||
-      generateProductSku(createdProduct.id, { categorySlug: category.slug });
+      payload.sku?.trim() || generateProductSku(createdProduct.id, { categorySlug: category.slug });
 
     // Создаём варианты товара
     const itemsData = payload.items.map((it, i) => {
       const itemSku =
-        it.sku?.trim() ||
-        generateVariantSku(baseSku, i, { color: it.color, size: it.size });
+        it.sku?.trim() || generateVariantSku(baseSku, i, { color: it.color, size: it.size });
 
       return {
         productId: createdProduct.id,
@@ -186,7 +183,7 @@ export interface AdminProductsFilters {
  * Получает список товаров для админки с фильтрацией и сортировкой
  */
 export async function getAdminProductsList(
-  filters: AdminProductsFilters,
+  filters: AdminProductsFilters
 ): Promise<{ products: AdminProductListItem[]; total: number }> {
   const where = buildProductsWhere(filters);
   const total = await prisma.product.count({ where });
@@ -252,13 +249,14 @@ async function getProductsSortedByPrice(
   where: Prisma.ProductWhereInput,
   sort: "price_asc" | "price_desc",
   skip: number,
-  take: number,
+  take: number
 ): Promise<AdminProductListItem[]> {
   const orderBy = sort === "price_asc" ? "asc" : "desc";
 
-  const productsWithPrice = sort === "price_asc"
-    ? await getProductsWithMinPrice(prisma, where, orderBy, skip, take)
-    : await getProductsWithMaxPrice(prisma, where, orderBy, skip, take);
+  const productsWithPrice =
+    sort === "price_asc"
+      ? await getProductsWithMinPrice(prisma, where, orderBy, skip, take)
+      : await getProductsWithMaxPrice(prisma, where, orderBy, skip, take);
 
   const productIds = productsWithPrice.map((p) => p.productId);
   if (productIds.length === 0) return [];
@@ -281,7 +279,7 @@ async function getProductsSortedByPrice(
 async function getProductsSortedByPopularity(
   where: Prisma.ProductWhereInput,
   skip: number,
-  take: number,
+  take: number
 ): Promise<AdminProductListItem[]> {
   const productIds = await getProductIdsSortedByPopularity(prisma, where, skip, take);
   if (productIds.length === 0) return [];
@@ -346,7 +344,7 @@ export type UpdateAdminProductResult = {
  */
 export async function updateAdminProduct(
   slug: string,
-  body: DTO.ProductUpdateDto,
+  body: DTO.ProductUpdateDto
 ): Promise<UpdateAdminProductResult | null> {
   const {
     categoryId: incomingCategoryId,
@@ -436,7 +434,9 @@ export async function updateAdminProduct(
 
     const itemsData = items.map((item, index) => ({
       productId: existing.id,
-      sku: item.sku?.trim() || generateVariantSku(baseSku, index, { size: item.size, color: item.color }),
+      sku:
+        item.sku?.trim() ||
+        generateVariantSku(baseSku, index, { size: item.size, color: item.color }),
       color: item.color,
       size: item.size as PrismaSize,
       price: item.price,
@@ -445,7 +445,7 @@ export async function updateAdminProduct(
     }));
 
     const createdItems = await Promise.all(
-      itemsData.map((data) => tx.productItem.create({ data })),
+      itemsData.map((data) => tx.productItem.create({ data }))
     );
 
     return { ...updatedProduct, items: createdItems } as UpdateAdminProductResult;

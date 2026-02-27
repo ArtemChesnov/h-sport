@@ -9,42 +9,42 @@ import { generatePaymentUrl } from "@/modules/payment/lib/robokassa";
 import type { PaymentRequest } from "@/modules/payment/types";
 import { OrderForPaymentService } from "@/shared/services/server";
 import { validateRequestSize, withErrorHandling } from "@/shared/lib/api/error-handler";
+import { createErrorResponse } from "@/shared/lib/api/error-response";
+import { getAppUrl } from "@/shared/lib/config/env";
 import { applyRateLimit } from "@/shared/lib/api/rate-limit-middleware";
 import { NextRequest, NextResponse } from "next/server";
 
-async function handler(request: NextRequest): Promise<NextResponse<{ success: boolean; message?: string; url?: string; paymentId?: number }>> {
+async function handler(
+  request: NextRequest
+): Promise<NextResponse<{ success: boolean; message?: string; url?: string; paymentId?: number }>> {
   const rateLimitResponse = await applyRateLimit(request, "payment");
   if (rateLimitResponse) return rateLimitResponse;
 
   const sizeCheck = validateRequestSize(request, 10 * 1024);
   if (!sizeCheck.valid) {
-    return sizeCheck.response as NextResponse<{ success: boolean; message?: string; url?: string; paymentId?: number }>;
+    return sizeCheck.response as NextResponse<{
+      success: boolean;
+      message?: string;
+      url?: string;
+      paymentId?: number;
+    }>;
   }
 
   const body = (await request.json()) as PaymentRequest;
   const { orderId, amount, description, email, userParameters } = body;
 
   if (!orderId || !amount || !description) {
-    return NextResponse.json(
-      { success: false, message: "orderId, amount и description обязательны" },
-      { status: 400 },
-    );
+    return createErrorResponse("orderId, amount и description обязательны", 400);
   }
 
   const order = await OrderForPaymentService.getOrderForPaymentCreate(orderId);
 
   if (!order) {
-    return NextResponse.json(
-      { success: false, message: "Заказ не найден" },
-      { status: 404 },
-    );
+    return createErrorResponse("Заказ не найден", 404);
   }
 
   if (amount !== order.total) {
-    return NextResponse.json(
-      { success: false, message: "Сумма платежа не совпадает с суммой заказа" },
-      { status: 400 },
-    );
+    return createErrorResponse("Сумма платежа не совпадает с суммой заказа", 400);
   }
 
   let paymentId: number;
@@ -67,11 +67,12 @@ async function handler(request: NextRequest): Promise<NextResponse<{ success: bo
   } catch (err) {
     const { logger } = await import("@/shared/lib/logger");
     const errorMessage = err instanceof Error ? err.message : "Unknown error";
-    logger.warn("Payment system not configured, using mock response for testing", { error: errorMessage });
+    logger.warn("Payment system not configured, using mock response for testing", {
+      error: errorMessage,
+    });
 
     paymentId = -1;
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    url = `${baseUrl}/api/payment/success?InvId=${orderId}&OutSum=${amount}&SignatureValue=mock`;
+    url = `${getAppUrl()}/api/payment/success?InvId=${orderId}&OutSum=${amount}&SignatureValue=mock`;
   }
 
   return NextResponse.json({

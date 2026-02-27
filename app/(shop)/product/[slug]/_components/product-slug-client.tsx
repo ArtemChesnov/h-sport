@@ -1,15 +1,16 @@
 "use client";
 
 import {
-    Container,
-    FavoriteToggleButton,
-    ShopBreadcrumbs,
-    StoreEmptyBlock,
-    YouMightLikeBlock,
+  Container,
+  FavoriteToggleButton,
+  ShopBreadcrumbs,
+  StoreEmptyBlock,
+  YouMightLikeBlock,
 } from "@/shared/components/common";
 import { ProductErrorBoundary } from "@/shared/components/error-boundaries";
 import { CTA } from "@/shared/constants";
-import { formatMoney } from "@/shared/lib";
+import { env } from "@/shared/lib/env.client";
+import { formatMoney } from "@/shared/lib/formatters";
 import { createProductJsonLd, JsonLd } from "@/shared/lib/seo/json-ld";
 import type { DTO } from "@/shared/services";
 import { useMemo } from "react";
@@ -29,7 +30,11 @@ type ProductSlugClientProps = {
   youMightLikeProducts?: DTO.ProductListItemDto[];
 };
 
-export function ProductSlugClient({ slug, initialProduct, youMightLikeProducts }: ProductSlugClientProps) {
+export function ProductSlugClient({
+  slug,
+  initialProduct,
+  youMightLikeProducts,
+}: ProductSlugClientProps) {
   const {
     product,
     isLoading,
@@ -62,7 +67,7 @@ export function ProductSlugClient({ slug, initialProduct, youMightLikeProducts }
   const jsonLdData = useMemo(() => {
     if (!product || !selectedItem) return null;
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const baseUrl = env.appUrl;
     const productUrl = `${baseUrl}/product/${product.slug}`;
     const toAbsoluteUrl = (src: string) =>
       src.startsWith("http") ? src : `${baseUrl}${src.startsWith("/") ? "" : "/"}${src}`;
@@ -196,10 +201,7 @@ export function ProductSlugClient({ slug, initialProduct, youMightLikeProducts }
           </div>
 
           {/* Вам понравится — данные с сервера, без отдельного запроса */}
-          <YouMightLikeBlock
-            excludeProductId={product.id}
-            initialProducts={youMightLikeProducts}
-          />
+          <YouMightLikeBlock excludeProductId={product.id} initialProducts={youMightLikeProducts} />
         </div>
       </Container>
     </ProductErrorBoundary>

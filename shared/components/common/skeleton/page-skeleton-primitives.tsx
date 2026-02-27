@@ -4,7 +4,7 @@
  */
 
 import { Skeleton } from "@/shared/components/ui/skeleton";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import React from "react";
 
 export type PageSkeletonBreadcrumbProps = {
@@ -24,10 +24,7 @@ export type PageSkeletonTitleProps = {
 export function PageSkeletonTitle({ className }: PageSkeletonTitleProps) {
   return (
     <Skeleton
-      className={cn(
-        "h-10 w-48 mt-10 rounded-md max-[768px]:h-7 max-[768px]:w-36",
-        className
-      )}
+      className={cn("h-10 w-48 mt-10 rounded-md max-[768px]:h-7 max-[768px]:w-36", className)}
       aria-hidden
     />
   );

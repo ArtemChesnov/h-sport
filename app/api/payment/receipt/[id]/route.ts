@@ -1,16 +1,13 @@
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { createErrorResponse } from "@/shared/lib/api/error-response";
 import { getReceiptById } from "@/shared/services/server/payment/receipt.service";
-import { formatMoney } from "@/shared/lib";
+import { formatMoney } from "@/shared/lib/formatters";
 import type { RouteParams } from "@/shared/dto";
 import { NextRequest, NextResponse } from "next/server";
 
 type RouteContext = RouteParams<{ id: string }>;
 
-export async function GET(
-  request: NextRequest,
-  context: RouteContext,
-) {
+export async function GET(request: NextRequest, context: RouteContext) {
   return withErrorHandling(
     async () => {
       const { id } = await context.params;
@@ -111,22 +108,30 @@ export async function GET(
               <span class="info-label">ID платежа:</span>
               <span>${payment.id}</span>
             </div>
-            ${payment.externalId ? `
+            ${
+              payment.externalId
+                ? `
             <div class="info-row">
               <span class="info-label">Внешний ID:</span>
               <span>${payment.externalId}</span>
             </div>
-            ` : ""}
+            `
+                : ""
+            }
             <div class="info-row">
               <span class="info-label">Email:</span>
               <span>${order.email}</span>
             </div>
-            ${order.fullName ? `
+            ${
+              order.fullName
+                ? `
             <div class="info-row">
               <span class="info-label">Получатель:</span>
               <span>${order.fullName}</span>
             </div>
-            ` : ""}
+            `
+                : ""
+            }
           </div>
 
           <table>
@@ -139,7 +144,9 @@ export async function GET(
               </tr>
             </thead>
             <tbody>
-              ${order.items.map((item) => `
+              ${order.items
+                .map(
+                  (item) => `
                 <tr>
                   <td>
                     ${item.productName}
@@ -150,29 +157,43 @@ export async function GET(
                   <td style="text-align: right;">${formatMoney(item.price)}</td>
                   <td style="text-align: right;">${formatMoney(item.total)}</td>
                 </tr>
-              `).join("")}
+              `
+                )
+                .join("")}
             </tbody>
           </table>
 
           <div class="info">
-            ${order.subtotal != null ? `
+            ${
+              order.subtotal != null
+                ? `
             <div class="info-row">
               <span class="info-label">Товары:</span>
               <span>${formatMoney(order.subtotal)}</span>
             </div>
-            ` : ""}
-            ${order.discount > 0 ? `
+            `
+                : ""
+            }
+            ${
+              order.discount > 0
+                ? `
             <div class="info-row">
               <span class="info-label">Скидка${order.promoCodeCode ? ` (${order.promoCodeCode})` : ""}:</span>
               <span>-${formatMoney(order.discount)}</span>
             </div>
-            ` : ""}
-            ${order.deliveryFee > 0 ? `
+            `
+                : ""
+            }
+            ${
+              order.deliveryFee > 0
+                ? `
             <div class="info-row">
               <span class="info-label">Доставка:</span>
               <span>${formatMoney(order.deliveryFee)}</span>
             </div>
-            ` : ""}
+            `
+                : ""
+            }
           </div>
 
           <div class="total">
@@ -194,6 +215,6 @@ export async function GET(
       });
     },
     request,
-    "GET /api/payment/receipt/[id]",
+    "GET /api/payment/receipt/[id]"
   );
 }

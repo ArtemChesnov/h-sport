@@ -1,6 +1,7 @@
 "use client";
 
-import { cn, formatDateISO, parseDateString } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
+import { formatDateISO, parseDateString } from "@/shared/lib/validation";
 import { CalendarIcon } from "lucide-react";
 import * as React from "react";
 import { ru } from "react-day-picker/locale";
@@ -72,7 +73,7 @@ export function DatePicker({
       }
       setOpen(false);
     },
-    [onChange],
+    [onChange]
   );
 
   // Текст для отображения в кнопке
@@ -93,7 +94,7 @@ export function DatePicker({
             !selectedDate && "text-muted-foreground",
             error && "border-destructive",
             disabled && "opacity-70 cursor-not-allowed",
-            className,
+            className
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />

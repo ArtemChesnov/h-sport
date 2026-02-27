@@ -20,7 +20,7 @@ export async function addItemToCart(
   cartId: number,
   productItemId: number,
   qty: number,
-  recalculateFn: (cartId: number, tx: Prisma.TransactionClient) => Promise<void>,
+  recalculateFn: (cartId: number, tx: Prisma.TransactionClient) => Promise<void>
 ): Promise<AddItemResult> {
   // Проверяем наличие и доступность варианта
   const productItem = await tx.productItem.findUnique({
@@ -68,30 +68,6 @@ export async function addItemToCart(
   await recalculateFn(cartId, tx);
 
   return { ok: true, productId: productItem.productId };
-}
-
-/** Валидация productItemId и qty для добавления в корзину. */
-export function validateAddItemInput(
-  productItemId: unknown,
-  qty: unknown,
-): { ok: true; productItemId: number; qty: number } | { ok: false; message: string } {
-  const parsedId = Number(productItemId);
-  const parsedQty = qty ?? 1;
-  const qtyNum = Number(parsedQty);
-
-  if (!Number.isInteger(parsedId) || parsedId <= 0) {
-    return { ok: false, message: "Некорректный идентификатор товара" };
-  }
-
-  if (!Number.isInteger(qtyNum) || qtyNum <= 0) {
-    return { ok: false, message: "Количество должно быть положительным целым числом" };
-  }
-
-  if (qtyNum > MAX_CART_ITEM_QUANTITY) {
-    return { ok: false, message: `Максимальное количество товара одной позиции — ${MAX_CART_ITEM_QUANTITY} штук` };
-  }
-
-  return { ok: true, productItemId: parsedId, qty: qtyNum };
 }
 
 /** Текстовое сообщение по коду ошибки. */

@@ -8,7 +8,7 @@ import {
   SHOP_ERROR_ICON_WRAPPER_CLASS,
 } from "@/shared/constants";
 import { DesignButton } from "@/shared/components/ui/design-button";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import type { LucideIcon } from "lucide-react";
 import { AlertTriangle, Home, RefreshCw } from "lucide-react";
 import Link from "next/link";
@@ -54,13 +54,7 @@ export function ErrorFallbackBlock({
   const SecondaryIcon = secondaryAction.icon ?? Home;
 
   return (
-    <div
-      className={cn(
-        SHOP_ERROR_EMPTY_CONTAINER_CLASS,
-        heightClass,
-        className
-      )}
-    >
+    <div className={cn(SHOP_ERROR_EMPTY_CONTAINER_CLASS, heightClass, className)}>
       <div className="text-center space-y-6 max-w-md w-full">
         <div className={SHOP_ERROR_ICON_WRAPPER_CLASS}>
           <AlertTriangle className={SHOP_ERROR_ICON_CLASS} aria-hidden />
@@ -81,10 +75,7 @@ export function ErrorFallbackBlock({
             Попробовать снова
           </DesignButton>
           <DesignButton variant="outline" asChild>
-            <Link
-              href={secondaryAction.href}
-              className="inline-flex items-center gap-2"
-            >
+            <Link href={secondaryAction.href} className="inline-flex items-center gap-2">
               <SecondaryIcon className="h-4 w-4" />
               {secondaryAction.label}
             </Link>

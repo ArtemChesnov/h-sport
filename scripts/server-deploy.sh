@@ -1,14 +1,14 @@
 #!/bin/bash
 # Скрипт деплоя на сервере: pull, установка зависимостей, миграции, сборка, перезапуск PM2.
 # Запускать из корня проекта на сервере: ./scripts/server-deploy.sh
-# Требует: git, node, npm, pm2, настроенный .env и ветку (например main).
+# Требует: git, node, npm, pm2, настроенный .env. Ветка по умолчанию master (совпадает с GitHub Actions).
 
 set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR/.."
 APP_DIR="$(pwd)"
 PM2_APP_NAME="${PM2_APP_NAME:-h-sport}"
-BRANCH="${BRANCH:-main}"
+BRANCH="${BRANCH:-master}"
 
 echo "=== Deploy $APP_DIR (branch: $BRANCH) ==="
 

@@ -21,7 +21,7 @@ export const revalidate = 7200;
 
 export async function GET(
   request: NextRequest,
-  context: ProductRouteContext,
+  context: ProductRouteContext
 ): Promise<NextResponse<DTO.ProductDetailDto | ErrorResponse>> {
   return withErrorHandling(
     async (req) => {
@@ -30,7 +30,7 @@ export async function GET(
 
       const { slug } = await context.params;
       if (!slug || typeof slug !== "string") {
-        return createErrorResponse("Invalid product slug", 400);
+        return createErrorResponse("Недопустимый slug товара", 400);
       }
 
       const cacheKey = `product:${slug}`;
@@ -43,7 +43,7 @@ export async function GET(
       }
 
       const dto = await getProductBySlug(slug);
-      if (!dto) return createErrorResponse("Product not found", 404);
+      if (!dto) return createErrorResponse("Товар не найден", 404);
 
       set(cacheKey, dto, PRODUCT_SLUG_CACHE_TTL_MS);
 
@@ -62,6 +62,6 @@ export async function GET(
       });
     },
     request,
-    "GET /api/shop/product/[slug]",
+    "GET /api/shop/product/[slug]"
   );
 }

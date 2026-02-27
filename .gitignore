@@ -49,9 +49,19 @@ next-env.d.ts
 /lib/generated/prisma
 node_modules
 
-# internal docs (not for public repo)
+# internal docs (not for public repo — содержат IP, пароли, внутренние отчёты)
 /docs/DEPLOY_INSTRUCTIONS.md
 /docs/DEPLOY.md
 /docs/BACKUPS.md
 /docs/OPERATIONS.md
 /docs/MONITORING.md
+/docs/DEEP_ANALYSIS_REPORT.md
+/docs/PRE_DEPLOY_ANALYSIS_AND_ASSESSMENT.md
+/docs/REFACTORING_ANALYSIS_PRE_DEPLOY.md
+/PRE_PROD_CHECKLIST.md
+/PROJECT_ANALYSIS_AND_DEPLOY_REPORT.md
+/RISK_PATCH_PLAN.md
+/SQL_INJECTION_AUDIT.md
+/PERFORMANCE_*.md
+/REFACTORING_PLAN.md
+/SHOP_PERFORMANCE_ANALYSIS.md

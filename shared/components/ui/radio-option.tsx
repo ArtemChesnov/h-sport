@@ -1,7 +1,6 @@
 "use client";
 
-import { cn } from "@/shared/lib";
-
+import { cn } from "@/shared/lib/utils";
 interface RadioOptionProps {
   name: string;
   value: string;

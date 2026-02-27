@@ -1,7 +1,7 @@
 "use client";
 
 import { useShopNav } from "@/shared/contexts";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import Image from "next/image";
 import * as React from "react";
 

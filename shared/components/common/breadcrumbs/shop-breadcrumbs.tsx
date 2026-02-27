@@ -2,6 +2,7 @@
 
 import { CART_LABELS } from "@/shared/constants";
 import { useShopNav } from "@/shared/contexts";
+import { env } from "@/shared/lib/env.client";
 import { createBreadcrumbJsonLd, JsonLd } from "@/shared/lib/seo/json-ld";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
@@ -80,8 +81,11 @@ export function ShopBreadcrumbs({ customLastLabel, className }: ShopBreadcrumbsP
   }
 
   // Один и тот же baseUrl на сервере и клиенте, иначе разный JSON-LD → hydration mismatch
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://h-sport.ru";
-  const allItems = [{ name: "Главная", url: baseUrl + "/" }, ...items.map((i) => ({ name: i.label, url: baseUrl + i.href }))];
+  const baseUrl = env.appUrl;
+  const allItems = [
+    { name: "Главная", url: baseUrl + "/" },
+    ...items.map((i) => ({ name: i.label, url: baseUrl + i.href })),
+  ];
   const breadcrumbJsonLd = createBreadcrumbJsonLd(allItems);
 
   return (
@@ -107,7 +111,10 @@ export function ShopBreadcrumbs({ customLastLabel, className }: ShopBreadcrumbsP
             >
               <ChevronRight className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" />
               {isLast ? (
-                <span className="font-medium text-[#EB6081] min-w-0 max-w-[55vw] truncate sm:max-w-none" title={item.label}>
+                <span
+                  className="font-medium text-[#EB6081] min-w-0 max-w-[55vw] truncate sm:max-w-none"
+                  title={item.label}
+                >
                   {item.label}
                 </span>
               ) : (

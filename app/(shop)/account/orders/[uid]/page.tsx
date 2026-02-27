@@ -3,7 +3,7 @@
 import { OrderSummaryBlock, StoreEmptyBlock, SummaryCardLayout } from "@/shared/components/common";
 import { DesignButton } from "@/shared/components/ui";
 import { useOrderDetailQuery, usePayOrderMutation } from "@/shared/hooks/orders/orders.hooks";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { formatOrderCardDate } from "@/shared/lib/formatters";
 import { getDeliveryMethodLabel, getOrderStatusInfo } from "@/shared/lib/styles";
 import { Loader2 } from "lucide-react";
@@ -70,7 +70,9 @@ export default function AccountOrderDetailPage() {
               Заказ от {formatOrderCardDate(order.createdAt)}
             </h1>
             <div className="flex items-center gap-2.5">
-              <p className="text-[16px] max-[576px]:text-[14px] text-muted-foreground leading-[130%]">#{order.id}</p>
+              <p className="text-[16px] max-[576px]:text-[14px] text-muted-foreground leading-[130%]">
+                #{order.id}
+              </p>
               <span
                 className={[
                   "text-[14px] font-light px-2.5 py-[2.5px] leading-[130%] rounded-full border",
@@ -102,9 +104,7 @@ export default function AccountOrderDetailPage() {
             {order.delivery?.method && (
               <div className="flex flex-col gap-2 min-[873px]:gap-3">
                 <h4 className={ORDER_LABEL_CLASS}>Способ доставки</h4>
-                <p className={ORDER_VALUE_CLASS}>
-                  {getDeliveryMethodLabel(order.delivery.method)}
-                </p>
+                <p className={ORDER_VALUE_CLASS}>{getDeliveryMethodLabel(order.delivery.method)}</p>
               </div>
             )}
             <div className="flex flex-col gap-2 min-[873px]:gap-3">

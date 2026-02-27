@@ -1,7 +1,6 @@
 "use client";
 
-import { cn } from "@/shared/lib";
-
+import { cn } from "@/shared/lib/utils";
 type FieldErrorProps = {
   message?: string;
   className?: string;
@@ -13,9 +12,5 @@ type FieldErrorProps = {
 export function FieldError({ message, className }: FieldErrorProps) {
   if (!message) return null;
 
-  return (
-    <p className={cn("mt-1 text-xs text-destructive", className)}>
-      {message}
-    </p>
-  );
+  return <p className={cn("mt-1 text-xs text-destructive", className)}>{message}</p>;
 }

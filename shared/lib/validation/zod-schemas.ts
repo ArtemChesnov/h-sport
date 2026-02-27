@@ -24,7 +24,10 @@ export const passwordSchema = z
  */
 export const searchQuerySchema = z
   .string()
-  .max(MAX_SEARCH_QUERY_LENGTH, `Поисковый запрос не должен превышать ${MAX_SEARCH_QUERY_LENGTH} символов`)
+  .max(
+    MAX_SEARCH_QUERY_LENGTH,
+    `Поисковый запрос не должен превышать ${MAX_SEARCH_QUERY_LENGTH} символов`
+  )
   .optional()
   .transform((val) => val?.trim() || undefined);
 
@@ -44,7 +47,10 @@ export const idSchema = z.coerce.number().int().positive();
 /**
  * Схема для валидации slug
  */
-export const slugSchema = z.string().min(1).regex(/^[a-z0-9-]+$/, "Slug может содержать только строчные буквы, цифры и дефисы");
+export const slugSchema = z
+  .string()
+  .min(1)
+  .regex(/^[a-z0-9-]+$/, "Slug может содержать только строчные буквы, цифры и дефисы");
 
 /**
  * Доступные методы доставки
@@ -89,16 +95,8 @@ const DELIVERY_METHODS_REQUIRING_ADDRESS = [
 export const orderDeliverySchema = z
   .object({
     method: deliveryMethodSchema,
-    city: z
-      .string()
-      .max(100, "Название города слишком длинное")
-      .nullable()
-      .optional(),
-    address: z
-      .string()
-      .max(500, "Адрес слишком длинный")
-      .nullable()
-      .optional(),
+    city: z.string().max(100, "Название города слишком длинное").nullable().optional(),
+    address: z.string().max(500, "Адрес слишком длинный").nullable().optional(),
   })
   .superRefine((data, ctx) => {
     const requiresAddress = DELIVERY_METHODS_REQUIRING_ADDRESS.includes(
@@ -134,16 +132,8 @@ export const orderCreateSchema = z.object({
     .min(1, "E-mail обязателен")
     .email("Некорректный email")
     .max(255, "Email слишком длинный"),
-  phone: z
-    .string()
-    .max(20, "Телефон слишком длинный")
-    .optional()
-    .nullable(),
-  fullName: z
-    .string()
-    .max(200, "ФИО слишком длинное")
-    .optional()
-    .nullable(),
+  phone: z.string().max(20, "Телефон слишком длинный").optional().nullable(),
+  fullName: z.string().max(200, "ФИО слишком длинное").optional().nullable(),
   delivery: orderDeliverySchema,
 });
 
@@ -169,7 +159,10 @@ export const signUpSchema = z.object({
  */
 export const signInSchema = z.object({
   email: z.string().min(1, "Email обязателен").email("Некорректный email"),
-  password: z.string().min(1, "Пароль обязателен").min(8, "Пароль должен содержать минимум 8 символов"),
+  password: z
+    .string()
+    .min(1, "Пароль обязателен")
+    .min(8, "Пароль должен содержать минимум 8 символов"),
   remember: z.boolean().default(false),
 });
 
@@ -182,3 +175,18 @@ export type SignUpInput = z.infer<typeof signUpSchema>;
  * Тип данных для входа
  */
 export type SignInInput = z.infer<typeof signInSchema>;
+
+/**
+ * Схема для запроса на сброс пароля
+ */
+export const resetPasswordRequestSchema = z.object({
+  email: z.string().min(1, "Email обязателен").email("Некорректный email"),
+});
+
+/**
+ * Схема для подтверждения сброса пароля
+ */
+export const resetPasswordConfirmSchema = z.object({
+  token: z.string().min(1, "Токен обязателен"),
+  password: passwordSchema,
+});

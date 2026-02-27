@@ -1,8 +1,11 @@
-import { MailIcon, PhoneIcon, TelegramIcon, VkIcon, WhatsAppIcon } from "@/shared/components/icons";
-import { cn } from "@/shared/lib";
+import { MailIcon, PhoneIcon, TelegramIcon, VkIcon } from "@/shared/components/icons";
+import { cn } from "@/shared/lib/utils";
 import Link from "next/link";
 import React from "react";
 import { DesignButton } from "./design-button";
+
+const PHONE_DISPLAY = "+7 910 146 25 17";
+const PHONE_HREF = "tel:+79101462517";
 
 interface Props {
   className?: string;
@@ -18,28 +21,22 @@ export const ContactsBlock: React.FC<Props> = ({ className }) => {
     {
       alt: "Мы ВКонтакте",
       Icon: VkIcon,
-      href: "https://vk.com/...",
+      href: "https://vk.com/club228023323",
     },
     {
       alt: "Мы в Telegram",
       Icon: TelegramIcon,
-      href: "https://t.me/...",
+      href: "https://t.me/h_sportbrand",
     },
     {
       alt: "Наша почта",
       Icon: MailIcon,
-      href: "https://wa.me/...",
-    },
-
-    {
-      alt: "Мы в WhatsApp",
-      Icon: WhatsAppIcon,
-      href: "https://wa.me/...",
+      href: "mailto:h.sportbrand@yandex.ru",
     },
     {
       alt: "Наш номер телефона",
       Icon: PhoneIcon,
-      href: "https://wa.me/...",
+      href: PHONE_HREF,
     },
   ];
 
@@ -67,13 +64,13 @@ export const ContactsBlock: React.FC<Props> = ({ className }) => {
       </div>
 
       <Link
-        href="tel:8 800 000 00 00"
+        href={PHONE_HREF}
         className={cn(
           "inline-flex text-[22px] font-light transition-colors font-sans",
           phoneLinkClass
         )}
       >
-        <span className={"hover:text-[#EB6081]"}>8 800 000 00 00</span>
+        <span className={"hover:text-[#EB6081]"}>{PHONE_DISPLAY}</span>
       </Link>
     </div>
   );

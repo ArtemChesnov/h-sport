@@ -13,7 +13,7 @@ import {
   TooltipTrigger,
 } from "@/shared/components/ui";
 import { MetricsSection } from "@/shared/components/admin";
-import { formatMoney } from "@/shared/lib";
+import { formatMoney } from "@/shared/lib/formatters";
 import { METRICS_CONSTANTS } from "@/shared/constants";
 import { BarChart3, Info } from "lucide-react";
 
@@ -60,7 +60,8 @@ export function CategoriesSection({ categories }: CategoriesSectionProps) {
                       <div className="flex-1">
                         <p className="text-sm font-medium">{category.name}</p>
                         <p className="text-xs text-muted-foreground">
-                          {category.views} просмотров · {category.orders} заказов · {category.items} товаров
+                          {category.views} просмотров · {category.orders} заказов · {category.items}{" "}
+                          товаров
                         </p>
                       </div>
                     </div>
@@ -78,7 +79,9 @@ export function CategoriesSection({ categories }: CategoriesSectionProps) {
         </TooltipTrigger>
         <TooltipContent className="max-w-sm">
           <p className="text-xs leading-relaxed">
-            Рейтинг категорий товаров по выручке за выбранный период. Показывает, какие категории приносят наибольшую прибыль, включая количество просмотров, заказов и средний чек по категории.
+            Рейтинг категорий товаров по выручке за выбранный период. Показывает, какие категории
+            приносят наибольшую прибыль, включая количество просмотров, заказов и средний чек по
+            категории.
           </p>
         </TooltipContent>
       </Tooltip>

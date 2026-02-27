@@ -1,16 +1,11 @@
-
 "use client";
 
 import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { buildSearchString, cn, ProductsSearchParams } from "@/shared/lib";
+import { buildSearchString, type ProductsSearchParams } from "@/shared/lib/search";
+import { cn } from "@/shared/lib/utils";
 import { DTO } from "@/shared/services";
-import {
-  Button,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/shared/components/ui";
+import { Button, Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui";
 import { ArrowUpDown } from "lucide-react";
 
 export type CatalogSortValue = "new" | "price_asc" | "price_desc" | "popular";
@@ -29,9 +24,7 @@ type CatalogSortButtonProps = {
   className?: string;
 };
 
-export const CatalogSortButton: React.FC<CatalogSortButtonProps> = ({
-  className,
-}) => {
+export const CatalogSortButton: React.FC<CatalogSortButtonProps> = ({ className }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [open, setOpen] = React.useState(false);
@@ -65,8 +58,7 @@ export const CatalogSortButton: React.FC<CatalogSortButtonProps> = ({
     return { page, perPage, categorySlug, sort, q, priceFrom, priceTo, size, color };
   }, [searchParams]);
 
-  const activeSort: CatalogSortValue =
-    (params.sort as CatalogSortValue) ?? "new";
+  const activeSort: CatalogSortValue = (params.sort as CatalogSortValue) ?? "new";
 
   const handleSelect = (value: CatalogSortValue) => {
     // Закрываем Popover мгновенно для быстрой обратной связи
@@ -108,14 +100,12 @@ export const CatalogSortButton: React.FC<CatalogSortButtonProps> = ({
             className={cn(
               "flex w-full items-baseline justify-between rounded-md px-3 py-2 text-left text-[14px] font-normal cursor-pointer",
               "hover:bg-accent",
-              option.value === activeSort && "text-primary",
+              option.value === activeSort && "text-primary"
             )}
           >
             <span>{option.label}</span>
             {option.value === activeSort && (
-              <span className="ml-0 text-[10px] uppercase tracking-wide">
-                выбрано
-              </span>
+              <span className="ml-0 text-[10px] uppercase tracking-wide">выбрано</span>
             )}
           </button>
         ))}

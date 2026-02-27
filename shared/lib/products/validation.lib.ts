@@ -3,8 +3,9 @@
  */
 
 import { CATALOG_DEFAULT_PER_PAGE, CATALOG_MAX_PER_PAGE } from "@/shared/constants";
-import { normalizePaginationParams, validateSearchQuery } from "@/shared/lib";
-import { DTO } from "@/shared/services";
+import { normalizePaginationParams } from "@/shared/lib/pagination";
+import { validateSearchQuery } from "@/shared/lib/validation";
+import type * as DTO from "@/shared/services/dto";
 import type { NextRequest } from "next/server";
 
 /**
@@ -43,7 +44,7 @@ export function parseProductsQuery(request: NextRequest): ParsedProductsQuery {
     searchParams.get("page"),
     searchParams.get("perPage"),
     CATALOG_MAX_PER_PAGE,
-    CATALOG_DEFAULT_PER_PAGE,
+    CATALOG_DEFAULT_PER_PAGE
   );
 
   // Фильтры.

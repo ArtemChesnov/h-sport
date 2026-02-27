@@ -1,24 +1,23 @@
-
 "use client";
 
 import { TOAST } from "@/shared/constants";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
-import type { NestedFormErrors } from "@/shared/lib";
+import type { NestedFormErrors } from "@/shared/lib/validation/map-fields-errors";
 import { DTO } from "@/shared/services";
 
 import {
-    Button,
-    ColorBadge,
-    Input,
-    Label,
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-    Switch,
+  Button,
+  ColorBadge,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Switch,
 } from "@/shared/components/ui";
 
 import { COLOR_PRESETS } from "@/shared/constants";
@@ -28,16 +27,7 @@ import { createLocalId } from "../../lib/utils";
 import { ColorImagesEditor } from "./product-color-images-editor";
 import { FieldErrorText } from "./product-form-field-error";
 
-const ALL_SIZES: DTO.SizeDto[] = [
-  "XXS",
-  "XS",
-  "S",
-  "M",
-  "L",
-  "XL",
-  "XXL",
-  "ONE_SIZE",
-];
+const ALL_SIZES: DTO.SizeDto[] = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "ONE_SIZE"];
 
 type VariantsEditorProps = {
   variants: VariantFormRow[];
@@ -65,10 +55,7 @@ export function ProductVariantsEditor({
     return Array.from(map.values());
   }, [variants]);
 
-  const usedColors = useMemo(
-    () => Array.from(new Set(variants.map((v) => v.color))),
-    [variants],
-  );
+  const usedColors = useMemo(() => Array.from(new Set(variants.map((v) => v.color))), [variants]);
 
   /**
    * Маппинг ошибок от сервера к variant.id.
@@ -76,9 +63,7 @@ export function ProductVariantsEditor({
    */
   const errorsByVariantId = useMemo(() => {
     const map = new Map<string, Record<string, string>>();
-    const raw = (
-      errorsTree as unknown as { items?: Array<Record<string, string>> }
-    )?.items;
+    const raw = (errorsTree as unknown as { items?: Array<Record<string, string>> })?.items;
 
     if (!raw || raw.length === 0) return map;
 
@@ -91,9 +76,7 @@ export function ProductVariantsEditor({
   }, [errorsTree, variants]);
 
   function handleAddColor() {
-    const availablePreset = COLOR_PRESETS.find(
-      (preset) => !usedColors.includes(preset.value),
-    );
+    const availablePreset = COLOR_PRESETS.find((preset) => !usedColors.includes(preset.value));
 
     if (!availablePreset) {
       toast.error(TOAST.ERROR.ALL_COLORS_ADDED);
@@ -121,9 +104,7 @@ export function ProductVariantsEditor({
   function handleAddSize(color: string) {
     const colorVariants = variants.filter((v) => v.color === color);
     const usedSizes = colorVariants.map((v) => v.size);
-    const availableSizes = ALL_SIZES.filter(
-      (size) => !usedSizes.includes(size),
-    );
+    const availableSizes = ALL_SIZES.filter((size) => !usedSizes.includes(size));
 
     if (availableSizes.length === 0) {
       toast.error(TOAST.ERROR.SAME_COLOR_SIZE);
@@ -159,12 +140,7 @@ export function ProductVariantsEditor({
         <p className="text-sm text-muted-foreground">
           Пока нет ни одного варианта. Добавь первый цвет, чтобы начать.
         </p>
-        <Button
-          type="button"
-          variant="outline"
-          size="lg"
-          onClick={handleAddColor}
-        >
+        <Button type="button" variant="outline" size="lg" onClick={handleAddColor}>
           + Добавить цвет
         </Button>
       </div>
@@ -184,7 +160,7 @@ export function ProductVariantsEditor({
 
         const handleColorImagesChange = (next: string[]) => {
           const nextVariants = variants.map((v) =>
-            v.color === color ? { ...v, imageUrls: next } : v,
+            v.color === color ? { ...v, imageUrls: next } : v
           );
           onChange(nextVariants);
         };
@@ -194,10 +170,7 @@ export function ProductVariantsEditor({
           .find((msg) => typeof msg === "string" && msg.length > 0);
 
         return (
-          <div
-            key={color}
-            className="space-y-3 rounded-lg border border-border/70 bg-muted/40 p-3"
-          >
+          <div key={color} className="space-y-3 rounded-lg border border-border/70 bg-muted/40 p-3">
             <div className="flex items-center justify-between gap-2">
               <div className="flex flex-col gap-2 md:flex-row md:items-center">
                 <div className="flex items-center gap-3">
@@ -210,7 +183,7 @@ export function ProductVariantsEditor({
                         value={color}
                         onValueChange={(nextColor) => {
                           const nextVariants = variants.map((v) =>
-                            v.color === color ? { ...v, color: nextColor } : v,
+                            v.color === color ? { ...v, color: nextColor } : v
                           );
                           onChange(nextVariants);
                         }}
@@ -273,9 +246,7 @@ export function ProductVariantsEditor({
                     className="grid items-end gap-3 md:grid-cols-[minmax(0,140px)_minmax(0,220px)_minmax(0,160px)_auto_auto]"
                   >
                     <div className="space-y-1">
-                      <Label className="text-[11px] text-muted-foreground">
-                        Размер
-                      </Label>
+                      <Label className="text-[11px] text-muted-foreground">Размер</Label>
                       <Select
                         value={variant.size}
                         onValueChange={(val) =>
@@ -289,11 +260,7 @@ export function ProductVariantsEditor({
                         </SelectTrigger>
                         <SelectContent>
                           {ALL_SIZES.map((size) => (
-                            <SelectItem
-                              key={size}
-                              value={size}
-                              className="cursor-pointer"
-                            >
+                            <SelectItem key={size} value={size} className="cursor-pointer">
                               {size}
                             </SelectItem>
                           ))}
@@ -316,9 +283,7 @@ export function ProductVariantsEditor({
                     </div>
 
                     <div className="space-y-1">
-                      <Label className="text-[11px] text-muted-foreground">
-                        Цена, ₽
-                      </Label>
+                      <Label className="text-[11px] text-muted-foreground">Цена, ₽</Label>
                       <Input
                         className="h-8 w-full"
                         type="number"
@@ -335,9 +300,7 @@ export function ProductVariantsEditor({
                     </div>
 
                     <div className="space-y-1">
-                      <Label className="text-[11px] text-muted-foreground">
-                        В наличии
-                      </Label>
+                      <Label className="text-[11px] text-muted-foreground">В наличии</Label>
                       <div className="flex h-8 items-center">
                         <Switch
                           checked={variant.isAvailable}
@@ -367,12 +330,7 @@ export function ProductVariantsEditor({
         );
       })}
 
-      <Button
-        type="button"
-        variant="outline"
-        size="lg"
-        onClick={handleAddColor}
-      >
+      <Button type="button" variant="outline" size="lg" onClick={handleAddColor}>
         + Добавить цвет
       </Button>
     </div>

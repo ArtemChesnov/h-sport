@@ -1,4 +1,4 @@
-# Деплой на прод-сервер по пушу в main.
+# Деплой на прод-сервер по пушу в master.
 # Секреты в репозитории: Settings → Secrets and variables → Actions:
 #   SSH_HOST, SSH_USER, SSH_PRIVATE_KEY
 # Опционально: DEPLOY_PATH (каталог проекта на сервере, по умолчанию /home/deploy/h-sport)
@@ -8,7 +8,7 @@ name: Deploy to production
 
 on:
   push:
-    branches: [main]
+    branches: [master]
 
 concurrency:
   group: deploy-production

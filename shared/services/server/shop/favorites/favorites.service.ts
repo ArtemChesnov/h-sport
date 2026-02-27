@@ -3,17 +3,16 @@
  * Использует FavoritesRepository, маппит в DTO, записывает метрики.
  */
 
-import { FavoritesRepository, type FavoriteWithProductRow } from "@/shared/repositories/favorites.repository";
+import {
+  FavoritesRepository,
+  type FavoriteWithProductRow,
+} from "@/shared/repositories/favorites.repository";
 import { mapProductsToListDto } from "@/shared/lib/products";
-import type { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 
 function mapRowsToFavoriteDtos(rows: FavoriteWithProductRow[]): DTO.FavoriteDto[] {
-  const products = rows
-    .filter((f) => f.product)
-    .map((f) => f.product!);
-  const productDtos = mapProductsToListDto(
-    products as Parameters<typeof mapProductsToListDto>[0],
-  );
+  const products = rows.filter((f) => f.product).map((f) => f.product!);
+  const productDtos = mapProductsToListDto(products as Parameters<typeof mapProductsToListDto>[0]);
   const productMap = new Map<number, DTO.ProductListItemDto>();
   productDtos.forEach((p) => productMap.set(p.id, p));
 
@@ -40,7 +39,7 @@ export async function loadUserFavoritesList(userId: string): Promise<DTO.Favorit
  */
 export async function addFavorite(
   userId: string,
-  productId: number,
+  productId: number
 ): Promise<{ items: DTO.FavoriteDto[]; wasNew: boolean } | null> {
   const productExists = await FavoritesRepository.existsProduct(productId);
   if (!productExists) return null;
@@ -69,7 +68,7 @@ export async function addFavorite(
  */
 export async function removeFavorite(
   userId: string,
-  productId: number,
+  productId: number
 ): Promise<{ items: DTO.FavoriteDto[] } | null> {
   const productExists = await FavoritesRepository.existsProduct(productId);
   if (!productExists) return null;

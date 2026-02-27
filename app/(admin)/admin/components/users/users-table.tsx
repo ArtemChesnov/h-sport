@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from "react";
@@ -6,10 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowUpRight } from "lucide-react";
 import { Button } from "@/shared/components/ui";
-import { VirtualizedTable, type VirtualizedTableColumn } from "@/shared/components/common/virtualized-table";
+import {
+  VirtualizedTable,
+  type VirtualizedTableColumn,
+} from "@/shared/components/common/virtualized-table";
 import { DTO } from "@/shared/services";
-import { formatMoney } from "@/shared/lib";
-
+import { formatMoney } from "@/shared/lib/formatters";
 // Порог для включения виртуализации
 const VIRTUALIZATION_THRESHOLD = 50;
 
@@ -58,11 +59,7 @@ export function UsersTable(props: UsersTableProps) {
   const router = useRouter();
 
   if (users.length === 0) {
-    return (
-      <div className="px-1 py-6 text-sm text-muted-foreground">
-        Пользователей не найдено.
-      </div>
-    );
+    return <div className="px-1 py-6 text-sm text-muted-foreground">Пользователей не найдено.</div>;
   }
 
   const handleRowClick = (user: DTO.AdminUserListItemDto) => {
@@ -99,9 +96,7 @@ export function UsersTable(props: UsersTableProps) {
       id: "phone",
       header: "Телефон",
       width: "160px",
-      cell: (user) => (
-        <span className="text-sm text-muted-foreground">{user.phone || "—"}</span>
-      ),
+      cell: (user) => <span className="text-sm text-muted-foreground">{user.phone || "—"}</span>,
     },
     {
       id: "role",

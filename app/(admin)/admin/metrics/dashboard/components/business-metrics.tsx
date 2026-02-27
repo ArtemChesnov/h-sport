@@ -1,10 +1,16 @@
 "use client";
 
 import { Badge } from "@/shared/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useAdvancedMetricsQuery } from "@/shared/hooks/admin/use-advanced-metrics-query";
-import { formatMoney } from "@/shared/lib";
+import { formatMoney } from "@/shared/lib/formatters";
 import { DollarSign, ShoppingCart, TrendingUp, Users } from "lucide-react";
 
 interface AdvancedMetrics {
@@ -141,7 +147,9 @@ function FullView() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatMoney(typedMetrics.users.totalCustomers * typedMetrics.users.averageRevenuePerUser)}
+              {formatMoney(
+                typedMetrics.users.totalCustomers * typedMetrics.users.averageRevenuePerUser
+              )}
             </div>
             <p className="text-xs text-muted-foreground">
               ARPU: {formatMoney(typedMetrics.users.averageRevenuePerUser)}
@@ -155,7 +163,9 @@ function FullView() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{typedMetrics.cart.abandonedCartRate.toFixed(1)}%</div>
+            <div className="text-2xl font-bold">
+              {typedMetrics.cart.abandonedCartRate.toFixed(1)}%
+            </div>
             <p className="text-xs text-muted-foreground">
               {typedMetrics.cart.abandonedCarts} из {typedMetrics.cart.totalCarts}
             </p>
@@ -180,7 +190,9 @@ function FullView() {
               <div className="pt-2 border-t">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Ср. стоимость доставки</span>
-                  <span className="font-medium">{formatMoney(typedMetrics.delivery.averageDeliveryFee)}</span>
+                  <span className="font-medium">
+                    {formatMoney(typedMetrics.delivery.averageDeliveryFee)}
+                  </span>
                 </div>
               </div>
             </div>

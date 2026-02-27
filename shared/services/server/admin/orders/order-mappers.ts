@@ -2,7 +2,7 @@
  * Мапперы заказов в DTO (admin)
  */
 
-import type { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 import type { OrderWithRelations } from "./order-types";
 
 export function mapOrderToDetailDto(order: OrderWithRelations): DTO.OrderDetailDto {
@@ -40,7 +40,7 @@ export function mapOrderToDetailDto(order: OrderWithRelations): DTO.OrderDetailD
         price: item.price,
         total: item.total,
         productImageUrl: item.productImageUrl,
-      }),
+      })
     ),
     payments: order.payments.map(
       (payment): DTO.OrderPaymentDto => ({
@@ -51,7 +51,7 @@ export function mapOrderToDetailDto(order: OrderWithRelations): DTO.OrderDetailD
         method: payment.method,
         receiptUrl: payment.receiptUrl,
         createdAt: payment.createdAt.toISOString(),
-      }),
+      })
     ),
   };
 }

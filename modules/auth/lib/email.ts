@@ -2,6 +2,7 @@
  * Утилиты для отправки email
  */
 
+import { getAppUrl } from "@/shared/lib/config/env";
 import { formatMoneyHtml as formatMoney } from "@/shared/lib/formatters/format-money";
 import nodemailer from "nodemailer";
 
@@ -74,20 +75,15 @@ export function getEmailConfig(): EmailConfig | null {
   };
 }
 
-
 /**
  * Отправляет email (синхронно, для внутреннего использования)
  * Для публичного API используйте sendEmailAsync
  */
-export async function sendEmail(
-  to: string,
-  subject: string,
-  html: string,
-): Promise<void> {
+export async function sendEmail(to: string, subject: string, html: string): Promise<void> {
   if (!transporter) {
     const config = getEmailConfig();
     if (!config) {
-      const {logger} = await import("@/shared/lib/logger");
+      const { logger } = await import("@/shared/lib/logger");
       logger.error("Email transporter not configured. Check SMTP_* environment variables.");
       throw new Error("Email transporter not configured");
     }
@@ -95,7 +91,7 @@ export async function sendEmail(
   }
 
   if (!transporter) {
-    const {logger} = await import("@/shared/lib/logger");
+    const { logger } = await import("@/shared/lib/logger");
     logger.error("Failed to initialize email transporter");
     throw new Error("Failed to initialize email transporter");
   }
@@ -108,10 +104,10 @@ export async function sendEmail(
       html,
     });
 
-    const {logger} = await import("@/shared/lib/logger");
+    const { logger } = await import("@/shared/lib/logger");
     logger.info(`Email sent successfully to ${to}. MessageId: ${result.messageId}`);
   } catch (error) {
-    const {logger} = await import("@/shared/lib/logger");
+    const { logger } = await import("@/shared/lib/logger");
     logger.error(`Failed to send email to ${to}:`, error);
     throw error;
   }
@@ -121,11 +117,7 @@ export async function sendEmail(
  * Отправляет email асинхронно через очередь (не блокирует запрос)
  * Используйте эту функцию в API routes для неблокирующей отправки
  */
-export function sendEmailAsync(
-  to: string,
-  subject: string,
-  html: string,
-): void {
+export function sendEmailAsync(to: string, subject: string, html: string): void {
   import("./email-queue").then(({ queueEmail }) => {
     queueEmail(to, subject, html);
   });
@@ -134,10 +126,7 @@ export function sendEmailAsync(
 /**
  * Асинхронная версия sendVerificationEmail
  */
-export function sendVerificationEmailAsync(
-  email: string,
-  token: string,
-): void {
+export function sendVerificationEmailAsync(email: string, token: string): void {
   // Генерируем HTML синхронно и добавляем в очередь
   sendVerificationEmail(email, token).catch(async (error) => {
     const { logger } = await import("@/shared/lib/logger");
@@ -148,10 +137,7 @@ export function sendVerificationEmailAsync(
 /**
  * Асинхронная версия sendPasswordResetEmail
  */
-export function sendPasswordResetEmailAsync(
-  email: string,
-  token: string,
-): void {
+export function sendPasswordResetEmailAsync(email: string, token: string): void {
   sendPasswordResetEmail(email, token).catch(async (error) => {
     const { logger } = await import("@/shared/lib/logger");
     logger.error("Failed to queue password reset email", error);
@@ -163,10 +149,10 @@ export function sendPasswordResetEmailAsync(
  */
 export function sendOrderConfirmationEmailAsync(
   email: string,
-  orderData: Parameters<typeof sendOrderConfirmationEmail>[1],
+  orderData: Parameters<typeof sendOrderConfirmationEmail>[1]
 ): void {
   // Генерируем HTML и добавляем в очередь
-  const baseUrl = process.env.AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const baseUrl = getAppUrl();
   const orderUrl = `${baseUrl}/account/orders/${orderData.uid}`;
   const logoUrl = `${baseUrl}/logo-icon.png`;
 
@@ -182,7 +168,7 @@ export function sendOrderConfirmationEmailAsync(
         <td style="padding: 14px 0; text-align: right; color: #EB6081; font-size: 14px; font-weight: 500; vertical-align: top;">${formatMoney(item.qty * item.price)}</td>
       </tr>
       ${i < orderData.items.length - 1 ? '<tr><td colspan="3" style="padding: 0; height: 1px; background-color: #EB6081; line-height: 0;"></td></tr>' : ""}
-    `,
+    `
     )
     .join("");
 
@@ -251,7 +237,7 @@ export function sendOrderConfirmationEmailAsync(
  */
 export function sendOrderStatusChangeEmailAsync(
   email: string,
-  orderData: Parameters<typeof sendOrderStatusChangeEmail>[1],
+  orderData: Parameters<typeof sendOrderStatusChangeEmail>[1]
 ): void {
   sendOrderStatusChangeEmail(email, orderData).catch(async (error) => {
     const { logger } = await import("@/shared/lib/logger");
@@ -262,11 +248,8 @@ export function sendOrderStatusChangeEmailAsync(
 /**
  * Отправляет email для подтверждения
  */
-export async function sendVerificationEmail(
-  email: string,
-  token: string,
-): Promise<void> {
-  const baseUrl = process.env.AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+export async function sendVerificationEmail(email: string, token: string): Promise<void> {
+  const baseUrl = getAppUrl();
   const verificationUrl = `${baseUrl}/api/auth/verify-email?token=${token}`;
   const logoUrl = `${baseUrl}/logo-icon.png`;
 
@@ -317,11 +300,8 @@ export async function sendVerificationEmail(
 /**
  * Отправляет email для восстановления пароля
  */
-export async function sendPasswordResetEmail(
-  email: string,
-  token: string,
-): Promise<void> {
-  const baseUrl = process.env.AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+export async function sendPasswordResetEmail(email: string, token: string): Promise<void> {
+  const baseUrl = getAppUrl();
   const resetUrl = `${baseUrl}/auth/reset-password?token=${token}`;
   const logoUrl = `${baseUrl}/logo-icon.png`;
 
@@ -377,7 +357,7 @@ export async function sendPasswordResetEmail(
  * Отправляет email для подтверждения подписки на рассылку новостей
  */
 export async function sendNewsletterConfirmationEmail(email: string, token: string): Promise<void> {
-  const baseUrl = process.env.AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const baseUrl = getAppUrl();
   const confirmUrl = `${baseUrl}/api/shop/newsletter/confirm?token=${encodeURIComponent(token)}`;
   const logoUrl = `${baseUrl}/logo-icon.png`;
 
@@ -450,12 +430,11 @@ export async function sendOrderConfirmationEmail(
     discount?: number;
     deliveryFee?: number;
     subtotal?: number;
-  },
+  }
 ): Promise<void> {
-  const baseUrl = process.env.AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const baseUrl = getAppUrl();
   const orderUrl = `${baseUrl}/account/orders/${orderData.uid}`;
   const logoUrl = `${baseUrl}/logo-icon.png`;
-
 
   const itemsHtml = orderData.items
     .map(
@@ -469,12 +448,18 @@ export async function sendOrderConfirmationEmail(
         <td style="padding: 14px 0; text-align: right; color: #EB6081; font-size: 14px; font-weight: 500; vertical-align: top;">${formatMoney(item.qty * item.price)}</td>
       </tr>
       ${i < orderData.items.length - 1 ? '<tr><td colspan="3" style="padding: 0; height: 1px; background-color: #EB6081; line-height: 0;"></td></tr>' : ""}
-    `,
+    `
     )
     .join("");
 
-  const subtotalDisplay = orderData.subtotal !== undefined ? formatMoney(orderData.subtotal) : formatMoney(orderData.items.reduce((s, i) => s + i.qty * i.price, 0));
-  const deliveryDisplay = orderData.deliveryFee === 0 || orderData.deliveryFee == null ? "Бесплатно" : formatMoney(orderData.deliveryFee);
+  const subtotalDisplay =
+    orderData.subtotal !== undefined
+      ? formatMoney(orderData.subtotal)
+      : formatMoney(orderData.items.reduce((s, i) => s + i.qty * i.price, 0));
+  const deliveryDisplay =
+    orderData.deliveryFee === 0 || orderData.deliveryFee == null
+      ? "Бесплатно"
+      : formatMoney(orderData.deliveryFee);
 
   const html = `
     <!DOCTYPE html>
@@ -546,9 +531,9 @@ export async function sendOrderStatusChangeEmail(
     status: string;
     statusLabel: string;
     trackingCode?: string | null;
-  },
+  }
 ): Promise<void> {
-  const baseUrl = process.env.AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const baseUrl = getAppUrl();
   const orderUrl = `${baseUrl}/account/orders/${orderData.uid}`;
   const logoUrl = `${baseUrl}/logo-icon.png`;
 

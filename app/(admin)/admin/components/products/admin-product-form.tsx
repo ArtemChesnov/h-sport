@@ -1,4 +1,3 @@
-
 "use client";
 
 import { TOAST } from "@/shared/constants";
@@ -8,26 +7,30 @@ import { toast } from "sonner";
 import { useCategoriesQuery } from "@/shared/hooks";
 
 import {
-    Button,
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-    Input,
-    Label,
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-    Textarea,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Textarea,
 } from "@/shared/components/ui";
 
 import { Separator } from "@/shared/components/ui/separator";
 import { Spinner } from "@/shared/components/ui/spinner";
 
-import { slugify } from "@/shared/lib";
-import type { AdminProductFormProps, AdminProductFormValues, VariantFormRow } from "@/shared/services/dto";
+import { slugify } from "@/shared/lib/generators";
+import type {
+  AdminProductFormProps,
+  AdminProductFormValues,
+  VariantFormRow,
+} from "@/shared/services/dto";
 import { AlignLeft, FileText, FolderTree, Hash, Package, Palette, Tag, Type } from "lucide-react";
 import { FieldErrorText } from "./product-form-field-error";
 import { ProductVariantsEditor } from "./product-variants-editor";
@@ -67,7 +70,7 @@ export function AdminProductForm({
 
   function handleBaseChange<K extends keyof AdminProductFormValues>(
     field: K,
-    value: AdminProductFormValues[K],
+    value: AdminProductFormValues[K]
   ) {
     setValues((prev) => {
       const next = { ...prev, [field]: value };
@@ -106,9 +109,7 @@ export function AdminProductForm({
       return;
     }
 
-    const invalidPriceVariant = values.variants.find(
-      (v) => !isVariantPriceValid(v.priceRub),
-    );
+    const invalidPriceVariant = values.variants.find((v) => !isVariantPriceValid(v.priceRub));
     if (invalidPriceVariant) {
       toast.error(TOAST.ERROR.PRICE_REQUIRED);
       return;
@@ -122,9 +123,7 @@ export function AdminProductForm({
     if (!trimmed) return;
 
     setValues((prev) =>
-      prev.tags.includes(trimmed)
-        ? prev
-        : { ...prev, tags: [...prev.tags, trimmed] },
+      prev.tags.includes(trimmed) ? prev : { ...prev, tags: [...prev.tags, trimmed] }
     );
     setTagInput("");
   }
@@ -158,7 +157,9 @@ export function AdminProductForm({
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-xs font-medium">Название товара</Label>
+                <Label htmlFor="name" className="text-xs font-medium">
+                  Название товара
+                </Label>
                 <div className="relative">
                   <Type className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
@@ -173,23 +174,22 @@ export function AdminProductForm({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="categoryId" className="text-xs font-medium flex items-center gap-1.5">
+                <Label
+                  htmlFor="categoryId"
+                  className="text-xs font-medium flex items-center gap-1.5"
+                >
                   <FolderTree className="h-3.5 w-3.5 text-muted-foreground" />
                   Категория
                 </Label>
                 <Select
                   value={values.categoryId ? String(values.categoryId) : ""}
-                  onValueChange={(val) =>
-                    handleBaseChange("categoryId", Number(val) || 0)
-                  }
+                  onValueChange={(val) => handleBaseChange("categoryId", Number(val) || 0)}
                   disabled={isCategoriesLoading || isCategoriesError}
                 >
                   <SelectTrigger id="categoryId" className="h-9">
                     <SelectValue
                       placeholder={
-                        isCategoriesLoading
-                          ? "Загрузка категорий..."
-                          : "Выбери категорию"
+                        isCategoriesLoading ? "Загрузка категорий..." : "Выбери категорию"
                       }
                     />
                   </SelectTrigger>
@@ -208,7 +208,9 @@ export function AdminProductForm({
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="slug" className="text-xs font-medium">URL-адрес (slug)</Label>
+                <Label htmlFor="slug" className="text-xs font-medium">
+                  URL-адрес (slug)
+                </Label>
                 <div className="relative">
                   <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
@@ -223,7 +225,9 @@ export function AdminProductForm({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="sku" className="text-xs font-medium">Базовый артикул (SKU)</Label>
+                <Label htmlFor="sku" className="text-xs font-medium">
+                  Базовый артикул (SKU)
+                </Label>
                 <div className="relative">
                   <Package className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
@@ -250,14 +254,14 @@ export function AdminProductForm({
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="description" className="text-xs font-medium">Описание товара</Label>
+                <Label htmlFor="description" className="text-xs font-medium">
+                  Описание товара
+                </Label>
                 <Textarea
                   id="description"
                   rows={5}
                   value={values.description}
-                  onChange={(e) =>
-                    handleBaseChange("description", e.target.value)
-                  }
+                  onChange={(e) => handleBaseChange("description", e.target.value)}
                   placeholder="Краткое описание товара, которое увидит клиент."
                   className="text-sm resize-none"
                 />
@@ -265,14 +269,14 @@ export function AdminProductForm({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="composition" className="text-xs font-medium">Состав материала</Label>
+                <Label htmlFor="composition" className="text-xs font-medium">
+                  Состав материала
+                </Label>
                 <Textarea
                   id="composition"
                   rows={5}
                   value={values.composition}
-                  onChange={(e) =>
-                    handleBaseChange("composition", e.target.value)
-                  }
+                  onChange={(e) => handleBaseChange("composition", e.target.value)}
                   placeholder="Например: 80% полиэстер, 20% эластан."
                   className="text-sm resize-none"
                 />
@@ -302,9 +306,7 @@ export function AdminProductForm({
                     >
                       <Tag className="h-3 w-3" />
                       <span>{tag}</span>
-                      <span className="text-[10px] text-purple-500 hover:text-purple-700">
-                        ✕
-                      </span>
+                      <span className="text-[10px] text-purple-500 hover:text-purple-700">✕</span>
                     </button>
                   ))}
                 </div>
@@ -326,7 +328,12 @@ export function AdminProductForm({
                     className="pl-9 h-9"
                   />
                 </div>
-                <Button type="button" variant="outline" onClick={handleAddTag} className="h-9 cursor-pointer">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleAddTag}
+                  className="h-9 cursor-pointer"
+                >
                   Добавить
                 </Button>
               </div>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { VirtualizedTableColumn } from "@/shared/components/common/virtualized-table";
@@ -7,7 +6,7 @@ import { Button } from "@/shared/components/ui";
 import { ADMIN_ORDER_DELIVERY_METHOD_OPTIONS } from "@/shared/constants";
 import { TOAST } from "@/shared/constants";
 import { useCopyToClipboard } from "@/shared/hooks/common/use-copy-to-clipboard";
-import { formatMoney } from "@/shared/lib";
+import { formatMoney } from "@/shared/lib/formatters";
 import { getOrderStatusBadgeStyles } from "@/shared/lib/styles";
 import { DTO } from "@/shared/services";
 import { CheckCircle2, Copy, Hash, PencilIcon, Truck, XCircle } from "lucide-react";

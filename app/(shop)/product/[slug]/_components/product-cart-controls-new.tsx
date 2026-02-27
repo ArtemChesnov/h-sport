@@ -3,7 +3,7 @@
 import { Button } from "@/shared/components/ui/button";
 import { DesignButton } from "@/shared/components/ui/design-button";
 import { CART_ACTIONS } from "@/shared/constants";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 
@@ -38,9 +38,7 @@ export function ProductCartControlsNew({
       <div
         className={cn(
           "absolute inset-0 transition-all duration-300 ease-out",
-          isInCart
-            ? "opacity-0 scale-95 pointer-events-none"
-            : "opacity-100 scale-100"
+          isInCart ? "opacity-0 scale-95 pointer-events-none" : "opacity-100 scale-100"
         )}
       >
         <DesignButton
@@ -61,9 +59,7 @@ export function ProductCartControlsNew({
       <div
         className={cn(
           "absolute inset-0 flex gap-5 transition-all duration-300 ease-out",
-          isInCart
-            ? "opacity-100 scale-100"
-            : "opacity-0 scale-95 pointer-events-none"
+          isInCart ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
         )}
       >
         <DesignButton className="flex-1" variant="default" asChild>

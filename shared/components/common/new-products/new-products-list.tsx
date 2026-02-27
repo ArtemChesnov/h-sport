@@ -4,7 +4,7 @@ import React from "react";
 
 import { Carousel, CarouselContent, CarouselItem } from "@/shared/components/ui/carousel";
 import { useProductsQuery } from "@/shared/hooks";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import type { DTO } from "@/shared/services";
 import { Container } from "../layout";
 import { PromoButton } from "../ui";

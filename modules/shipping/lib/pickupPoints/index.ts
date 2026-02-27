@@ -5,17 +5,16 @@
 import type { PickupPoint, PickupPointsQuery } from "../../types/pickup-points";
 import { getCDEKPickupPoints } from "./providers/cdek";
 import { getRussianPostPickupPoints } from "./providers/russianpost";
-
+import { env } from "@/shared/lib/config/env";
 import { PICKUP_POINTS_CACHE_TTL_MS } from "@/shared/constants";
 
 // Гибридный кеш: в production с Redis использует Redis, иначе in-memory
 const cache = new Map<string, { data: PickupPoint[]; expiresAt: number }>();
 const CACHE_TTL = PICKUP_POINTS_CACHE_TTL_MS;
-const CACHE_TTL_SECONDS = Math.ceil(CACHE_TTL / 1000); // TTL в секундах для Redis
+const CACHE_TTL_SECONDS = Math.ceil(CACHE_TTL / 1000);
 const REDIS_KEY_PREFIX = "pickupPoints:";
 
-// Максимальный размер кеша для предотвращения утечек памяти
-const MAX_CACHE_SIZE = parseInt(process.env.PICKUP_POINTS_MAX_CACHE_SIZE || "200", 10);
+const MAX_CACHE_SIZE = parseInt(env.PICKUP_POINTS_MAX_CACHE_SIZE || "200", 10);
 
 /**
  * Очищает устаревшие записи из кеша
@@ -31,7 +30,7 @@ function cleanupExpiredCacheEntries(): void {
     }
   }
 
-  expiredKeys.forEach(key => cache.delete(key));
+  expiredKeys.forEach((key) => cache.delete(key));
 
   if (expiredKeys.length > 0) {
     // Логируем асинхронно чтобы не блокировать основной поток
@@ -77,14 +76,11 @@ function getCacheKey(query: PickupPointsQuery): string {
 /**
  * Получает пункты выдачи по запросу
  */
-export async function getPickupPoints(
-  query: PickupPointsQuery,
-): Promise<PickupPoint[]> {
+export async function getPickupPoints(query: PickupPointsQuery): Promise<PickupPoint[]> {
   const cacheKey = getCacheKey(query);
   const redisKey = REDIS_KEY_PREFIX + cacheKey;
 
-  // Гибридная логика: сначала проверяем Redis (если доступен), затем in-memory
-  if (process.env.REDIS_URL) {
+  if (env.REDIS_URL) {
     try {
       const { redisGet } = await import("@/shared/lib/redis");
       const redisCached = await redisGet<PickupPoint[]>(redisKey);
@@ -115,19 +111,18 @@ export async function getPickupPoints(
         query.city,
         query.lat,
         query.lon,
-        query.limit || 50,
+        query.limit || 50
       );
     } else if (query.provider === "russianpost") {
-      points = await getRussianPostPickupPoints(
-        query.city || "",
-        query.q,
-        query.limit || 50,
-      );
+      points = await getRussianPostPickupPoints(query.city || "", query.q, query.limit || 50);
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     const { logger } = await import("@/shared/lib/logger");
-    logger.error(`[PickupPoints] Error getting ${query.provider} points`, error, { provider: query.provider, city: query.city });
+    logger.error(`[PickupPoints] Error getting ${query.provider} points`, error, {
+      provider: query.provider,
+      city: query.city,
+    });
 
     // Для СДЕК - пробрасываем ошибку дальше, чтобы компонент мог показать понятное сообщение
     if (query.provider === "cdek" && errorMessage.includes("CDEK credentials not configured")) {
@@ -146,7 +141,7 @@ export async function getPickupPoints(
       expiresAt,
     });
 
-    if (process.env.REDIS_URL) {
+    if (env.REDIS_URL) {
       try {
         const { redisSet } = await import("@/shared/lib/redis");
         await redisSet(redisKey, points, CACHE_TTL_SECONDS);

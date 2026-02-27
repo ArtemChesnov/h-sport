@@ -2,7 +2,7 @@
 
 import { ErrorFallbackBlock, StoreEmptyBlock } from "@/shared/components/common";
 import { ProductCardSkeleton } from "@/shared/components/common/skeleton/product-card-skeleton";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { DTO } from "@/shared/services";
 import React from "react";
 import type { ViewMode } from "../catalog/view-toggle";
@@ -56,9 +56,10 @@ export function ProductList({
   const showSkeleton = isLoading && safeProducts.length === 0;
 
   // Класс для плавного затемнения при фоновой загрузке
-  const fetchingClass = isFetching && safeProducts.length > 0
-    ? "opacity-60 pointer-events-none transition-opacity duration-200"
-    : "opacity-100 transition-opacity duration-200";
+  const fetchingClass =
+    isFetching && safeProducts.length > 0
+      ? "opacity-60 pointer-events-none transition-opacity duration-200"
+      : "opacity-100 transition-opacity duration-200";
 
   if (showSkeleton) {
     // Скелетон для grid-2 вида
@@ -128,10 +129,7 @@ export function ProductList({
   if (safeProducts.length === 0) {
     return (
       <section className={cn("w-full", className)}>
-        <StoreEmptyBlock
-          title={emptyText}
-          action={emptyAction}
-        />
+        <StoreEmptyBlock title={emptyText} action={emptyAction} />
       </section>
     );
   }

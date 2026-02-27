@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/shared/components/ui/button";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import type { DTO } from "@/shared/services";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -12,10 +12,7 @@ interface OrdersPaginationProps {
   className?: string;
 }
 
-function generatePageNumbers(
-  currentPage: number,
-  totalPages: number,
-): (number | "ellipsis")[] {
+function generatePageNumbers(currentPage: number, totalPages: number): (number | "ellipsis")[] {
   const pages: (number | "ellipsis")[] = [];
   const delta = 1;
 
@@ -39,8 +36,8 @@ export function OrdersPagination({ meta, className }: OrdersPaginationProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const hasNext = meta.hasNext ?? (meta.page < meta.pages);
-  const hasPrev = meta.hasPrev ?? (meta.page > 1);
+  const hasNext = meta.hasNext ?? meta.page < meta.pages;
+  const hasPrev = meta.hasPrev ?? meta.page > 1;
 
   const updatePage = React.useCallback(
     (newPage: number) => {
@@ -58,7 +55,7 @@ export function OrdersPagination({ meta, className }: OrdersPaginationProps) {
         section?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 100);
     },
-    [searchParams, router],
+    [searchParams, router]
   );
 
   if (meta.pages <= 1) return null;
@@ -66,9 +63,7 @@ export function OrdersPagination({ meta, className }: OrdersPaginationProps) {
   const pageNumbers = generatePageNumbers(meta.page, meta.pages);
 
   return (
-    <div
-      className={cn("flex items-center justify-center gap-2 mt-8 pb-8", className)}
-    >
+    <div className={cn("flex items-center justify-center gap-2 mt-8 pb-8", className)}>
       <Button
         type="button"
         variant="outline"
@@ -86,11 +81,7 @@ export function OrdersPagination({ meta, className }: OrdersPaginationProps) {
         {pageNumbers.map((pageNum, index) => {
           if (pageNum === "ellipsis") {
             return (
-              <span
-                key={`ellipsis-${index}`}
-                className="px-2 py-2 text-neutral-400"
-                aria-hidden
-              >
+              <span key={`ellipsis-${index}`} className="px-2 py-2 text-neutral-400" aria-hidden>
                 <MoreHorizontal className="h-4 w-4" />
               </span>
             );
@@ -108,8 +99,7 @@ export function OrdersPagination({ meta, className }: OrdersPaginationProps) {
               aria-current={isCurrentPage ? "page" : undefined}
               className={cn(
                 "min-w-[36px] h-9 px-2 rounded-[6px] font-light",
-                isCurrentPage &&
-                  "bg-primary/10 border-primary text-primary pointer-events-none",
+                isCurrentPage && "bg-primary/10 border-primary text-primary pointer-events-none"
               )}
             >
               {pageNum}

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/shared/components/ui/button";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import type { DTO } from "@/shared/services";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -61,32 +61,35 @@ export function CatalogPagination({ meta, className }: CatalogPaginationProps) {
   const searchParams = useSearchParams();
 
   // Вычисляем hasNext и hasPrev из meta (для обратной совместимости)
-  const hasNext = meta.hasNext ?? (meta.page < meta.pages);
-  const hasPrev = meta.hasPrev ?? (meta.page > 1);
+  const hasNext = meta.hasNext ?? meta.page < meta.pages;
+  const hasPrev = meta.hasPrev ?? meta.page > 1;
 
   // Функция для обновления страницы в URL
-  const updatePage = React.useCallback((newPage: number) => {
-    const params = new URLSearchParams(searchParams.toString());
+  const updatePage = React.useCallback(
+    (newPage: number) => {
+      const params = new URLSearchParams(searchParams.toString());
 
-    if (newPage === 1) {
-      // Убираем параметр page для первой страницы (чистый URL)
-      params.delete("page");
-    } else {
-      params.set("page", String(newPage));
-    }
-
-    // Прокручиваем к началу каталога при смене страницы
-    const newUrl = `/catalog${params.toString() ? `?${params.toString()}` : ""}`;
-    router.push(newUrl);
-
-    // Прокрутка к началу блока каталога (не к самому верху документа)
-    setTimeout(() => {
-      const catalogSection = document.querySelector('[data-catalog-section]');
-      if (catalogSection) {
-        catalogSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (newPage === 1) {
+        // Убираем параметр page для первой страницы (чистый URL)
+        params.delete("page");
+      } else {
+        params.set("page", String(newPage));
       }
-    }, 100);
-  }, [searchParams, router]);
+
+      // Прокручиваем к началу каталога при смене страницы
+      const newUrl = `/catalog${params.toString() ? `?${params.toString()}` : ""}`;
+      router.push(newUrl);
+
+      // Прокрутка к началу блока каталога (не к самому верху документа)
+      setTimeout(() => {
+        const catalogSection = document.querySelector("[data-catalog-section]");
+        if (catalogSection) {
+          catalogSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    },
+    [searchParams, router]
+  );
 
   const handlePrev = () => {
     if (hasPrev && meta.page > 1) {
@@ -109,12 +112,7 @@ export function CatalogPagination({ meta, className }: CatalogPaginationProps) {
   const pageNumbers = generatePageNumbers(meta.page, meta.pages);
 
   return (
-    <div
-      className={cn(
-        "flex items-center justify-center gap-2 mt-8 pb-8",
-        className,
-      )}
-    >
+    <div className={cn("flex items-center justify-center gap-2 mt-8 pb-8", className)}>
       {/* Кнопка "Назад" */}
       <Button
         type="button"
@@ -157,7 +155,7 @@ export function CatalogPagination({ meta, className }: CatalogPaginationProps) {
               aria-current={isCurrentPage ? "page" : undefined}
               className={cn(
                 "min-w-[36px] h-9 px-2 rounded-[6px] font-light",
-                isCurrentPage && "bg-primary/10 border-primary text-primary pointer-events-none",
+                isCurrentPage && "bg-primary/10 border-primary text-primary pointer-events-none"
               )}
             >
               {pageNum}

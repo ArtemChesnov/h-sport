@@ -2,7 +2,7 @@
  * Валидация полей продуктов
  */
 
-import { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 import type { FieldError } from "@/shared/lib/validation";
 import type { BaseFieldOptions, ItemValidationContext } from "./product-types";
 import {
@@ -22,7 +22,7 @@ import { isNonEmptyString, isPositiveInt, getItemFieldName } from "./product-hel
 export function validateName(
   value: unknown,
   options: BaseFieldOptions = {},
-  mode: "create" | "update" = "create",
+  mode: "create" | "update" = "create"
 ): FieldError[] {
   const { field = "name", optional = false } = options;
   const errors: FieldError[] = [];
@@ -66,7 +66,7 @@ export function validateName(
 export function validateSlug(
   value: unknown,
   mode: "create" | "update" = "create",
-  options: BaseFieldOptions = {},
+  options: BaseFieldOptions = {}
 ): FieldError[] {
   const { field = "slug" } = options;
   const errors: FieldError[] = [];
@@ -124,7 +124,7 @@ export function validateSlug(
 export function validateCategoryId(
   value: unknown,
   options: BaseFieldOptions = {},
-  mode: "create" | "update" = "create",
+  mode: "create" | "update" = "create"
 ): FieldError[] {
   const { field = "categoryId", optional = false } = options;
   const errors: FieldError[] = [];
@@ -158,7 +158,7 @@ export function validateCategoryId(
 export function validateStringArrayField(
   value: unknown,
   field: string,
-  itemLabel: string,
+  itemLabel: string
 ): FieldError[] {
   const errors: FieldError[] = [];
 
@@ -205,7 +205,7 @@ export function validateTags(tags: unknown): FieldError[] {
  */
 export function validateItemColor(
   item: DTO.ProductItemInputDto,
-  ctx: ItemValidationContext,
+  ctx: ItemValidationContext
 ): FieldError[] {
   const errors: FieldError[] = [];
 
@@ -224,7 +224,7 @@ export function validateItemColor(
  */
 export function validateItemSize(
   item: DTO.ProductItemInputDto,
-  ctx: ItemValidationContext,
+  ctx: ItemValidationContext
 ): FieldError[] {
   const errors: FieldError[] = [];
   const field = getItemFieldName(ctx, "size");
@@ -249,7 +249,7 @@ export function validateItemSize(
  */
 export function validateItemPrice(
   item: DTO.ProductItemInputDto,
-  ctx: ItemValidationContext,
+  ctx: ItemValidationContext
 ): FieldError[] {
   const errors: FieldError[] = [];
   const field = getItemFieldName(ctx, "price");
@@ -274,7 +274,7 @@ export function validateItemPrice(
  */
 export function validateItemImageUrls(
   item: DTO.ProductItemInputDto,
-  ctx: ItemValidationContext,
+  ctx: ItemValidationContext
 ): FieldError[] {
   const errors: FieldError[] = [];
   const field = getItemFieldName(ctx, "imageUrls");
@@ -308,7 +308,7 @@ export function validateItemImageUrls(
  */
 export function validateItemSku(
   item: DTO.ProductItemInputDto,
-  ctx: ItemValidationContext,
+  ctx: ItemValidationContext
 ): FieldError[] {
   const errors: FieldError[] = [];
   const field = getItemFieldName(ctx, "sku");
@@ -351,7 +351,7 @@ export function validateItemSku(
  */
 export function validateItemUniqueCombo(
   item: DTO.ProductItemInputDto,
-  ctx: ItemValidationContext,
+  ctx: ItemValidationContext
 ): FieldError[] {
   const errors: FieldError[] = [];
   const field = getItemFieldName(ctx, "size");
@@ -375,7 +375,7 @@ export function validateItemUniqueCombo(
  */
 export function validateItems(
   items: DTO.ProductItemInputDto[] | undefined,
-  options: { allowEmpty: boolean; fieldPrefix?: string },
+  options: { allowEmpty: boolean; fieldPrefix?: string }
 ): FieldError[] {
   const errors: FieldError[] = [];
   const { allowEmpty, fieldPrefix = "items" } = options;

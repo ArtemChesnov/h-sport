@@ -1,5 +1,7 @@
+import { cartAddItemSchema } from "@/shared/lib/api/request-body-schemas";
 import { validateRequestSize, withErrorHandling } from "@/shared/lib/api/error-handler";
 import { createErrorResponse } from "@/shared/lib/api/error-response";
+import { validateRequestBody } from "@/shared/lib/api/validate-request-body";
 import { applyRateLimit } from "@/shared/lib/api/rate-limit-middleware";
 import { CART_COOKIE_MAX_AGE } from "@/shared/lib/cart";
 import { DTO } from "@/shared/services";
@@ -12,14 +14,13 @@ import {
   mapCartToDto,
   recalculateCartAggregates,
   runCartTransaction,
-  validateAddItemInput,
 } from "@/shared/services/server";
 import type { ErrorResponse } from "@/shared/dto";
 import { NextRequest, NextResponse } from "next/server";
 
 /** POST /api/shop/cart/items. Rate limit cart. */
 async function handler(
-  request: NextRequest,
+  request: NextRequest
 ): Promise<NextResponse<DTO.CartDto> | NextResponse<ErrorResponse>> {
   const rateLimitResponse = await applyRateLimit(request, "cart");
   if (rateLimitResponse) return rateLimitResponse;
@@ -27,23 +28,15 @@ async function handler(
   const sizeCheck = validateRequestSize(request, 10 * 1024);
   if (!sizeCheck.valid) return sizeCheck.response;
 
-  let body: DTO.CartAddItemDto;
-  try {
-    body = (await request.json()) as DTO.CartAddItemDto;
-  } catch {
-    return createErrorResponse("Некорректный формат данных", 400);
-  }
-
-  const validation = validateAddItemInput(body.productItemId, body.qty);
-  if (!validation.ok) return createErrorResponse(validation.message, 400);
-
-  const { productItemId, qty } = validation;
+  const bodyResult = await validateRequestBody(request, cartAddItemSchema);
+  if ("error" in bodyResult) return bodyResult.error;
+  const { productItemId, qty } = bodyResult.data;
   const { cart, newToken } = await getOrCreateCartCore(request);
 
   const result = await runCartTransaction((tx) =>
     addItemToCart(tx, cart.id, productItemId, qty, (cartId, txClient) =>
-      recalculateCartAggregates(cartId, txClient),
-    ),
+      recalculateCartAggregates(cartId, txClient)
+    )
   );
 
   if (!result.ok) {
@@ -69,7 +62,7 @@ async function handler(
 }
 
 export async function POST(
-  request: NextRequest,
+  request: NextRequest
 ): Promise<NextResponse<DTO.CartDto | ErrorResponse>> {
   return withErrorHandling(handler, request, "POST /api/shop/cart/items");
 }
@@ -79,7 +72,7 @@ async function recordCartMetrics(
   request: NextRequest,
   productId: number,
   qty: number,
-  cartToken: string | null,
+  cartToken: string | null
 ) {
   const { getSessionUserFromRequest } = await import("@/shared/lib/auth/session");
   const user = await getSessionUserFromRequest(request);

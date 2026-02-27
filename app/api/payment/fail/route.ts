@@ -5,32 +5,39 @@
  * Перенаправляет пользователя на страницу ошибки
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import { findPaymentByOrderId, updatePaymentStatus, createOrderEvent } from "@/modules/payment/lib/db";
+import {
+  findPaymentByOrderId,
+  updatePaymentStatus,
+  createOrderEvent,
+} from "@/modules/payment/lib/db";
+import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { logger } from "@/shared/lib/logger";
+import { NextRequest, NextResponse } from "next/server";
+
+async function handler(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const InvId = searchParams.get("InvId");
+
+  if (InvId) {
+    const orderId = parseInt(InvId, 10);
+    if (!isNaN(orderId)) {
+      const payment = await findPaymentByOrderId(orderId);
+      if (payment) {
+        await updatePaymentStatus(payment.id, "CANCELED");
+        await createOrderEvent(orderId, "PAYMENT_FAILED", {
+          paymentId: payment.id,
+          timestamp: new Date().toISOString(),
+        });
+      }
+    }
+  }
+
+  return NextResponse.redirect(new URL("/checkout?error=payment_canceled", request.url));
+}
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const InvId = searchParams.get("InvId");
-
-    if (InvId) {
-      const orderId = parseInt(InvId, 10);
-      if (!isNaN(orderId)) {
-        // Обновляем статус платежа
-        const payment = await findPaymentByOrderId(orderId);
-        if (payment) {
-          await updatePaymentStatus(payment.id, "CANCELED");
-          await createOrderEvent(orderId, "PAYMENT_FAILED", {
-            paymentId: payment.id,
-            timestamp: new Date().toISOString(),
-          });
-        }
-      }
-    }
-
-    // Перенаправляем на страницу ошибки
-    return NextResponse.redirect(new URL("/checkout?error=payment_canceled", request.url));
+    return await withErrorHandling(handler, request, "GET /api/payment/fail");
   } catch (error) {
     logger.error("GET /api/payment/fail: Ошибка при обработке неуспешной оплаты", error);
     return NextResponse.redirect(new URL("/checkout?error=payment_error", request.url));

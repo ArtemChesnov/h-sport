@@ -48,8 +48,7 @@ const globalForRateLimit = globalThis as typeof globalThis & {
 
 // Глобальный store (защищён от HMR)
 const inMemoryStore: Map<string, InMemoryRecord> =
-  globalForRateLimit.__rateLimitStore ||
-  (globalForRateLimit.__rateLimitStore = new Map());
+  globalForRateLimit.__rateLimitStore || (globalForRateLimit.__rateLimitStore = new Map());
 
 /**
  * Очистка устаревших записей
@@ -196,7 +195,8 @@ class HybridRateLimitStore implements RateLimitStore {
     this.initAttempted = true;
 
     // При наличии REDIS_URL пытаемся использовать Redis
-    if (process.env.REDIS_URL) {
+    const { env } = await import("@/shared/lib/config/env");
+    if (env.REDIS_URL) {
       try {
         const { getRedisClient } = await import("./redis");
         const redisClient = await getRedisClient();
@@ -270,7 +270,7 @@ export function getRateLimitStore(): RateLimitStore {
  */
 export function checkRateLimit(
   key: string,
-  options: RateLimitOptions = { maxRequests: 100, windowMs: 60 * 1000 },
+  options: RateLimitOptions = { maxRequests: 100, windowMs: 60 * 1000 }
 ): RateLimitResult {
   const result = currentStore.check(key, options);
 
@@ -291,7 +291,7 @@ export function checkRateLimit(
  */
 export async function checkRateLimitAsync(
   key: string,
-  options: RateLimitOptions = { maxRequests: 100, windowMs: 60 * 1000 },
+  options: RateLimitOptions = { maxRequests: 100, windowMs: 60 * 1000 }
 ): Promise<RateLimitResult> {
   // Используем гибридный store, который автоматически выбирает Redis в production
   return await hybridStore.checkAsync(key, options);

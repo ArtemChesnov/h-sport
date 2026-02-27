@@ -1,10 +1,12 @@
-import { buildPaginatedResponse, calculateSkip, normalizeAdminPaginationParams } from "@/shared/lib";
-import { validateRequestSize, withErrorHandling } from "@/shared/lib/api/error-handler";
-import { createErrorResponse } from "@/shared/lib/api/error-response";
+import { newsletterIssueCreateSchema } from "@/shared/lib/api/request-body-schemas";
 import {
-  createNewsletterIssue,
-  getNewsletterIssuesList,
-} from "@/shared/services/server";
+  buildPaginatedResponse,
+  calculateSkip,
+  normalizeAdminPaginationParams,
+} from "@/shared/lib/pagination";
+import { validateRequestSize, withErrorHandling } from "@/shared/lib/api/error-handler";
+import { validateRequestBody } from "@/shared/lib/api/validate-request-body";
+import { createNewsletterIssue, getNewsletterIssuesList } from "@/shared/services/server";
 import type { ErrorResponse } from "@/shared/dto";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -33,15 +35,10 @@ async function postHandler(request: NextRequest) {
   const authError = await requireAdmin(request);
   if (authError) return authError as NextResponse<ErrorResponse>;
 
-  const body = (await request.json()) as { subject?: string; bodyHtml?: string };
-  const subject = typeof body.subject === "string" ? body.subject.trim() : "";
-  const bodyHtml = typeof body.bodyHtml === "string" ? body.bodyHtml : "";
+  const bodyResult = await validateRequestBody(request, newsletterIssueCreateSchema);
+  if ("error" in bodyResult) return bodyResult.error;
 
-  if (!subject) {
-    return createErrorResponse("Укажите тему письма", 400);
-  }
-
-  const issue = await createNewsletterIssue({ subject, bodyHtml });
+  const issue = await createNewsletterIssue(bodyResult.data);
   return NextResponse.json(issue, { status: 201 });
 }
 

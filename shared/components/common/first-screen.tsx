@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import gsap from "gsap";
 import Image from "next/image";
 import React, { useEffect, useRef } from "react";

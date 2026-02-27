@@ -10,14 +10,14 @@
  */
 
 import type { FieldError } from "@/shared/lib/validation";
-import { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 import {
-    validateCategoryId,
-    validateImages,
-    validateItems,
-    validateName,
-    validateSlug,
-    validateTags,
+  validateCategoryId,
+  validateImages,
+  validateItems,
+  validateName,
+  validateSlug,
+  validateTags,
 } from "./product-validation";
 
 /**

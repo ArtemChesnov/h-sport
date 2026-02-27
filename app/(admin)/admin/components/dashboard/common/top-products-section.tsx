@@ -14,7 +14,7 @@ import {
   TooltipTrigger,
 } from "@/shared/components/ui";
 import { MetricsSection, EmptyState } from "@/shared/components/admin";
-import { formatMoney } from "@/shared/lib";
+import { formatMoney } from "@/shared/lib/formatters";
 import { METRICS_CONSTANTS } from "@/shared/constants";
 import { Trophy, Info } from "lucide-react";
 import Link from "next/link";
@@ -46,7 +46,10 @@ export function TopProductsSection({ topProducts, isLoading }: TopProductsSectio
           <CardContent>
             <div className="space-y-3">
               {Array.from({ length: METRICS_CONSTANTS.TOP_ITEMS_COUNT }).map((_, i) => (
-                <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                <div
+                  key={i}
+                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
+                >
                   <div className="flex items-center gap-3 flex-1">
                     <Skeleton className="h-7 w-7 rounded-full" />
                     <div className="flex-1">
@@ -101,16 +104,23 @@ export function TopProductsSection({ topProducts, isLoading }: TopProductsSectio
                                 {item.name}
                               </Link>
                             ) : (
-                              <span className="text-sm font-medium block truncate">{item.name}</span>
+                              <span className="text-sm font-medium block truncate">
+                                {item.name}
+                              </span>
                             )}
                             <p className="text-xs text-muted-foreground">
-                              {item.totalQty} {item.totalQty === 1 ? "шт" : item.totalQty < 5 ? "шт" : "шт"} · {formatMoney(item.totalRevenue)}
+                              {item.totalQty}{" "}
+                              {item.totalQty === 1 ? "шт" : item.totalQty < 5 ? "шт" : "шт"} ·{" "}
+                              {formatMoney(item.totalRevenue)}
                             </p>
                           </div>
                         </div>
                         <div className="text-right shrink-0 ml-4">
                           <p className="text-sm font-semibold">{formatMoney(item.totalRevenue)}</p>
-                          <p className="text-xs text-muted-foreground">{item.totalQty} {item.totalQty === 1 ? "шт" : item.totalQty < 5 ? "шт" : "шт"}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {item.totalQty}{" "}
+                            {item.totalQty === 1 ? "шт" : item.totalQty < 5 ? "шт" : "шт"}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -121,7 +131,9 @@ export function TopProductsSection({ topProducts, isLoading }: TopProductsSectio
           </TooltipTrigger>
           <TooltipContent className="max-w-sm">
             <p className="text-xs leading-relaxed">
-              Топ-5 товаров по количеству продаж за выбранный период. Показывает самые популярные товары с указанием количества проданных единиц и общей выручки. Помогает понять, какие товары наиболее востребованы.
+              Топ-5 товаров по количеству продаж за выбранный период. Показывает самые популярные
+              товары с указанием количества проданных единиц и общей выручки. Помогает понять, какие
+              товары наиболее востребованы.
             </p>
           </TooltipContent>
         </Tooltip>

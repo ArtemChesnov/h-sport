@@ -4,7 +4,7 @@
  */
 
 import { z } from "zod";
-import type { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 
 /** Доступные размеры */
 export const VALID_SIZES: DTO.SizeDto[] = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "ONE_SIZE"];

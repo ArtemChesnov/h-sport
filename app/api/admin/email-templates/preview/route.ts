@@ -3,8 +3,9 @@
  * Возвращает HTML превью шаблона письма (только для админа). Для вёрстки в админке.
  */
 
-import { EMAIL_RESPONSIVE_STYLE } from "@/shared/lib/styles";
+import { createErrorResponse } from "@/shared/lib/api/error-response";
 import { requireAdmin } from "@/shared/lib/auth/middleware";
+import { EMAIL_RESPONSIVE_STYLE } from "@/shared/lib/styles";
 import { formatMoneyHtml } from "@/shared/lib/formatters/format-money";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -246,9 +247,9 @@ export async function GET(request: NextRequest) {
   const template = searchParams.get("template");
 
   if (!isTemplate(template)) {
-    return NextResponse.json(
-      { success: false, message: "Укажите template: verification | password-reset | newsletter | order | order-status" },
-      { status: 400 },
+    return createErrorResponse(
+      "Укажите template: verification | password-reset | newsletter | order | order-status",
+      400
     );
   }
 

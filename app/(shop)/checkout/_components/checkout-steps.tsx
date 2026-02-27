@@ -3,7 +3,7 @@
 import { CreditCardIcon, HomeIcon } from "@/shared/components/icons";
 import { Button } from "@/shared/components/ui/button";
 import { useShopNav } from "@/shared/contexts";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -60,31 +60,37 @@ export const CheckoutSteps: React.FC = () => {
               variant="ghost"
               className={cn(
                 "flex flex-col items-center gap-1 flex-shrink-0 h-auto p-0 hover:bg-transparent min-w-0 max-[576px]:gap-1 max-[625px]:min-w-0 max-[390px]:gap-0.5",
-                isActive || isCompleted ? "text-[#EB6081]" : "text-neutral-400",
+                isActive || isCompleted ? "text-[#EB6081]" : "text-neutral-400"
               )}
             >
-              <Link href={step.href} onClick={() => handleStepClick(step.href)} className="flex flex-col items-center min-w-0">
+              <Link
+                href={step.href}
+                onClick={() => handleStepClick(step.href)}
+                className="flex flex-col items-center min-w-0"
+              >
                 <div
                   className={cn(
                     "flex items-center justify-center rounded-lg border-2 transition-colors",
                     "h-12 w-12 max-[576px]:h-10 max-[576px]:w-10 max-[625px]:h-9 max-[625px]:w-9 max-[390px]:h-8 max-[390px]:w-8",
                     isActive || isCompleted
                       ? "border-[#EB6081] bg-[#EB6081]/5"
-                      : "border-neutral-300 bg-neutral-50",
+                      : "border-neutral-300 bg-neutral-50"
                   )}
                 >
                   {IconComponent === CheckCircle2 ? (
                     <IconComponent
                       className={cn(
                         "h-8 w-8 max-[576px]:h-6 max-[576px]:w-6 max-[625px]:h-5 max-[625px]:w-5 max-[390px]:h-5 max-[390px]:w-5",
-                        isActive || isCompleted ? "text-[#EB6081]" : "text-neutral-400",
+                        isActive || isCompleted ? "text-[#EB6081]" : "text-neutral-400"
                       )}
                     />
                   ) : (
                     <IconComponent
                       className="w-8 h-8 max-[576px]:w-7 max-[576px]:h-7 max-[625px]:w-6 max-[625px]:h-6 max-[390px]:w-6 max-[390px]:h-6 shrink-0"
                       pathClassName={cn(
-                        isActive || isCompleted ? "stroke-[#EB6081] fill-none" : "stroke-neutral-400 fill-none",
+                        isActive || isCompleted
+                          ? "stroke-[#EB6081] fill-none"
+                          : "stroke-neutral-400 fill-none"
                       )}
                     />
                   )}
@@ -102,7 +108,7 @@ export const CheckoutSteps: React.FC = () => {
                       key={dotIndex}
                       className={cn(
                         "h-0.5 w-0.5 rounded-full transition-colors flex-shrink-0",
-                        shouldColorDots ? "bg-[#EB6081]" : "bg-neutral-300",
+                        shouldColorDots ? "bg-[#EB6081]" : "bg-neutral-300"
                       )}
                     />
                   ))}

@@ -13,7 +13,7 @@ import {
   TooltipTrigger,
 } from "@/shared/components/ui";
 import { MetricsSection } from "@/shared/components/admin";
-import { formatMoney } from "@/shared/lib";
+import { formatMoney } from "@/shared/lib/formatters";
 import { Truck, CreditCard, Info } from "lucide-react";
 
 type DeliveryPaymentSectionProps = {
@@ -77,7 +77,9 @@ export function DeliveryPaymentSection({
           </TooltipTrigger>
           <TooltipContent className="max-w-sm">
             <p className="text-xs leading-relaxed">
-              Распределение заказов по способам доставки за выбранный период. Показывает предпочтения клиентов и помогает оптимизировать логистику. Средняя стоимость доставки рассчитывается по всем заказам.
+              Распределение заказов по способам доставки за выбранный период. Показывает
+              предпочтения клиентов и помогает оптимизировать логистику. Средняя стоимость доставки
+              рассчитывается по всем заказам.
             </p>
           </TooltipContent>
         </Tooltip>
@@ -98,9 +100,7 @@ export function DeliveryPaymentSection({
                   {payment.distribution.map(({ method, count, percentage }) => (
                     <div key={method} className="space-y-1.5">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium">
-                          {paymentMethodLabels[method] || method}
-                        </span>
+                        <span className="font-medium">{paymentMethodLabels[method] || method}</span>
                         <span className="text-muted-foreground">
                           {count} ({percentage.toFixed(1)}%)
                         </span>
@@ -119,7 +119,9 @@ export function DeliveryPaymentSection({
           </TooltipTrigger>
           <TooltipContent className="max-w-sm">
             <p className="text-xs leading-relaxed">
-              Распределение успешных оплат по способам оплаты за выбранный период. Показывает предпочтения клиентов в выборе платежных методов и помогает оптимизировать процесс оплаты.
+              Распределение успешных оплат по способам оплаты за выбранный период. Показывает
+              предпочтения клиентов в выборе платежных методов и помогает оптимизировать процесс
+              оплаты.
             </p>
           </TooltipContent>
         </Tooltip>

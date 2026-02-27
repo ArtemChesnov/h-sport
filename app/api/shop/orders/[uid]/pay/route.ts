@@ -9,6 +9,7 @@ import { createPayment } from "@/modules/payment/lib/db";
 import { generatePaymentUrl } from "@/modules/payment/lib/robokassa";
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { createErrorResponse } from "@/shared/lib/api/error-response";
+import { getSessionUserOrError } from "@/shared/lib/auth/middleware";
 import { applyRateLimit } from "@/shared/lib/api/rate-limit-middleware";
 import { OrdersService } from "@/shared/services/server";
 import type { RouteParams } from "@/shared/dto";
@@ -18,23 +19,22 @@ type RouteContext = RouteParams<{ uid: string }>;
 
 export async function POST(
   request: NextRequest,
-  context: RouteContext,
+  context: RouteContext
 ): Promise<NextResponse<{ url: string } | { message: string }>> {
   return withErrorHandling(
     async (req) => {
       const rateLimitResponse = await applyRateLimit(req, "payment");
       if (rateLimitResponse) return rateLimitResponse;
 
-      const { getSessionUserFromRequest } = await import("@/shared/lib/auth/session");
-      const user = await getSessionUserFromRequest(req);
-      if (!user) return createErrorResponse("Требуется авторизация", 401);
+      const session = await getSessionUserOrError(req);
+      if ("error" in session) return session.error;
 
       const { uid } = await context.params;
       if (!uid || typeof uid !== "string") {
         return createErrorResponse("Некорректный идентификатор заказа", 400);
       }
 
-      const result = await OrdersService.getPayableOrder(uid, user.id);
+      const result = await OrdersService.getPayableOrder(uid, session.user.id);
       if (!result.ok) return createErrorResponse(result.message, result.status);
 
       const { id: orderId, total, email } = result.data;
@@ -53,9 +53,11 @@ export async function POST(
       } catch (err) {
         const { logger } = await import("@/shared/lib/logger");
         const errorMessage = err instanceof Error ? err.message : "Unknown error";
-        logger.warn("Payment system not configured, using mock for order pay", { error: errorMessage });
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-        url = `${baseUrl}/api/payment/success?InvId=${orderId}&OutSum=${total}&SignatureValue=mock&returnTo=order`;
+        logger.warn("Payment system not configured, using mock for order pay", {
+          error: errorMessage,
+        });
+        const { getAppUrl } = await import("@/shared/lib/config/env");
+        url = `${getAppUrl()}/api/payment/success?InvId=${orderId}&OutSum=${total}&SignatureValue=mock&returnTo=order`;
       }
 
       const res = NextResponse.json({ url }, { status: 200 });
@@ -71,6 +73,6 @@ export async function POST(
       return res;
     },
     request,
-    "POST /api/shop/orders/[uid]/pay",
+    "POST /api/shop/orders/[uid]/pay"
   );
 }

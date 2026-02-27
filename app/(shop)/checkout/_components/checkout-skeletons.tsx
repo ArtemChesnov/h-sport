@@ -4,8 +4,7 @@
 
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { SUMMARY_CARD_CONTAINER_CLASS } from "@/shared/constants";
-import { cn } from "@/shared/lib";
-
+import { cn } from "@/shared/lib/utils";
 export function CheckoutInputSkeleton() {
   return (
     <div className="space-y-1">
@@ -74,12 +73,7 @@ export function CheckoutDeliveryMethodSkeleton() {
  */
 export function CheckoutSummaryCardSkeleton() {
   return (
-    <div
-      className={cn(
-        SUMMARY_CARD_CONTAINER_CLASS,
-        "flex flex-col h-fit w-200 shrink-0"
-      )}
-    >
+    <div className={cn(SUMMARY_CARD_CONTAINER_CLASS, "flex flex-col h-fit w-200 shrink-0")}>
       <Skeleton className="h-8 w-40 rounded-[10px]" />
       <div className="mt-10 flex flex-col gap-4">
         {[1, 2, 3].map((i) => (

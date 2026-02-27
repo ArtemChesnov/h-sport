@@ -2,7 +2,7 @@
  * Утилиты для пагинации
  */
 
-import { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 import { DEFAULT_PER_PAGE, MAX_PER_PAGE, ADMIN_MAX_PER_PAGE } from "@/shared/constants";
 
 /**
@@ -17,7 +17,7 @@ export function normalizePaginationParams(
   rawPage: string | null | undefined,
   rawPerPage: string | null | undefined,
   maxPerPage: number = MAX_PER_PAGE,
-  defaultPerPage: number = DEFAULT_PER_PAGE,
+  defaultPerPage: number = DEFAULT_PER_PAGE
 ): { page: number; perPage: number } {
   const pageFromQuery = parseInt(rawPage ?? "1", 10);
   const page = Math.max(pageFromQuery || 1, 1);
@@ -33,7 +33,7 @@ export function normalizePaginationParams(
  */
 export function normalizeAdminPaginationParams(
   rawPage: string | null | undefined,
-  rawPerPage: string | null | undefined,
+  rawPerPage: string | null | undefined
 ): { page: number; perPage: number } {
   return normalizePaginationParams(rawPage, rawPerPage, ADMIN_MAX_PER_PAGE, DEFAULT_PER_PAGE);
 }
@@ -58,7 +58,7 @@ export function calculateTotalPages(total: number, perPage: number): number {
 export function buildPaginationMeta(
   total: number,
   page: number,
-  perPage: number,
+  perPage: number
 ): DTO.PaginationMetaDto {
   const pages = calculateTotalPages(total, perPage);
   // Ограничиваем page максимальным значением pages
@@ -81,7 +81,7 @@ export function buildPaginatedResponse<T>(
   items: T[],
   total: number,
   page: number,
-  perPage: number,
+  perPage: number
 ): {
   items: T[];
   meta: DTO.PaginationMetaDto;

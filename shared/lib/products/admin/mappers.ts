@@ -1,4 +1,4 @@
-import { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 import { generateProductSku } from "@/shared/lib/generators";
 
 /**
@@ -42,7 +42,9 @@ export function mapToAdminListItemDto(product: {
   if (product.images && product.images.length > 0 && product.images[0]) {
     previewImage = product.images[0];
   } else {
-    const variantWithImages = product.items.find((item) => item.imageUrls && item.imageUrls.length > 0);
+    const variantWithImages = product.items.find(
+      (item) => item.imageUrls && item.imageUrls.length > 0
+    );
     previewImage = variantWithImages?.imageUrls[0] ?? null;
   }
 

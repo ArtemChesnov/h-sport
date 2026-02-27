@@ -1,4 +1,4 @@
-import { formatMoney } from "@/shared/lib";
+import { formatMoney } from "@/shared/lib/formatters";
 import { DTO } from "@/shared/services";
 
 type PromoType = DTO.PromoTypeDto;
@@ -45,16 +45,9 @@ export function formatRuDate(input?: string | Date | null): string {
 /**
  * Формат периода: "16.12.2025 - 29.12.2025".
  */
-export function formatPromoPeriod(
-  startsAt?: string | null,
-  endsAt?: string | null,
-): string {
-  if (startsAt && endsAt)
-    return `${formatRuDate(startsAt)} - ${formatRuDate(endsAt)}`;
+export function formatPromoPeriod(startsAt?: string | null, endsAt?: string | null): string {
+  if (startsAt && endsAt) return `${formatRuDate(startsAt)} - ${formatRuDate(endsAt)}`;
   if (startsAt) return `${formatRuDate(startsAt)} - —`;
   if (endsAt) return `— - ${formatRuDate(endsAt)}`;
   return "—";
 }
-
-
-

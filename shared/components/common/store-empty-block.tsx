@@ -6,7 +6,7 @@ import {
   SHOP_ERROR_ICON_WRAPPER_CLASS,
 } from "@/shared/constants";
 import { DesignButton } from "@/shared/components/ui/design-button";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import type { LucideIcon } from "lucide-react";
 import { ShoppingBag } from "lucide-react";
 import Link from "next/link";

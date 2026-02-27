@@ -5,8 +5,9 @@
 
 import { validateRequestSize, withErrorHandling } from "@/shared/lib/api/error-handler";
 import { createErrorResponse } from "@/shared/lib/api/error-response";
+import { validateRequestBody } from "@/shared/lib/api/validate-request-body";
 import { createSession, setSessionCookie } from "@/shared/lib/auth/session";
-import { isValidEmail, passwordSchema } from "@/shared/lib/validation";
+import { signUpSchema } from "@/shared/lib/validation/zod-schemas";
 import { signUp } from "@/shared/services/server/auth/auth.service";
 import { applyRateLimit } from "@/shared/lib/api/rate-limit-middleware";
 import { NextRequest, NextResponse } from "next/server";
@@ -18,24 +19,9 @@ async function handler(request: NextRequest) {
   const sizeCheck = validateRequestSize(request, 10 * 1024);
   if (!sizeCheck.valid) return sizeCheck.response;
 
-  const body = await request.json();
-  const { email, password, name, secondName } = body;
-
-  if (!email || !password) {
-    return createErrorResponse("Email и пароль обязательны", 400);
-  }
-
-  if (!isValidEmail(email)) {
-    return createErrorResponse("Некорректный email", 400);
-  }
-
-  const passwordValidation = passwordSchema.safeParse(password);
-  if (!passwordValidation.success) {
-    return createErrorResponse(
-      passwordValidation.error.issues[0]?.message || "Некорректный пароль",
-      400,
-    );
-  }
+  const bodyResult = await validateRequestBody(request, signUpSchema);
+  if ("error" in bodyResult) return bodyResult.error;
+  const { email, password, name, secondName } = bodyResult.data;
 
   const result = await signUp({ email, password, name, secondName });
 

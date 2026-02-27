@@ -2,7 +2,7 @@
 
 import { prisma } from "@/prisma/prisma-client";
 import { calculatePromoDiscount } from "@/shared/lib/promo";
-import { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 import type { Prisma } from "@prisma/client";
 import { randomUUID } from "crypto";
 import type { NextRequest } from "next/server";
@@ -125,7 +125,7 @@ export async function getOrCreateCartCore(request: NextRequest) {
 
 export async function removeUnavailableItems(
   cartId: number,
-  tx?: Prisma.TransactionClient,
+  tx?: Prisma.TransactionClient
 ): Promise<boolean> {
   const client = tx || prisma;
 
@@ -172,7 +172,7 @@ export async function removeUnavailableItems(
 export async function recalculateCartAggregates(
   cartId: number,
   tx?: Prisma.TransactionClient,
-  forceRecalculate: boolean = false,
+  forceRecalculate: boolean = false
 ): Promise<void> {
   const client = tx || prisma;
 
@@ -319,7 +319,7 @@ export function mapCartToDto(cart: CartWithRelations): DTO.CartDto {
 
 /** Выполняет fn в транзакции Prisma. */
 export async function runCartTransaction<T>(
-  fn: (tx: Prisma.TransactionClient) => Promise<T>,
+  fn: (tx: Prisma.TransactionClient) => Promise<T>
 ): Promise<T> {
   return prisma.$transaction(fn);
 }

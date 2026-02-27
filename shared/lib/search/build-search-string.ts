@@ -1,4 +1,4 @@
-import { DTO } from "@/shared/services";
+import type * as DTO from "@/shared/services/dto";
 import { CATALOG_DEFAULT_PER_PAGE } from "@/shared/constants";
 
 export type ProductsSearchParams = DTO.ProductsQueryDto & {

@@ -5,7 +5,7 @@ import React from "react";
 
 import { PromoIcon } from "@/shared/components/icons";
 import { useShopNav } from "@/shared/contexts";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { DesignButton } from "./design-button";
 
 type DesignButtonVariant = React.ComponentProps<typeof DesignButton>["variant"];
@@ -48,7 +48,7 @@ export const PromoButton: React.FC<Props> = ({
       <PromoIcon
         className={cn(
           "stroke-[#1F1E1E] transition-colors",
-          !keepIconColorOnHover && "group-hover:stroke-white",
+          !keepIconColorOnHover && "group-hover:stroke-white"
         )}
         alt="promo-button"
         width={28}

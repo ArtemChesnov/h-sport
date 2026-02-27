@@ -4,7 +4,7 @@ import { ContactsBlock } from "@/shared/components/common/ui";
 import { DesignButton } from "@/shared/components/ui";
 import { CART_LABELS } from "@/shared/constants";
 import { useNewsletterModal } from "@/shared/contexts/newsletter-modal-context";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { Mail } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";

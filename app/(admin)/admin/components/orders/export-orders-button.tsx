@@ -2,7 +2,7 @@
 
 import { Button } from "@/shared/components/ui";
 import { TOAST } from "@/shared/constants";
-import { formatMoney } from "@/shared/lib";
+import { formatMoney } from "@/shared/lib/formatters";
 import { DTO } from "@/shared/services";
 import { Download } from "lucide-react";
 import { toast } from "sonner";

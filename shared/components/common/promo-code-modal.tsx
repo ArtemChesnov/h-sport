@@ -2,20 +2,20 @@
 
 import { DesignButton } from "@/shared/components/ui";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
 } from "@/shared/components/ui/dialog";
 import {
-    INPUT_LABEL_CLASS,
-    SHOP_MODAL_BODY_GAP,
-    SHOP_MODAL_CONTENT_CLASS,
-    SHOP_MODAL_DESCRIPTION_CLASS,
-    SHOP_MODAL_TITLE_CLASS,
+  INPUT_LABEL_CLASS,
+  SHOP_MODAL_BODY_GAP,
+  SHOP_MODAL_CONTENT_CLASS,
+  SHOP_MODAL_DESCRIPTION_CLASS,
+  SHOP_MODAL_TITLE_CLASS,
 } from "@/shared/constants";
-import { cn } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { toast } from "sonner";
 
 const PROMO_CODE = "WELCOME10";
@@ -81,9 +81,7 @@ export function PromoCodeModal({ open, onOpenChange, className }: PromoCodeModal
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={cn("shop", SHOP_MODAL_CONTENT_CLASS, className)}>
         <DialogHeader className="pb-4">
-          <DialogTitle className={SHOP_MODAL_TITLE_CLASS}>
-            Промокод на первый заказ
-          </DialogTitle>
+          <DialogTitle className={SHOP_MODAL_TITLE_CLASS}>Промокод на первый заказ</DialogTitle>
         </DialogHeader>
         <div className={cn("flex flex-col", SHOP_MODAL_BODY_GAP)}>
           <DialogDescription className={SHOP_MODAL_DESCRIPTION_CLASS}>
@@ -91,9 +89,7 @@ export function PromoCodeModal({ open, onOpenChange, className }: PromoCodeModal
             скидку 10% на весь заказ.
           </DialogDescription>
           <div className="flex flex-col gap-3">
-            <span className={INPUT_LABEL_CLASS}>
-              Скопируйте код и введите в корзине:
-            </span>
+            <span className={INPUT_LABEL_CLASS}>Скопируйте код и введите в корзине:</span>
             <DesignButton
               type="button"
               variant="outline"
@@ -102,9 +98,7 @@ export function PromoCodeModal({ open, onOpenChange, className }: PromoCodeModal
             >
               {PROMO_CODE}
             </DesignButton>
-            <p className="text-[14px] text-muted-foreground">
-              Нажмите на код, чтобы скопировать
-            </p>
+            <p className="text-[14px] text-muted-foreground">Нажмите на код, чтобы скопировать</p>
           </div>
         </div>
       </DialogContent>

@@ -17,7 +17,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/shared/components/ui";
-import { formatMoney } from "@/shared/lib";
+import { formatMoney } from "@/shared/lib/formatters";
 import { DTO } from "@/shared/services";
 import { CheckCircle2, DollarSign, Info, ShoppingBag, TrendingUp } from "lucide-react";
 
@@ -69,15 +69,14 @@ export function SummaryCards({ summary, isLoading }: SummaryCardsProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                <p className="text-xs text-muted-foreground">
-                  По всем активным заказам
-                </p>
+                <p className="text-xs text-muted-foreground">По всем активным заказам</p>
               </CardContent>
             </Card>
           </TooltipTrigger>
           <TooltipContent className="max-w-sm">
             <p className="text-xs leading-relaxed">
-              Общая сумма выручки за выбранный период. Учитываются заказы со статусами: оплачен, обрабатывается, отправлен, доставлен.
+              Общая сумма выручки за выбранный период. Учитываются заказы со статусами: оплачен,
+              обрабатывается, отправлен, доставлен.
             </p>
           </TooltipContent>
         </Tooltip>
@@ -96,15 +95,14 @@ export function SummaryCards({ summary, isLoading }: SummaryCardsProps) {
                 <CardTitle className="text-3xl font-bold text-indigo-900">{totalOrders}</CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                <p className="text-xs text-muted-foreground">
-                  За выбранный период
-                </p>
+                <p className="text-xs text-muted-foreground">За выбранный период</p>
               </CardContent>
             </Card>
           </TooltipTrigger>
           <TooltipContent className="max-w-sm">
             <p className="text-xs leading-relaxed">
-              Общее количество заказов за выбранный период. Включает все заказы независимо от статуса.
+              Общее количество заказов за выбранный период. Включает все заказы независимо от
+              статуса.
             </p>
           </TooltipContent>
         </Tooltip>
@@ -123,15 +121,14 @@ export function SummaryCards({ summary, isLoading }: SummaryCardsProps) {
                 <CardTitle className="text-3xl font-bold text-violet-900">{paidOrders}</CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                <p className="text-xs text-muted-foreground">
-                  Успешно оплаченные заказы
-                </p>
+                <p className="text-xs text-muted-foreground">Успешно оплаченные заказы</p>
               </CardContent>
             </Card>
           </TooltipTrigger>
           <TooltipContent className="max-w-sm">
             <p className="text-xs leading-relaxed">
-              Количество заказов, которые были успешно оплачены. Показывает количество завершенных транзакций.
+              Количество заказов, которые были успешно оплачены. Показывает количество завершенных
+              транзакций.
             </p>
           </TooltipContent>
         </Tooltip>
@@ -152,15 +149,14 @@ export function SummaryCards({ summary, isLoading }: SummaryCardsProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                <p className="text-xs text-muted-foreground">
-                  Средняя сумма заказа
-                </p>
+                <p className="text-xs text-muted-foreground">Средняя сумма заказа</p>
               </CardContent>
             </Card>
           </TooltipTrigger>
           <TooltipContent className="max-w-sm">
             <p className="text-xs leading-relaxed">
-              Средняя сумма одного заказа за выбранный период. Рассчитывается как общая выручка, разделенная на количество заказов.
+              Средняя сумма одного заказа за выбранный период. Рассчитывается как общая выручка,
+              разделенная на количество заказов.
             </p>
           </TooltipContent>
         </Tooltip>

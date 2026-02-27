@@ -5,9 +5,8 @@
  */
 
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
-import { withAuth } from "@/shared/lib/auth/with-auth";
+import { requireAdmin } from "@/shared/lib/auth/middleware";
 import { getRecentAlerts, type MetricAlert } from "@/shared/lib/metrics";
-import type { ErrorResponse } from "@/shared/dto";
 import { NextRequest, NextResponse } from "next/server";
 
 interface AlertsResponse {
@@ -15,16 +14,17 @@ interface AlertsResponse {
   count: number;
 }
 
-const getAlertsHandler = withAuth<AlertsResponse | ErrorResponse>({ role: "ADMIN" })(
-  async ({ request }) => {
-    const { searchParams } = new URL(request.url);
-    const limitRaw = searchParams.get("limit");
-    const limit = Math.min(parseInt(limitRaw ?? "20", 10), 100);
-    const alerts = getRecentAlerts(limit);
-    return NextResponse.json({ alerts, count: alerts.length });
-  },
-);
+async function handler(request: NextRequest) {
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
+
+  const { searchParams } = new URL(request.url);
+  const limitRaw = searchParams.get("limit");
+  const limit = Math.min(parseInt(limitRaw ?? "20", 10), 100);
+  const alerts = getRecentAlerts(limit);
+  return NextResponse.json<AlertsResponse>({ alerts, count: alerts.length });
+}
 
 export async function GET(request: NextRequest) {
-  return withErrorHandling(getAlertsHandler, request, "GET /api/admin/metrics/alerts");
+  return withErrorHandling(handler, request, "GET /api/admin/metrics/alerts");
 }

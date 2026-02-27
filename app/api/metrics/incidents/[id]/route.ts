@@ -5,13 +5,17 @@
 
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { createErrorResponse } from "@/shared/lib/api/error-response";
+import { validateRequestBody } from "@/shared/lib/api/validate-request-body";
 import { requireAdmin } from "@/shared/lib/auth/middleware";
-import { getIncidentById, updateIncidentStatus } from "@/shared/services/server/metrics/metrics-route.service";
+import {
+  getIncidentById,
+  updateIncidentStatus,
+} from "@/shared/services/server/metrics/metrics-route.service";
 import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";
 
 const UpdateIncidentSchema = z.object({
-  status: z.enum(["ACTIVE", "RESOLVED"]).optional(),
+  status: z.enum(["ACTIVE", "RESOLVED"], { error: "Неверные данные для обновления" }),
 });
 
 async function handler(request: NextRequest) {
@@ -28,14 +32,10 @@ async function handler(request: NextRequest) {
   const existing = await getIncidentById(incidentId);
   if (!existing) return createErrorResponse("Инцидент не найден", 404);
 
-  const body = await request.json();
-  const validatedData = UpdateIncidentSchema.parse(body);
+  const bodyResult = await validateRequestBody(request, UpdateIncidentSchema);
+  if ("error" in bodyResult) return bodyResult.error;
 
-  if (!validatedData.status) {
-    return createErrorResponse("Неверные данные для обновления", 400);
-  }
-
-  const updatedIncident = await updateIncidentStatus(incidentId, validatedData.status);
+  const updatedIncident = await updateIncidentStatus(incidentId, bodyResult.data.status);
   return NextResponse.json(updatedIncident, { status: 200 });
 }
 
