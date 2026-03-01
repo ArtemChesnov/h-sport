@@ -2,9 +2,18 @@
 
 ## Робокасса (оплата)
 
-- Переменные: `ROBOKASSA_MERCHANT_LOGIN`, `ROBOKASSA_PASSWORD_1`, `ROBOKASSA_PASSWORD_2`, опционально `ROBOKASSA_IS_TEST`, `ROBOKASSA_HASH_ALGORITHM`.
+- **Переменные окружения** (достаточно заполнить в `.env` и на сервере):
+  - `ROBOKASSA_MERCHANT_LOGIN` — идентификатор магазина из ЛК Робокассы
+  - `ROBOKASSA_PASSWORD_1` — пароль №1 (для подписи запросов и Success URL)
+  - `ROBOKASSA_PASSWORD_2` — пароль №2 (для Result URL / webhook)
+  - `ROBOKASSA_IS_TEST` — `true` для тестового режима, `false` для боевого
+  - `ROBOKASSA_HASH_ALGORITHM` — алгоритм подписи: `md5`, `sha256` или `sha512` (в ЛК должен совпадать)
 - Без конфига создание платежа возвращает mock-URL на «успех»; webhook при вызове без конфига вернёт 500.
-- После настройки: в ЛК Робокассы указать Result URL: `https://h-brand.ru/api/payment/webhook`.
+- **В личном кабинете Робокассы** (Настройки → Технические настройки) укажите:
+  - **Result URL:** `https://h-brand.ru/api/payment/webhook` — уведомление сервера об оплате (обязательно)
+  - **Success URL:** `https://h-brand.ru/api/payment/success` — редирект пользователя после успешной оплаты
+  - **Fail URL:** `https://h-brand.ru/api/payment/fail` — редирект при отмене/ошибке
+- Алгоритм хеширования в ЛК должен совпадать с `ROBOKASSA_HASH_ALGORITHM`.
 
 ## СДЭК (доставка)
 
