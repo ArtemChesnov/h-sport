@@ -172,9 +172,6 @@ export function buildProductsWhere(query: Partial<ParsedProductsQuery>): Prisma.
     };
   }
 
-  // В каталоге показываем только товары, у которых есть хотя бы один вариант в наличии.
-  itemFilters.isAvailable = true;
-
   // Если есть фильтры по вариантам — учитываем items.some(...).
   if (Object.keys(itemFilters).length > 0) {
     where.items = {
@@ -439,11 +436,6 @@ function buildSqlParts(where: Prisma.ProductWhereInput): {
       ) {
         const searchPattern = `%${itemFilters.sku.contains}%`;
         whereConditions.push(Prisma.sql`LOWER(pi.sku) LIKE LOWER(${searchPattern})`);
-      }
-
-      // В каталоге — только товары с хотя бы одним вариантом в наличии
-      if (itemFilters.isAvailable === true) {
-        whereConditions.push(Prisma.sql`pi."isAvailable" = true`);
       }
     }
   }

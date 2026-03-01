@@ -2,7 +2,7 @@
  * GET /api/payment/fail
  *
  * Обработка неуспешной оплаты (Failure URL от Robokassa)
- * Перенаправляет пользователя на страницу ошибки
+ * Перенаправляет на страницу завершения с сообщением «оплата не прошла»
  */
 
 import {
@@ -10,6 +10,7 @@ import {
   updatePaymentStatus,
   createOrderEvent,
 } from "@/modules/payment/lib/db";
+import { OrderForPaymentService } from "@/shared/services/server";
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { logger } from "@/shared/lib/logger";
 import { NextRequest, NextResponse } from "next/server";
@@ -28,6 +29,13 @@ async function handler(request: NextRequest) {
           paymentId: payment.id,
           timestamp: new Date().toISOString(),
         });
+      }
+
+      const order = await OrderForPaymentService.getOrderForSuccessEmail(orderId);
+      if (order) {
+        return NextResponse.redirect(
+          new URL(`/checkout/success?uid=${order.uid}&paid=0`, request.url)
+        );
       }
     }
   }

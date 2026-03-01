@@ -102,7 +102,7 @@ export function ProductInfo({
       {/* Дополнительная информация */}
       <div className="space-y-2 text-xs text-muted-foreground">
         {!selectedItem.isAvailable && (
-          <div className="text-orange-600 font-medium">Временно отсутствует</div>
+          <div className="text-gray-500 font-medium">Нет в наличии</div>
         )}
       </div>
     </div>

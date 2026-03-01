@@ -195,7 +195,7 @@ export function ProductSlugClient({
 
               {/* Статус доступности */}
               {selectedItem && !selectedItem.isAvailable && (
-                <div className="text-orange-600 font-medium text-[16px]">Временно отсутствует</div>
+                <div className="text-gray-500 font-medium text-[16px]">Нет в наличии</div>
               )}
             </div>
           </div>

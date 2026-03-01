@@ -83,7 +83,7 @@ async function handler(request: NextRequest) {
 
     const redirectUrl = returnToOrder
       ? `/account/orders/${order.uid}`
-      : `/checkout/success?uid=${order.uid}`;
+      : `/checkout/success?uid=${order.uid}&paid=1`;
 
     const redirect = NextResponse.redirect(new URL(redirectUrl, request.url));
     if (returnToOrder) {
@@ -92,7 +92,7 @@ async function handler(request: NextRequest) {
     return redirect;
   }
 
-  return NextResponse.redirect(new URL(`/checkout/success?orderId=${orderId}`, request.url));
+  return NextResponse.redirect(new URL("/checkout?error=payment_error", request.url));
 }
 
 export async function GET(request: NextRequest) {
