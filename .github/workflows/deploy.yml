@@ -1,7 +1,6 @@
 # Деплой на прод-сервер по пушу в master.
-# Секреты в репозитории: Settings → Secrets and variables → Actions:
-#   SSH_HOST, SSH_USER, SSH_PRIVATE_KEY
-# Переменные: DEPLOY_ENABLED = true
+# Секреты: SSH_HOST, SSH_USER, SSH_PRIVATE_KEY
+# Переменные: DEPLOY_ENABLED = true, DEPLOY_PATH (по умолчанию /root/h-sport)
 
 name: Deploy to production
 
@@ -18,13 +17,14 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ vars.DEPLOY_ENABLED == 'true' }}
     steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd ${{ vars.DEPLOY_PATH || '/root/h-sport' }}
-            ./scripts/server-deploy.sh
-          script_stop: true
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+            "cd ${{ vars.DEPLOY_PATH || '/root/h-sport' }} && ./scripts/server-deploy.sh"
