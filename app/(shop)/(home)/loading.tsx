@@ -13,7 +13,7 @@ function SportTypesSkeletonSection() {
       <div className="flex overflow-hidden">
         {[1, 2].map((i) => (
           <div key={i} className="relative flex-shrink-0 basis-full min-[577px]:basis-1/2">
-            <Skeleton className="h-[500px] min-[769px]:h-[800px] min-[1440px]:h-[1080px] w-full rounded-md" />
+            <Skeleton className="h-[650px] min-[577px]:h-[520px] min-[769px]:h-[800px] min-[1440px]:h-[1080px] w-full rounded-md" />
           </div>
         ))}
       </div>

@@ -8,12 +8,12 @@ import { cn } from "@/shared/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
 } from "../../ui/sheet";
 import { ContactsBlock } from "../ui";
 
@@ -41,6 +41,7 @@ export const MenuDrawer: React.FC<React.PropsWithChildren<Props>> = ({ className
 
       <SheetContent
         side="left"
+        data-menu-drawer
         className={cn(
           "shop flex flex-col bg-[#FDF7F8] pl-[30px] pt-5 pb-5 border-0 w-full max-w-full md:w-[540px] md:min-w-[540px]",
           className
@@ -62,16 +63,16 @@ export const MenuDrawer: React.FC<React.PropsWithChildren<Props>> = ({ className
           />
         </Link>
 
-        <div className="flex flex-col mt-10">
+        <div className="flex flex-col mt-10 menu-drawer-section">
           {/* Основные ссылки */}
-          <nav className="flex flex-col gap-4">
+          <nav className="flex flex-col gap-4 menu-drawer-nav">
             {MENU_PRIMARY_LINKS.map((link) => (
               <Link
                 key={link.label}
                 href={link.href}
                 onClick={() => handleLinkClick(link.href)}
                 className={cn(
-                  "inline-flex leading-none text-[22px] font-light hover:text-[#EB6081] transition-colors",
+                  "inline-flex leading-none text-[16px] min-[577px]:text-[20px] font-light hover:text-[#EB6081] transition-colors",
                   className
                 )}
               >
@@ -82,13 +83,18 @@ export const MenuDrawer: React.FC<React.PropsWithChildren<Props>> = ({ className
         </div>
 
         {/* Контакты */}
-        <div className="mt-auto flex flex-col gap-15">
+        <div className="mt-auto flex flex-col gap-15 menu-drawer-contacts">
           {/* Покупателям */}
-          <nav className="flex flex-col">
-            <h3 className={cn("text-[26px] font-light leading-[120%] mb-6 ", className)}>
+          <nav className="flex flex-col menu-drawer-customer">
+            <h3
+              className={cn(
+                "text-[20px] min-[577px]:text-[26px] font-light leading-[120%] mb-6 menu-drawer-heading",
+                className
+              )}
+            >
               Покупателям
             </h3>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 menu-drawer-customer-links">
               {MENU_CUSTOMER_LINKS.map((link) => (
                 <Link
                   key={link.label}
@@ -96,7 +102,7 @@ export const MenuDrawer: React.FC<React.PropsWithChildren<Props>> = ({ className
                   target={"target" in link ? link.target : undefined}
                   onClick={closeDrawer}
                   className={cn(
-                    "inline-flex leading-none text-[22px] font-light hover:text-[#EB6081] transition-colors",
+                    "inline-flex leading-none text-[16px] min-[577px]:text-[20px] font-light hover:text-[#EB6081] transition-colors",
                     className
                   )}
                 >
@@ -106,7 +112,7 @@ export const MenuDrawer: React.FC<React.PropsWithChildren<Props>> = ({ className
             </div>
           </nav>
 
-          <ContactsBlock />
+          <ContactsBlock className="menu-drawer-contacts-block" />
         </div>
       </SheetContent>
     </Sheet>

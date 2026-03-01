@@ -40,11 +40,12 @@ export const ContactsBlock: React.FC<Props> = ({ className }) => {
     },
   ];
 
-  const phoneLinkClass = "leading-[120%] text-[19px] hover:text-primary transition-colors";
+  const phoneLinkClass =
+    "leading-[120%] text-[16px] min-[577px]:text-[20px] hover:text-primary transition-colors";
 
   return (
     <div className={cn("flex flex-col gap-4 max-[1024px]:gap-3", className)}>
-      <h3 className="text-[26px] leading-[120%] font-light max-[1280px]:text-[24px]">
+      <h3 className="text-[20px] min-[577px]:text-[26px] leading-[120%] font-light">
         СВЯЖИТЕСЬ С НАМИ
       </h3>
       <div className="flex items-center gap-2">
@@ -66,7 +67,7 @@ export const ContactsBlock: React.FC<Props> = ({ className }) => {
       <Link
         href={PHONE_HREF}
         className={cn(
-          "inline-flex text-[22px] font-light transition-colors font-sans",
+          "inline-flex text-[16px] min-[577px]:text-[20px] font-light transition-colors font-sans",
           phoneLinkClass
         )}
       >

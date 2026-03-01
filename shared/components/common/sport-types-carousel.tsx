@@ -42,7 +42,7 @@ export const SportTypesCarousel: React.FC<Props> = ({ className }) => {
                 key={index}
                 className="basis-full shrink-0 !pl-0 min-[577px]:basis-1/2 min-[1024px]:basis-1/3 relative cursor-pointer"
               >
-                <div className="relative w-full h-[650px] min-[577px]:h-[920px] min-[769px]:h-[765px] min-[1025px]:h-[820px] min-[1281px]:h-[800px] min-[1441px]:h-[920px] min-[1601px]:h-[1080px] overflow-hidden">
+                <div className="relative w-full h-[650px] min-[577px]:h-[520px] min-[769px]:h-[765px] min-[1025px]:h-[820px] min-[1281px]:h-[800px] min-[1441px]:h-[920px] min-[1601px]:h-[1080px] overflow-hidden">
                   <Image
                     src={item.src}
                     alt={item.type}

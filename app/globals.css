@@ -420,3 +420,29 @@ summary {
   scrollbar-width: thin;
   scrollbar-color: #EB6081 transparent;
 }
+
+/* Бургер-меню: компактные отступы при высоте экрана до 680px */
+@media (max-height: 680px) {
+  [data-menu-drawer] {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+  [data-menu-drawer] .menu-drawer-section {
+    margin-top: 1.5rem;
+  }
+  [data-menu-drawer] .menu-drawer-nav {
+    gap: 0.75rem;
+  }
+  [data-menu-drawer] .menu-drawer-contacts {
+    gap: 2rem;
+  }
+  [data-menu-drawer] .menu-drawer-heading {
+    margin-bottom: 1rem;
+  }
+  [data-menu-drawer] .menu-drawer-customer-links {
+    gap: 0.75rem;
+  }
+  [data-menu-drawer] .menu-drawer-contacts-block {
+    gap: 0.75rem;
+  }
+}
