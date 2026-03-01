@@ -52,12 +52,13 @@ function Carousel({
 }: React.ComponentProps<"div"> & CarouselProps) {
   const dragStartRef = React.useRef({ x: 0, y: 0 });
   const mergedOpts = React.useMemo(() => {
-    const base = { ...opts, axis: orientation === "horizontal" ? "x" : ("y" as const) };
+    const axis = orientation === "horizontal" ? ("x" as const) : ("y" as const);
+    const base = { ...opts, axis };
     if (orientation !== "horizontal") return base;
     return {
       ...base,
-      watchDrag: (api: CarouselApi, evt: PointerEvent) => {
-        if (evt.type === "pointermove") {
+      watchDrag: (api: CarouselApi, evt: TouchEvent | MouseEvent) => {
+        if ("clientX" in evt && "clientY" in evt) {
           const { x, y } = dragStartRef.current;
           const dx = Math.abs(evt.clientX - x);
           const dy = Math.abs(evt.clientY - y);
@@ -66,10 +67,9 @@ function Carousel({
           if (dy > dx) return false;
         }
         return (
-          (opts as { watchDrag?: (api: CarouselApi, evt: PointerEvent) => boolean })?.watchDrag?.(
-            api,
-            evt
-          ) ?? true
+          (
+            opts as { watchDrag?: (api: CarouselApi, evt: TouchEvent | MouseEvent) => boolean }
+          )?.watchDrag?.(api, evt) ?? true
         );
       },
     };
