@@ -12,10 +12,7 @@ function SportTypesSkeletonSection() {
     <div className="mx-auto w-full max-w-[1920px]">
       <div className="flex overflow-hidden">
         {[1, 2].map((i) => (
-          <div
-            key={i}
-            className="relative flex-shrink-0 basis-full min-[577px]:basis-1/2"
-          >
+          <div key={i} className="relative flex-shrink-0 basis-full min-[577px]:basis-1/2">
             <Skeleton className="h-[500px] min-[769px]:h-[800px] min-[1440px]:h-[1080px] w-full rounded-md" />
           </div>
         ))}
@@ -42,7 +39,7 @@ function ProductsSectionSkeleton({ titleWidth }: { titleWidth: string }) {
             key={i}
             className="flex-shrink-0 basis-full min-[577px]:basis-[calc(50%-5px)] min-[577px]:pl-2.5 min-w-0 flex flex-col"
           >
-            <Skeleton className="w-full h-[500px] min-[769px]:h-[800px] min-[1440px]:h-[1080px] rounded-lg" />
+            <Skeleton className="w-full h-[820px] min-[577px]:h-[560px] min-[769px]:h-[800px] min-[1440px]:h-[1080px] rounded-lg" />
             <div className="flex flex-col gap-[15px] mt-5">
               <Skeleton className="h-6 w-3/4" />
               <Skeleton className="h-5 w-1/2" />

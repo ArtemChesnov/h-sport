@@ -47,7 +47,7 @@ export const FirstScreen: React.FC<Props> = ({ className }) => {
     <div className="relative mx-auto">
       <div className="relative h-screen w-full max-w-[1920px] mx-auto overflow-hidden">
         <Image
-          className={cn("w-full h-full object-cover object-[80%_0]", className)}
+          className={cn("w-full h-full object-cover object-[80%_20%]", className)}
           alt="first-screen"
           src="/assets/images/banner.webp"
           fill

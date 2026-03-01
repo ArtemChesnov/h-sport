@@ -72,7 +72,7 @@ export const NewProductsList: React.FC<Props> = ({ className, initialData }) => 
                     key={item.id}
                     className="basis-full shrink-0 pl-0 min-[577px]:basis-[calc(50%-5px)] min-[577px]:pl-2.5 min-[1024px]:basis-[calc(33.333%-7px)] min-[1024px]:pl-2.5"
                   >
-                    <div className="w-full min-w-0 h-[500px] min-[769px]:h-[800px] min-[1440px]:h-[1080px]">
+                    <div className="w-full min-w-0 h-[820px] min-[577px]:h-[560px] min-[769px]:h-[800px] min-[1440px]:h-[1080px]">
                       <NewProductsCard
                         name={item.name}
                         price={item.price}

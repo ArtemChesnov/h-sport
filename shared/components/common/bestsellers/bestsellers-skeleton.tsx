@@ -14,7 +14,7 @@ export function BestSellersSkeleton() {
             key={index}
             className="flex-shrink-0 basis-full min-[577px]:basis-[calc(50%-5px)] min-[577px]:pl-2.5 min-[1024px]:basis-[calc(33.333%-7px)] min-[1024px]:pl-2.5 min-w-0 flex flex-col"
           >
-            <Skeleton className="w-full aspect-[607/1014] min-h-[500px] rounded-lg" />
+            <Skeleton className="w-full aspect-[607/1014] min-h-[820px] min-[577px]:min-h-[560px] rounded-lg" />
             <div className="flex flex-col gap-[15px] mt-5">
               <Skeleton className="h-6 w-3/4 min-[1280px]:h-[36px]" />
               <Skeleton className="h-5 w-1/2 min-[1280px]:h-[30px]" />
