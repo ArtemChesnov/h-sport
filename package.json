@@ -13,7 +13,7 @@
     "redis:start": "node scripts/start-redis.js",
     "redis:stop": "node scripts/stop-redis.js",
     "clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\"",
-    "build": "next build",
+    "build": "next build && node scripts/postbuild-standalone.js",
     "rebuild": "npm run clean && npm run build",
     "start": "next start",
     "lint": "next lint",
