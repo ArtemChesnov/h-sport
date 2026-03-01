@@ -12,10 +12,8 @@ BRANCH="${BRANCH:-master}"
 
 echo "=== Deploy $APP_DIR (branch: $BRANCH) ==="
 
-git checkout -- .
 git fetch origin
-git checkout "$BRANCH"
-git pull origin "$BRANCH"
+git reset --hard "origin/$BRANCH"
 
 npm install
 npx prisma generate
