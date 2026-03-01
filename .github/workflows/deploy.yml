@@ -24,11 +24,7 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
 
-      - name: Test SSH connection
-        run: |
-          ssh -vvv -o StrictHostKeyChecking=no -o BatchMode=yes -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "echo SSH_OK && whoami" 2>&1 || true
-
       - name: Deploy via SSH
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-            "cd ${{ vars.DEPLOY_PATH || '/root/h-sport' }} && ./scripts/server-deploy.sh"
+            "cd ${{ vars.DEPLOY_PATH || '/root/h-sport' }} && bash scripts/server-deploy.sh"
