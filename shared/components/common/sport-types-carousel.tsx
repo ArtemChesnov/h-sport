@@ -47,7 +47,7 @@ export const SportTypesCarousel: React.FC<Props> = ({ className }) => {
                     src={item.src}
                     alt={item.type}
                     fill
-                    className="object-cover"
+                    className="object-cover object-[50%_0%]"
                     sizes="(min-width: 1024px) 33.33vw, (min-width: 577px) 50vw, 100vw"
                     priority={index === 0}
                     loading={index === 0 ? undefined : "lazy"}
