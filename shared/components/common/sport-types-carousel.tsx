@@ -33,48 +33,44 @@ export const SportTypesCarousel: React.FC<Props> = ({ className }) => {
   };
 
   return (
-    <div className={cn("mx-auto w-full max-w-[1920px] ", className)}>
-      <Carousel
-        opts={{
-          align: "start",
-          loop: true,
-        }}
-        className="w-full"
-      >
-        <CarouselContent className="ml-0">
-          {sportTypes.map((item, index) => (
-            <CarouselItem
-              key={index}
-              className="relative m-0 basis-full shrink-0 pl-0 min-[577px]:basis-1/2 cursor-pointer"
-            >
-              <div className="relative h-screen min-[769px]:h-[800px] min-[1440px]:h-[1080px] w-full overflow-hidden">
-                <Image
-                  src={item.src}
-                  alt={item.type}
-                  fill
-                  className="object-cover"
-                  sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
-                  priority={index === 0}
-                  loading={index === 0 ? undefined : "lazy"}
-                />
+    <div className={cn("relative mx-auto", className)}>
+      <div className="relative w-full max-w-[1920px] mx-auto overflow-hidden">
+        <Carousel opts={{ align: "start", loop: true }} className="w-full min-w-0 overflow-hidden">
+          <CarouselContent className="!ml-0">
+            {sportTypes.map((item, index) => (
+              <CarouselItem
+                key={index}
+                className="basis-full shrink-0 !pl-0 min-[577px]:basis-1/2 min-[1024px]:basis-1/3 relative cursor-pointer"
+              >
+                <div className="relative w-full h-[500px] min-[577px]:h-[580px] min-[769px]:h-[765px] min-[1025px]:h-[820px] min-[1281px]:h-[800px] min-[1441px]:h-[920px] min-[1601px]:h-[1080px] overflow-hidden">
+                  <Image
+                    src={item.src}
+                    alt={item.type}
+                    fill
+                    className="object-cover"
+                    sizes="(min-width: 1024px) 33.33vw, (min-width: 577px) 50vw, 100vw"
+                    priority={index === 0}
+                    loading={index === 0 ? undefined : "lazy"}
+                  />
 
-                <div className="absolute bottom-10 left-1/2 flex max-w-132 -translate-x-1/2 flex-col items-center gap-1.5 min-[1280px]:px-10 min-[1280px]:py-5 rounded-[10px] bg-white/50 backdrop-blur-xl px-5 py-2.5">
-                  <h1 className="text-center text-[32px] font-semibold uppercase leading-[120%] text-foreground lg:text-[56px] mb-2">
-                    {item.type}
-                  </h1>
-                  <Link href="/catalog" onClick={handleCatalogClick}>
-                    <PromoButton
-                      _variant="outline"
-                      className="text-[16px] rounded-[10px] uppercase"
-                      text="Перейти в каталог"
-                    />
-                  </Link>
+                  <div className="absolute bottom-4 left-1/2 flex max-w-132 -translate-x-1/2 flex-col items-center gap-1.5 rounded-[10px] bg-white/50 backdrop-blur-xl px-4 py-2.5 min-[768px]:px-5 min-[768px]:py-3 min-[1280px]:px-10 min-[1280px]:py-5">
+                    <h1 className="text-center text-[22px] font-semibold uppercase leading-[120%] text-foreground sm:text-[28px] lg:text-[40px] min-[1280px]:text-[56px] mb-1 min-[768px]:mb-2">
+                      {item.type}
+                    </h1>
+                    <Link href="/catalog" onClick={handleCatalogClick}>
+                      <PromoButton
+                        _variant="outline"
+                        className="text-[12px] rounded-[10px] uppercase min-[768px]:text-[16px]"
+                        text="Перейти в каталог"
+                      />
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </Carousel>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+      </div>
     </div>
   );
 };

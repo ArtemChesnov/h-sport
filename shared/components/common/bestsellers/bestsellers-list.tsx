@@ -17,12 +17,12 @@ export function BestSellersList(props: BestSellersListProps = {}) {
   const query = useProductsQuery(
     {
       page: 1,
-      perPage: 4,
+      perPage: 3,
       sort: "popular",
     },
     {
       initialData: initialData
-        ? { items: initialData, meta: { page: 1, perPage: 4, total: initialData.length, pages: 1 } }
+        ? { items: initialData, meta: { page: 1, perPage: 3, total: initialData.length, pages: 1 } }
         : undefined,
     }
   );
@@ -55,14 +55,14 @@ export function BestSellersList(props: BestSellersListProps = {}) {
         <p className=" text-lg text-muted-foreground">Пока нет популярных товаров.</p>
       ) : (
         <>
-          {/* ≤1280px: слайдер; ≤576px — 1 карточка, >576px — 2 карточки */}
+          {/* ≤1280px: слайдер; ≤576px — 1 карточка, >576px — 2, ≥1024px — 3 карточки */}
           <div className="xl:hidden w-full min-w-0 overflow-hidden">
             <Carousel opts={{ align: "start", loop: true }} className="w-full">
-              <CarouselContent className="ml-0 min-[577px]:-ml-2.5">
+              <CarouselContent className="ml-0 min-[577px]:-ml-2.5 min-[1024px]:-ml-2.5">
                 {items.map((product) => (
                   <CarouselItem
                     key={product.id}
-                    className="basis-full shrink-0 pl-0 min-[577px]:basis-[calc(50%-5px)] min-[577px]:pl-2.5"
+                    className="basis-full shrink-0 pl-0 min-[577px]:basis-[calc(50%-5px)] min-[577px]:pl-2.5 min-[1024px]:basis-[calc(33.333%-7px)] min-[1024px]:pl-2.5"
                   >
                     <div className="w-full min-w-0 h-[500px] min-[769px]:h-[800px] min-[1440px]:h-[1080px]">
                       <ProductCard
@@ -78,8 +78,8 @@ export function BestSellersList(props: BestSellersListProps = {}) {
               </CarouselContent>
             </Carousel>
           </div>
-          {/* >1280px: сетка 2 колонки, 4 карточки */}
-          <div className="hidden xl:grid xl:grid-cols-2 xl:gap-2.5 min-[1440px]:!gap-5 w-full min-w-0 overflow-hidden ">
+          {/* >1280px: сетка 3 колонки */}
+          <div className="hidden xl:grid xl:grid-cols-3 xl:gap-2.5 min-[1440px]:!gap-5 w-full min-w-0 overflow-hidden ">
             {items.map((product) => (
               <div
                 key={product.id}

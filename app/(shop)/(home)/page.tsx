@@ -19,8 +19,8 @@ export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const [newProducts, bestSellers] = await Promise.all([
-    PRODUCT_SERVER.getNewProducts(4),
-    PRODUCT_SERVER.getBestSellers(4, 100),
+    PRODUCT_SERVER.getNewProducts(3),
+    PRODUCT_SERVER.getBestSellers(3, 100),
   ]);
 
   return (
