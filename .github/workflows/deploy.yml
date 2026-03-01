@@ -39,4 +39,8 @@ jobs:
           SSH_USER: ${{ secrets.SSH_USER }}
           DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/root/h-sport' }}
         run: |
-          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -i ~/.ssh/id_ed25519 "$SSH_USER@$SSH_HOST" "echo '=== SSH OK ===' && pwd && cd $DEPLOY_PATH && echo '=== IN DIR ===' && pwd && head -3 scripts/server-deploy.sh && echo '=== RUNNING ===' && bash -x scripts/server-deploy.sh 2>&1"
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 -i ~/.ssh/id_ed25519 "$SSH_USER@$SSH_HOST" "echo HELLO" > /tmp/ssh_out.txt 2>&1 || true
+          echo "SSH exit code: $?"
+          echo "--- SSH output ---"
+          cat /tmp/ssh_out.txt
+          echo "--- end ---"
