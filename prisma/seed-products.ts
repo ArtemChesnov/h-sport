@@ -1,7 +1,47 @@
 import { PrismaClient, Size } from "@prisma/client";
+import * as fs from "fs";
+import * as path from "path";
 import { generateSku } from "../shared/lib/generators";
 import { RAW_PRODUCTS } from "./constants";
 import { RawProduct } from "./types";
+
+/**
+ * Строит карту SKU (lowercase) → отсортированный список URL изображений.
+ * Файлы в public/assets/images/products/ имеют формат:
+ *   {name}_{color}_{sku}-{photoNum}-{hash}.webp
+ */
+function buildSkuImageMap(): Map<string, string[]> {
+  const imagesDir = path.join(process.cwd(), "public/assets/images/products");
+  const map = new Map<string, string[]>();
+
+  if (!fs.existsSync(imagesDir)) return map;
+
+  const files = fs.readdirSync(imagesDir).filter((f) => f.endsWith(".webp"));
+
+  for (const file of files) {
+    // Извлекаем SKU: всё между вторым "_" и последними двумя "-{num}-{hash}.webp"
+    // Пример: top_chernyy_hs-top-0020-m-clr-01-4-b2c271ef.webp → hs-top-0020-m-clr-01
+    const match = file.match(/_([a-z]+-[a-z]+-\d+-[a-z]+-[a-z]+-\d+)-\d+-[0-9a-f]+\.webp$/i);
+    if (!match) continue;
+
+    const sku = match[1].toLowerCase();
+    const url = `/assets/images/products/${file}`;
+
+    if (!map.has(sku)) map.set(sku, []);
+    map.get(sku)!.push(url);
+  }
+
+  // Сортируем по номеру фото (предпоследний сегмент перед хешем)
+  for (const [, urls] of map) {
+    urls.sort((a, b) => {
+      const numA = parseInt(a.match(/-(\d+)-[0-9a-f]+\.webp$/)?.[1] ?? "0");
+      const numB = parseInt(b.match(/-(\d+)-[0-9a-f]+\.webp$/)?.[1] ?? "0");
+      return numA - numB;
+    });
+  }
+
+  return map;
+}
 
 /**
  * Генерирует теги для товара на основе его свойств
@@ -66,6 +106,9 @@ function generateTags(product: RawProduct, index: number): string[] {
 export async function seedProducts(prisma: PrismaClient) {
   const categories = await prisma.category.findMany();
   const categoryIdBySlug = new Map<string, number>(categories.map((c) => [c.slug, c.id]));
+  const skuImageMap = buildSkuImageMap();
+
+  console.log(`[seedProducts] Найдено ${skuImageMap.size} уникальных SKU с фотографиями`);
 
   const allProducts: RawProduct[] = [...RAW_PRODUCTS];
 
@@ -146,12 +189,14 @@ export async function seedProducts(prisma: PrismaClient) {
             size: productSize,
           });
 
+          const itemImages = skuImageMap.get(sku.toLowerCase()) ?? [];
+
           productItemsToCreate.push({
             color: variation.color,
             size: productSize,
             price: variation.priceRub * 100, // в копейках
             isAvailable: variation.isAvailable,
-            imageUrls: [], // фото добавляются вручную в админке
+            imageUrls: itemImages,
             sku,
           });
 
@@ -180,6 +225,8 @@ export async function seedProducts(prisma: PrismaClient) {
       // Генерируем теги для товара
       const tags = generateTags(rawProduct, productIndex);
 
+      const firstItemImages = productItemsToCreate[0]?.imageUrls ?? [];
+
       await prisma.product.create({
         data: {
           ...(productId != null ? { id: productId } : {}),
@@ -188,7 +235,7 @@ export async function seedProducts(prisma: PrismaClient) {
           categoryId,
           description: rawProduct.description ?? null,
           composition: composition === "—" ? null : composition,
-          images: [], // фото добавляются вручную в админке
+          images: firstItemImages.length > 0 ? firstItemImages : [],
           tags,
           items: {
             create: productItemsToCreate,
