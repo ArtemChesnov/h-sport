@@ -1,7 +1,7 @@
 # Деплой на прод-сервер по пушу в master.
 # Секреты в репозитории: Settings → Secrets and variables → Actions:
 #   SSH_HOST, SSH_USER, SSH_PRIVATE_KEY
-# Опционально: DEPLOY_PATH (по умолчанию /root/h-sport)
+# Переменные: DEPLOY_ENABLED = true
 
 name: Deploy to production
 
@@ -19,12 +19,12 @@ jobs:
     if: ${{ vars.DEPLOY_ENABLED == 'true' }}
     steps:
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ${{ secrets.DEPLOY_PATH || '/root/h-sport' }}
+            cd ${{ vars.DEPLOY_PATH || '/root/h-sport' }}
             ./scripts/server-deploy.sh
           script_stop: true
