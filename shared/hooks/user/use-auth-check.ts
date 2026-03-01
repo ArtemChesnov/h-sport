@@ -1,10 +1,10 @@
-
 "use client";
 
 import { subscribeToAuthBroadcast } from "@/shared/lib/auth/auth-broadcast";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
-import { USER_PROFILE_QUERY_KEY, useUserProfileQuery } from "./user-profile.hooks";
+import { AUTH_ME_QUERY_KEY, useAuthMeQuery } from "./use-auth-me";
+import { USER_PROFILE_QUERY_KEY } from "./user-profile.hooks";
 
 /** sessionStorage: флаг неавторизованности. Один запрос после загрузки. */
 export const UNAUTHORIZED_FLAG_KEY = "h-sport:unauthorized";
@@ -25,89 +25,72 @@ function setUnauthorizedFlag(value: boolean): void {
 /**
  * Хук для проверки авторизации пользователя на клиенте
  *
- * Проверяет авторизацию через запрос к API /api/shop/profile
- * Cookie с httpOnly: true недоступна в JavaScript, поэтому проверяем через API
+ * Использует GET /api/auth/me (только проверка сессии, без загрузки профиля из БД).
+ * Cookie с httpOnly: true недоступна в JavaScript, поэтому проверяем через API.
  *
  * SSR-safe: на сервере возвращает { isAuthenticated: false, isLoading: true }
- * isLoading: true на сервере для предотвращения hydration mismatch
  *
  * @returns {isAuthenticated: boolean, isLoading: boolean}
  */
 export function useAuthCheck() {
   const isClient = typeof window !== "undefined";
 
-  // SSR: возвращаем mock результат чтобы не вызывать useQueryClient на сервере
-  // isLoading: true чтобы на сервере и клиенте был одинаковый рендеринг
   if (!isClient) {
     return {
       isAuthenticated: false,
-      isLoading: true, // true для предотвращения hydration mismatch
+      isLoading: true,
     };
   }
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- условный вызов хуков: выполняется только на клиенте после проверки isClient
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- условный вызов: ветка только на клиенте (isClient)
   const queryClient = useQueryClient();
+  const cachedMe = queryClient.getQueryData(AUTH_ME_QUERY_KEY);
+  const hasValidMe = cachedMe && typeof cachedMe === "object" && "id" in cachedMe;
+  const shouldFetch = !hasValidMe;
 
-  // Определяем, нужно ли делать запрос
-  const cachedProfile = queryClient.getQueryData(USER_PROFILE_QUERY_KEY);
-
-  // Логика shouldFetch:
-  // Всегда делаем запрос, кроме случая когда в кэше уже есть валидный профиль.
-  //
-  // ВАЖНО: раньше при 401 в кэш записывался null, и мы не делали запрос если cachedProfile === null.
-  // Это создавало проблему: после успешного логина кэш мог содержать null,
-  // и запрос не выполнялся. Теперь мы всегда делаем запрос если нет валидного профиля.
-  //
-  // Если пользователь не авторизован, получим 401 — это нормально.
-  // React Query имеет retry: false для 401, так что спама не будет.
-  const hasValidProfile = cachedProfile && typeof cachedProfile === "object" && "id" in cachedProfile;
-  const shouldFetch = !hasValidProfile;
-
-  // Запрашиваем профиль
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- условный вызов хуков: выполняется только на клиенте после проверки isClient
-  const { data: profile, isLoading, isError } = useUserProfileQuery({
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- условный вызов: ветка только на клиенте (isClient)
+  const {
+    data: user,
+    isLoading,
+    isError,
+  } = useAuthMeQuery({
     enabled: shouldFetch,
   });
 
-  // Синхронизируем sessionStorage с результатом запроса
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- условный вызов хуков: выполняется только на клиенте после проверки isClient
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- условный вызов: ветка только на клиенте (isClient)
   useEffect(() => {
-    if (profile) {
-      // Успешно получили профиль - убираем флаг неавторизованности
+    if (user) {
       setUnauthorizedFlag(false);
     }
-    // При ошибке 401 флаг устанавливается в useUserProfileQuery
-  }, [profile]);
+  }, [user]);
 
-  // Обработчик сообщений от других вкладок
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- условный вызов хуков: выполняется только на клиенте после проверки isClient
-  const handleAuthBroadcast = useCallback((message: { type: string; userId?: string }) => {
-    if (!queryClient) return;
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- условный вызов: ветка только на клиенте (isClient)
+  const handleAuthBroadcast = useCallback(
+    (message: { type: string; userId?: string }) => {
+      if (!queryClient) return;
 
-    if (message.type === "LOGOUT") {
-      // Другая вкладка вышла из аккаунта — удаляем профиль из кэша
-      queryClient.removeQueries({ queryKey: USER_PROFILE_QUERY_KEY });
-      setUnauthorizedFlag(true);
-    } else if (message.type === "LOGIN") {
-      // Другая вкладка вошла — обновляем профиль
-      setUnauthorizedFlag(false);
-      queryClient.invalidateQueries({ queryKey: USER_PROFILE_QUERY_KEY });
-    } else if (message.type === "SESSION_REFRESH") {
-      // Сессия обновлена — перезапрашиваем профиль
-      queryClient.invalidateQueries({ queryKey: USER_PROFILE_QUERY_KEY });
-    }
-  }, [queryClient]);
+      if (message.type === "LOGOUT") {
+        queryClient.removeQueries({ queryKey: AUTH_ME_QUERY_KEY });
+        queryClient.removeQueries({ queryKey: USER_PROFILE_QUERY_KEY });
+        setUnauthorizedFlag(true);
+      } else if (message.type === "LOGIN") {
+        setUnauthorizedFlag(false);
+        queryClient.invalidateQueries({ queryKey: AUTH_ME_QUERY_KEY });
+        queryClient.invalidateQueries({ queryKey: USER_PROFILE_QUERY_KEY });
+      } else if (message.type === "SESSION_REFRESH") {
+        queryClient.invalidateQueries({ queryKey: AUTH_ME_QUERY_KEY });
+        queryClient.invalidateQueries({ queryKey: USER_PROFILE_QUERY_KEY });
+      }
+    },
+    [queryClient]
+  );
 
-  // Подписываемся на события от других вкладок
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- условный вызов хуков: выполняется только на клиенте после проверки isClient
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- условный вызов: ветка только на клиенте (isClient)
   useEffect(() => {
     return subscribeToAuthBroadcast(handleAuthBroadcast);
   }, [handleAuthBroadcast]);
 
-  // Если есть данные профиля и нет ошибки - пользователь авторизован
-  const isAuthenticated = !!profile && !isError;
-
-  // Показываем загрузку только если запрос разрешен и выполняется
+  const isAuthenticated = !!user && !isError;
   const isActuallyLoading = shouldFetch && isLoading;
 
   return {

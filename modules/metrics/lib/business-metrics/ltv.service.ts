@@ -3,6 +3,7 @@
  */
 
 import { prisma } from "@/prisma/prisma-client";
+import { getExcludeTestUserOrderWhere } from "@/shared/lib/auth/privileged";
 import { OrderStatus } from "@prisma/client";
 import {
   calculateAverageLTV,
@@ -37,6 +38,7 @@ export async function getLTVMetrics(days: number): Promise<LTVMetrics> {
       createdAt: { gte: from, lte: now },
       status: { in: includedStatuses },
       userId: { not: null },
+      ...getExcludeTestUserOrderWhere(),
     },
     include: {
       user: {
@@ -61,12 +63,14 @@ export async function getLTVMetrics(days: number): Promise<LTVMetrics> {
       userId,
       orderCount: orders.length,
       totalSpent: orders.reduce((sum, o) => sum + o.total, 0),
-      firstOrderDate: orders.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())[0].createdAt,
-      lastOrderDate: orders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0].createdAt,
+      firstOrderDate: orders.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())[0]
+        .createdAt,
+      lastOrderDate: orders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0]
+        .createdAt,
     }));
 
   const allCustomerSpent = Array.from(userOrders.values()).map((orders) =>
-    orders.reduce((sum, o) => sum + o.total, 0),
+    orders.reduce((sum, o) => sum + o.total, 0)
   );
 
   return {
@@ -74,7 +78,12 @@ export async function getLTVMetrics(days: number): Promise<LTVMetrics> {
     repeatCustomersCount: repeatCustomers.length,
     repeatCustomersRate: calculateRepeatCustomerRate(repeatCustomers.length, userOrders.size),
     averageLTV: calculateAverageLTV(
-      allCustomerSpent.map((spent) => ({ orderCount: 0, totalSpent: spent, firstOrderDate: new Date(), lastOrderDate: new Date() }))
+      allCustomerSpent.map((spent) => ({
+        orderCount: 0,
+        totalSpent: spent,
+        firstOrderDate: new Date(),
+        lastOrderDate: new Date(),
+      }))
     ),
     topCustomers: repeatCustomers
       .sort((a, b) => b.totalSpent - a.totalSpent)
@@ -84,6 +93,9 @@ export async function getLTVMetrics(days: number): Promise<LTVMetrics> {
         orderCount: c.orderCount,
         totalSpent: c.totalSpent,
       })),
-    averageOrdersPerCustomer: calculateAverageOrdersPerCustomer(ordersInPeriod.length, userOrders.size),
+    averageOrdersPerCustomer: calculateAverageOrdersPerCustomer(
+      ordersInPeriod.length,
+      userOrders.size
+    ),
   };
 }

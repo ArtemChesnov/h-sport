@@ -2,17 +2,25 @@
  * GET /api/shipping/cdek-test
  *
  * Проверка подключения к API СДЭК: токен, поиск города, список ПВЗ.
- * Использует CDEK_CLIENT_ID, CDEK_CLIENT_SECRET, CDEK_IS_TEST из .env.
+ * В production возвращает 404 — только для development/отладки.
  */
 
-import { findCDEKCity, getCDEKPickupPoints } from "@/modules/shipping/lib/pickupPoints/providers/cdek";
+import { env } from "@/shared/lib/config/env";
+import {
+  findCDEKCity,
+  getCDEKPickupPoints,
+} from "@/modules/shipping/lib/pickupPoints/providers/cdek";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const clientId = process.env.CDEK_CLIENT_ID;
-  const clientSecret = process.env.CDEK_CLIENT_SECRET;
+  if (env.NODE_ENV === "production") {
+    return new NextResponse(null, { status: 404 });
+  }
+
+  const clientId = env.CDEK_CLIENT_ID;
+  const clientSecret = env.CDEK_CLIENT_SECRET;
 
   if (!clientId || !clientSecret) {
     return NextResponse.json(
@@ -21,12 +29,12 @@ export async function GET() {
         message: "CDEK credentials not configured",
         hint: "Add CDEK_CLIENT_ID and CDEK_CLIENT_SECRET to .env",
       },
-      { status: 503 },
+      { status: 503 }
     );
   }
 
   try {
-    const isTest = process.env.CDEK_IS_TEST === "true";
+    const isTest = env.CDEK_IS_TEST ?? false;
     const baseUrl = isTest ? "https://api.edu.cdek.ru" : "https://api.cdek.ru";
 
     // 1) Получение токена (вызов getCDEKPickupPoints или findCDEKCity подтянет токен внутри)
@@ -70,7 +78,7 @@ export async function GET() {
         message: "CDEK API error",
         error: message,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

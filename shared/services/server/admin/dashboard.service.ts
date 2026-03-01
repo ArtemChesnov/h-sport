@@ -1,8 +1,10 @@
 /** Дашборд админки: сводка, графики, топ товаров по периоду. */
 
 import { prisma } from "@/prisma/prisma-client";
+import { periodToDays as periodToDaysFromConverter } from "@/shared/lib/period-converter";
 import type * as DTO from "@/shared/services/dto";
 import { OrderStatus } from "@prisma/client";
+import { getExcludeTestUserOrderWhere } from "@/shared/lib/auth/privileged";
 
 /** Статусы заказов, учитываемые в выручке */
 const REVENUE_STATUSES: OrderStatus[] = [
@@ -28,17 +30,10 @@ export function parsePeriod(raw: string | null): DTO.AdminDashboardPeriodDto {
 
 /**
  * Конвертирует период в количество дней
+ * Делегирует в единый модуль period-converter
  */
 export function periodToDays(period: DTO.AdminDashboardPeriodDto): number {
-  switch (period) {
-    case "7d":
-      return 7;
-    case "90d":
-      return 90;
-    case "30d":
-    default:
-      return 30;
-  }
+  return periodToDaysFromConverter(period);
 }
 
 /**
@@ -70,6 +65,7 @@ export async function getSummary(
   const where = {
     createdAt: { gte: from, lte: to },
     status: { in: REVENUE_STATUSES },
+    ...getExcludeTestUserOrderWhere(),
   };
 
   const [summaryAgg, paidOrdersCount, totalOrdersCount] = await Promise.all([
@@ -106,6 +102,7 @@ export async function getChartData(
   const where = {
     createdAt: { gte: from, lte: to },
     status: { in: REVENUE_STATUSES },
+    ...getExcludeTestUserOrderWhere(),
   };
 
   const chartData = await prisma.order.groupBy({
@@ -160,6 +157,7 @@ export async function getTopProducts(
       order: {
         createdAt: { gte: from, lte: to },
         status: { in: REVENUE_STATUSES },
+        ...getExcludeTestUserOrderWhere(),
       },
     },
     _sum: { qty: true, total: true },

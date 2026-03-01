@@ -1,7 +1,7 @@
 "use client";
 
 import { NewsletterSubscribeModal } from "@/shared/components/common/newsletter-subscribe-modal";
-import React, { createContext, useCallback, useContext, useState } from "react";
+import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
 
 type NewsletterModalContextValue = {
   openNewsletterModal: () => void;
@@ -13,8 +13,10 @@ export function NewsletterModalProvider({ children }: { children: React.ReactNod
   const [open, setOpen] = useState(false);
   const openNewsletterModal = useCallback(() => setOpen(true), []);
 
+  const value = useMemo(() => ({ openNewsletterModal }), [openNewsletterModal]);
+
   return (
-    <NewsletterModalContext.Provider value={{ openNewsletterModal }}>
+    <NewsletterModalContext.Provider value={value}>
       {children}
       <NewsletterSubscribeModal open={open} onOpenChange={setOpen} />
     </NewsletterModalContext.Provider>

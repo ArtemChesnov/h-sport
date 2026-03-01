@@ -42,24 +42,31 @@ const ProductsTable = dynamic(
       <div className="w-full overflow-x-auto rounded-lg border border-border/50 bg-background">
         <div className="space-y-0">
           <div className="bg-muted/30 border-b border-border/50 h-12 flex items-center gap-4 px-4">
+            <Skeleton className="h-3 w-12 shrink-0" />
+            <Skeleton className="h-3 w-10 shrink-0" />
             <Skeleton className="h-3 w-40" />
-            <Skeleton className="h-3 w-32" />
             <Skeleton className="h-3 w-24" />
             <Skeleton className="h-3 w-20" />
-            <Skeleton className="h-3 w-32" />
-            <Skeleton className="h-3 w-12 ml-auto" />
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-3 w-24 ml-auto" />
           </div>
           {Array.from({ length: 5 }).map((_, index) => (
             <div
               key={index}
               className="border-b border-border/30 h-14 flex items-center gap-4 px-4"
             >
-              <Skeleton className="h-4 w-40" />
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-4 w-20" />
-              <Skeleton className="h-4 w-32" />
-              <div className="flex gap-2 ml-auto">
+              <Skeleton className="h-12 w-12 rounded-lg shrink-0" />
+              <Skeleton className="h-4 w-10 shrink-0" />
+              <div className="flex flex-col gap-1 min-w-0">
+                <Skeleton className="h-4 w-40" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+              <Skeleton className="h-4 w-24 shrink-0" />
+              <Skeleton className="h-4 w-20 shrink-0" />
+              <Skeleton className="h-4 w-20 shrink-0" />
+              <div className="flex gap-2 ml-auto shrink-0">
+                <Skeleton className="h-9 w-9 rounded" />
+                <Skeleton className="h-9 w-9 rounded" />
                 <Skeleton className="h-9 w-9 rounded" />
                 <Skeleton className="h-9 w-9 rounded" />
               </div>
@@ -286,27 +293,32 @@ export function ProductsPageClient() {
           {isLoading && (
             <div className="w-full overflow-x-auto rounded-lg border border-border/50 bg-background">
               <div className="space-y-0">
-                {/* Заголовок таблицы */}
                 <div className="bg-muted/30 border-b border-border/50 h-12 flex items-center gap-4 px-4">
+                  <Skeleton className="h-3 w-12 shrink-0" />
+                  <Skeleton className="h-3 w-10 shrink-0" />
                   <Skeleton className="h-3 w-40" />
-                  <Skeleton className="h-3 w-32" />
                   <Skeleton className="h-3 w-24" />
                   <Skeleton className="h-3 w-20" />
-                  <Skeleton className="h-3 w-32" />
-                  <Skeleton className="h-3 w-12 ml-auto" />
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="h-3 w-24 ml-auto" />
                 </div>
-                {/* Строки таблицы */}
                 {Array.from({ length: 5 }).map((_, index) => (
                   <div
                     key={index}
                     className="border-b border-border/30 h-14 flex items-center gap-4 px-4"
                   >
-                    <Skeleton className="h-4 w-40" />
-                    <Skeleton className="h-4 w-32" />
-                    <Skeleton className="h-4 w-24" />
-                    <Skeleton className="h-4 w-20" />
-                    <Skeleton className="h-4 w-32" />
-                    <div className="flex gap-2 ml-auto">
+                    <Skeleton className="h-12 w-12 rounded-lg shrink-0" />
+                    <Skeleton className="h-4 w-10 shrink-0" />
+                    <div className="flex flex-col gap-1 min-w-0">
+                      <Skeleton className="h-4 w-40" />
+                      <Skeleton className="h-3 w-24" />
+                    </div>
+                    <Skeleton className="h-4 w-24 shrink-0" />
+                    <Skeleton className="h-4 w-20 shrink-0" />
+                    <Skeleton className="h-4 w-20 shrink-0" />
+                    <div className="flex gap-2 ml-auto shrink-0">
+                      <Skeleton className="h-9 w-9 rounded" />
+                      <Skeleton className="h-9 w-9 rounded" />
                       <Skeleton className="h-9 w-9 rounded" />
                       <Skeleton className="h-9 w-9 rounded" />
                     </div>

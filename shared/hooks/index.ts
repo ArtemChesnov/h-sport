@@ -1,15 +1,21 @@
-
 export { useProductQuery, useProductsQuery } from "./product/products.hooks";
 export { useProductVariants } from "./product/use-product-variants";
 
 export {
-    useAddCartItemMutation, useCartCount, useCartQuery, useDeleteCartItemMutation, useUpdateCartItemMutation
+  useAddCartItemMutation,
+  useCartCount,
+  useCartQuery,
+  useDeleteCartItemMutation,
+  useUpdateCartItemMutation,
 } from "./cart/cart.hooks";
 export { useCartItemActions } from "./cart/use-cart-item-actions";
 export { useProductCart } from "./cart/use-product-cart";
 
 export {
-    useAddFavoriteMutation, useFavoritesCount, useFavoritesQuery, useRemoveFavoriteMutation
+  useAddFavoriteMutation,
+  useFavoritesCount,
+  useFavoritesQuery,
+  useRemoveFavoriteMutation,
 } from "./favorites/favorites.hooks";
 export { useFavoritesPage } from "./favorites/use-favorites-page";
 export type { UseFavoritesPageOptions } from "./favorites/use-favorites-page";
@@ -17,20 +23,32 @@ export type { UseFavoritesPageOptions } from "./favorites/use-favorites-page";
 export { useCategoriesQuery } from "./categories/categories.hooks";
 
 export {
-    useCancelOrderMutation, useCreateOrderMutation, useOrderDetailQuery, useOrdersListQuery, usePayOrderMutation
+  useCancelOrderMutation,
+  useCreateOrderMutation,
+  useOrderDetailQuery,
+  useOrdersListQuery,
+  usePayOrderMutation,
 } from "./orders/orders.hooks";
 
 export {
-    useAdminProductQuery, useAdminProductsQuery, useCreateProductMutation, useDeleteProductMutation, useUpdateProductMutation
+  useAdminProductQuery,
+  useAdminProductsQuery,
+  useCreateProductMutation,
+  useDeleteProductMutation,
+  useUpdateProductMutation,
 } from "./admin/admin.products.hooks";
 
 export {
-    useAdminOrderDetailQuery, useAdminOrderUpdateMutation, useAdminOrdersListQuery
+  useAdminOrderDetailQuery,
+  useAdminOrderUpdateMutation,
+  useAdminOrdersListQuery,
 } from "./admin/admin.orders.hooks";
 
 export {
-    useAdminPromoCodesQuery,
-    useCreateAdminPromoCodeMutation, useDeleteAdminPromoCodeMutation, useUpdateAdminPromoCodeMutation
+  useAdminPromoCodesQuery,
+  useCreateAdminPromoCodeMutation,
+  useDeleteAdminPromoCodeMutation,
+  useUpdateAdminPromoCodeMutation,
 } from "./admin/admin.promos.hooks";
 
 export { useApplyPromoCodeMutation, useClearPromoCodeMutation } from "./promo/promo.hooks";
@@ -49,20 +67,21 @@ export { usePaymentErrorFromUrl } from "./checkout/use-payment-error-from-url";
 export { useAuthRequiredDialog } from "./account/use-auth-required-dialog";
 export { useSignout } from "./auth/use-signout";
 export { useAuthCheck } from "./user/use-auth-check";
-export {
-    useUpdateUserProfileMutation, useUserProfileQuery
-} from "./user/user-profile.hooks";
+export { AUTH_ME_QUERY_KEY, useAuthMeQuery } from "./user/use-auth-me";
+export { useUpdateUserProfileMutation, useUserProfileQuery } from "./user/user-profile.hooks";
 
 export {
-    useAdminUserDetailQuery, useAdminUserUpdateRoleMutation, useAdminUsersQuery
+  useAdminUserDetailQuery,
+  useAdminUserUpdateRoleMutation,
+  useAdminUsersQuery,
 } from "./admin/admin.users.hooks";
 
 export {
-    useAdminNewsletterIssuesQuery,
-    useAdminNewsletterSubscribersQuery,
-    useCreateAdminNewsletterIssueMutation,
-    useDeleteAdminNewsletterSubscriberMutation,
-    useSendAdminNewsletterIssueMutation
+  useAdminNewsletterIssuesQuery,
+  useAdminNewsletterSubscribersQuery,
+  useCreateAdminNewsletterIssueMutation,
+  useDeleteAdminNewsletterSubscriberMutation,
+  useSendAdminNewsletterIssueMutation,
 } from "./admin/admin.newsletter.hooks";
 
 export { useCatalogFiltersQuery } from "./catalog/use-catalog-filters";
@@ -74,4 +93,3 @@ export { useIsHydrated } from "./common/use-is-hydrated";
 export { useCitySuggestions } from "./shipping/useCitySuggestions";
 export { useCountrySuggestions } from "./shipping/useCountrySuggestions";
 export { usePickupPointsQuery } from "./shipping/usePickupPoints";
-

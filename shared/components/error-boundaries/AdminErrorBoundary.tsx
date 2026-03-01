@@ -12,15 +12,44 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui
  */
 export class AdminErrorBoundary extends React.Component<
   { children: React.ReactNode },
-  { hasError: boolean; error: Error | null }
+  { hasError: boolean; error: Error | null; errorTime: string | null; errorUrl: string | null }
 > {
   constructor(props: { children: React.ReactNode }) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, error: null, errorTime: null, errorUrl: null };
   }
 
   static getDerivedStateFromError(error: Error) {
     return { hasError: true, error };
+  }
+
+  private captureErrorContext() {
+    if (typeof window !== "undefined") {
+      this.setState({
+        errorTime: new Date().toLocaleString(),
+        errorUrl: window.location.href,
+      });
+    }
+  }
+
+  componentDidMount() {
+    if (this.state.hasError) {
+      this.captureErrorContext();
+    }
+  }
+
+  componentDidUpdate(
+    _prevProps: { children: React.ReactNode },
+    prevState: {
+      hasError: boolean;
+      error: Error | null;
+      errorTime: string | null;
+      errorUrl: string | null;
+    }
+  ) {
+    if (this.state.hasError && !prevState.hasError && this.state.errorTime === null) {
+      this.captureErrorContext();
+    }
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
@@ -68,8 +97,8 @@ export class AdminErrorBoundary extends React.Component<
                 <Bug className="h-4 w-4" />
                 <AlertTitle>Что-то пошло не так</AlertTitle>
                 <AlertDescription>
-                  Произошла ошибка в административной панели. Для диагностики проблемы
-                  обратитесь к логам сервера или перезагрузите страницу.
+                  Произошла ошибка в административной панели. Для диагностики проблемы обратитесь к
+                  логам сервера или перезагрузите страницу.
                 </AlertDescription>
               </Alert>
 
@@ -82,11 +111,7 @@ export class AdminErrorBoundary extends React.Component<
                   <RefreshCw className="h-4 w-4" />
                   Попробовать снова
                 </Button>
-                <Button
-                  onClick={() => window.location.reload()}
-                >
-                  Перезагрузить страницу
-                </Button>
+                <Button onClick={() => window.location.reload()}>Перезагрузить страницу</Button>
               </div>
 
               {/* Детальная информация для админов */}
@@ -111,9 +136,9 @@ export class AdminErrorBoundary extends React.Component<
                       </div>
                     )}
                     <div className="text-xs text-muted-foreground">
-                      URL: {typeof window !== "undefined" ? window.location.href : "N/A"}
+                      URL: {this.state.errorUrl ?? "—"}
                       <br />
-                      Время: {new Date().toLocaleString()}
+                      Время: {this.state.errorTime ?? "—"}
                     </div>
                   </div>
                 </details>

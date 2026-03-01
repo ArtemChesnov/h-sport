@@ -17,9 +17,6 @@ interface Props {
 }
 
 export const NewProductsList: React.FC<Props> = ({ className, initialData }) => {
-  // Проверяем, что мы на клиенте перед использованием React Query
-  const isClient = typeof window !== "undefined";
-
   const query = useProductsQuery(
     {
       page: 1,
@@ -33,15 +30,12 @@ export const NewProductsList: React.FC<Props> = ({ className, initialData }) => 
             meta: { page: 1, perPage: 4, total: initialData.length, pages: 1 },
           }
         : undefined,
-      enabled: isClient,
     }
   );
 
-  const items: DTO.ProductListItemDto[] = isClient
-    ? (query.data?.items ?? initialData ?? [])
-    : (initialData ?? []);
-  const showSkeleton = isClient && query.isLoading && items.length === 0;
-  const isError = isClient && (query.isError ?? false);
+  const items: DTO.ProductListItemDto[] = query.data?.items ?? initialData ?? [];
+  const showSkeleton = query.isLoading && items.length === 0;
+  const isError = query.isError ?? false;
 
   return (
     <Container
@@ -83,7 +77,7 @@ export const NewProductsList: React.FC<Props> = ({ className, initialData }) => 
                         name={item.name}
                         price={item.price}
                         slug={item.slug}
-                        imageUrl={item.previewImage || "/assets/images/fitness.webp"}
+                        imageUrl={item.previewImage || "/assets/images/sport-types/fitness.webp"}
                         priority
                         fillHeight
                       />
@@ -104,7 +98,7 @@ export const NewProductsList: React.FC<Props> = ({ className, initialData }) => 
                   name={item.name}
                   price={item.price}
                   slug={item.slug}
-                  imageUrl={item.previewImage || "/assets/images/fitness.webp"}
+                  imageUrl={item.previewImage || "/assets/images/sport-types/fitness.webp"}
                   priority
                 />
               </div>

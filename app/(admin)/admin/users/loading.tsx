@@ -31,18 +31,27 @@ export default function AdminUsersLoading() {
         <div className="px-4 pb-4">
           <div className="rounded-lg border border-border/50 overflow-hidden">
             <div className="bg-muted/30 border-b border-border/50 h-12 flex items-center gap-4 px-4">
-              <Skeleton className="h-3 w-32" />
-              <Skeleton className="h-3 w-48" />
+              <Skeleton className="h-3 w-28" />
+              <Skeleton className="h-3 w-40" />
+              <Skeleton className="h-3 w-20" />
               <Skeleton className="h-3 w-24" />
-              <Skeleton className="h-3 w-32" />
-              <Skeleton className="h-3 w-16 ml-auto" />
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="h-3 w-20" />
+              <Skeleton className="h-3 w-28" />
+              <Skeleton className="h-3 w-12 ml-auto" />
             </div>
             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div key={i} className="border-b border-border/30 last:border-b-0 h-14 flex items-center gap-4 px-4">
+              <div
+                key={i}
+                className="border-b border-border/30 last:border-b-0 h-14 flex items-center gap-4 px-4"
+              >
                 <Skeleton className="h-4 w-32" />
                 <Skeleton className="h-4 w-48" />
                 <Skeleton className="h-6 w-16 rounded-full" />
                 <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 w-12" />
+                <Skeleton className="h-4 w-12" />
+                <Skeleton className="h-4 w-24" />
                 <Skeleton className="h-8 w-8 ml-auto" />
               </div>
             ))}

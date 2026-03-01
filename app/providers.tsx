@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { Toaster } from "sonner";
-import { ErrorBoundary } from "@/shared/components/common";
 import { reportWebVitals } from "@/shared/lib/web-vitals";
 
 function makeQueryClient() {
@@ -23,7 +22,7 @@ function makeQueryClient() {
 // На клиенте используем синглтон, чтобы не пересоздавать при навигации
 let browserQueryClient: QueryClient | undefined = undefined;
 
-function getQueryClient() {
+export function getQueryClient() {
   if (typeof window === "undefined") {
     // На сервере всегда создаём новый QueryClient
     return makeQueryClient();
@@ -44,17 +43,15 @@ export function Providers({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        {children}
-        <Toaster
-          richColors
-          position="top-right"
-          toastOptions={{
-            style: { fontSize: 13 },
-          }}
-        />
-      </QueryClientProvider>
-    </ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      {children}
+      <Toaster
+        richColors
+        position="top-right"
+        toastOptions={{
+          style: { fontSize: 13 },
+        }}
+      />
+    </QueryClientProvider>
   );
 }

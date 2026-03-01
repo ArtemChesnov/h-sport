@@ -2,13 +2,15 @@
  * Агрегация e-commerce метрик на уровне БД через SQL
  */
 
+import { TEST_USER_EMAIL } from "@/shared/lib/auth/privileged";
+
 /**
  * Получает агрегированные e-commerce метрики по часам/дням
  * Полезно для долгосрочного анализа трендов
  */
 export async function getAggregatedEcommerceMetrics(
   timeWindowMs: number = 7 * 24 * 60 * 60 * 1000, // По умолчанию 7 дней
-  aggregationInterval: "hour" | "day" = "day",
+  aggregationInterval: "hour" | "day" = "day"
 ) {
   const now = new Date();
   const cutoff = new Date(now.getTime() - timeWindowMs);
@@ -17,11 +19,14 @@ export async function getAggregatedEcommerceMetrics(
     const { prisma } = await import("@/prisma/prisma-client");
 
     // Используем SQL для агрегации на уровне БД (более эффективно)
-    const viewsAggregation = aggregationInterval === "hour"
-      ? await prisma.$queryRaw<Array<{
-          period: Date;
-          count: bigint;
-        }>>`
+    const viewsAggregation =
+      aggregationInterval === "hour"
+        ? await prisma.$queryRaw<
+            Array<{
+              period: Date;
+              count: bigint;
+            }>
+          >`
           SELECT
             DATE_TRUNC('hour', "createdAt") AS period,
             COUNT(*)::bigint AS count
@@ -30,10 +35,12 @@ export async function getAggregatedEcommerceMetrics(
           GROUP BY period
           ORDER BY period ASC
         `
-      : await prisma.$queryRaw<Array<{
-          period: Date;
-          count: bigint;
-        }>>`
+        : await prisma.$queryRaw<
+            Array<{
+              period: Date;
+              count: bigint;
+            }>
+          >`
           SELECT
             DATE_TRUNC('day', "createdAt") AS period,
             COUNT(*)::bigint AS count
@@ -43,11 +50,14 @@ export async function getAggregatedEcommerceMetrics(
           ORDER BY period ASC
         `;
 
-    const cartAggregation = aggregationInterval === "hour"
-      ? await prisma.$queryRaw<Array<{
-          period: Date;
-          count: bigint;
-        }>>`
+    const cartAggregation =
+      aggregationInterval === "hour"
+        ? await prisma.$queryRaw<
+            Array<{
+              period: Date;
+              count: bigint;
+            }>
+          >`
           SELECT
             DATE_TRUNC('hour', "createdAt") AS period,
             COUNT(*)::bigint AS count
@@ -57,10 +67,12 @@ export async function getAggregatedEcommerceMetrics(
           GROUP BY period
           ORDER BY period ASC
         `
-      : await prisma.$queryRaw<Array<{
-          period: Date;
-          count: bigint;
-        }>>`
+        : await prisma.$queryRaw<
+            Array<{
+              period: Date;
+              count: bigint;
+            }>
+          >`
           SELECT
             DATE_TRUNC('day', "createdAt") AS period,
             COUNT(*)::bigint AS count
@@ -71,33 +83,42 @@ export async function getAggregatedEcommerceMetrics(
           ORDER BY period ASC
         `;
 
-    const conversionsAggregation = aggregationInterval === "hour"
-      ? await prisma.$queryRaw<Array<{
-          period: Date;
-          type: string;
-          count: bigint;
-        }>>`
+    const conversionsAggregation =
+      aggregationInterval === "hour"
+        ? await prisma.$queryRaw<
+            Array<{
+              period: Date;
+              type: string;
+              count: bigint;
+            }>
+          >`
           SELECT
-            DATE_TRUNC('hour', "createdAt") AS period,
-            type,
+            DATE_TRUNC('hour', c."createdAt") AS period,
+            c.type,
             COUNT(*)::bigint AS count
-          FROM "Conversion"
-          WHERE "createdAt" >= ${cutoff} AND "createdAt" <= ${now}
-          GROUP BY period, type
+          FROM "Conversion" c
+          LEFT JOIN "Order" o ON o.id = c."orderId"
+          WHERE c."createdAt" >= ${cutoff} AND c."createdAt" <= ${now}
+            AND (c."orderId" IS NULL OR o.email <> ${TEST_USER_EMAIL})
+          GROUP BY period, c.type
           ORDER BY period ASC
         `
-      : await prisma.$queryRaw<Array<{
-          period: Date;
-          type: string;
-          count: bigint;
-        }>>`
+        : await prisma.$queryRaw<
+            Array<{
+              period: Date;
+              type: string;
+              count: bigint;
+            }>
+          >`
           SELECT
-            DATE_TRUNC('day', "createdAt") AS period,
-            type,
+            DATE_TRUNC('day', c."createdAt") AS period,
+            c.type,
             COUNT(*)::bigint AS count
-          FROM "Conversion"
-          WHERE "createdAt" >= ${cutoff} AND "createdAt" <= ${now}
-          GROUP BY period, type
+          FROM "Conversion" c
+          LEFT JOIN "Order" o ON o.id = c."orderId"
+          WHERE c."createdAt" >= ${cutoff} AND c."createdAt" <= ${now}
+            AND (c."orderId" IS NULL OR o.email <> ${TEST_USER_EMAIL})
+          GROUP BY period, c.type
           ORDER BY period ASC
         `;
 
@@ -154,7 +175,7 @@ export async function getAggregatedEcommerceMetrics(
 
     // Преобразуем в массив и сортируем
     const result = Array.from(aggregatedData.values()).sort(
-      (a, b) => a.period.getTime() - b.period.getTime(),
+      (a, b) => a.period.getTime() - b.period.getTime()
     );
 
     return {

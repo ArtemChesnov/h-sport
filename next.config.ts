@@ -1,17 +1,18 @@
 import type { NextConfig } from "next";
 
 // Bundle analyzer (только для анализа, не влияет на production)
-const withBundleAnalyzer = process.env.ANALYZE === "true"
-  // eslint-disable-next-line @typescript-eslint/no-require-imports -- next.config.ts использует require для условной загрузки bundle analyzer
-  ? require("@next/bundle-analyzer")({
-      enabled: process.env.ANALYZE === "true",
-      openAnalyzer: false, // Не открывать автоматически браузер
-      analyzerMode: "static", // Генерировать статические файлы
-      reportFilename: "bundle-analyzer-report.html",
-      generateStatsFile: true,
-      statsFilename: "bundle-stats.json",
-    })
-  : (config: NextConfig) => config;
+const withBundleAnalyzer =
+  process.env.ANALYZE === "true"
+    ? // eslint-disable-next-line @typescript-eslint/no-require-imports -- next.config.ts использует require для условной загрузки bundle analyzer
+      require("@next/bundle-analyzer")({
+        enabled: process.env.ANALYZE === "true",
+        openAnalyzer: false, // Не открывать автоматически браузер
+        analyzerMode: "static", // Генерировать статические файлы
+        reportFilename: "bundle-analyzer-report.html",
+        generateStatsFile: true,
+        statsFilename: "bundle-stats.json",
+      })
+    : (config: NextConfig) => config;
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -80,52 +81,20 @@ const nextConfig: NextConfig = {
         config.externals = { ...config.externals, redis: "commonjs redis" };
       } else {
         const existingExternals = config.externals;
-        config.externals = [
-          existingExternals,
-          { redis: "commonjs redis" },
-        ];
+        config.externals = [existingExternals, { redis: "commonjs redis" }];
       }
     }
 
     if (!isServer) {
       if (dev) {
-        // В dev режиме: упрощаем оптимизации для ускорения компиляции
-        // НЕ настраиваем config.cache - Next.js сам управляет кэшем
+        // В dev режиме не используем кастомный splitChunks — Next.js по умолчанию не создаёт
+        // отдельный vendor.css, который браузер может ошибочно загрузить как JS и выдать
+        // "Uncaught SyntaxError: Invalid or unexpected token" в vendor.css.
+        // Оставляем дефолтную разбивку чанков.
         config.optimization = {
           ...config.optimization,
           removeAvailableModules: false,
           removeEmptyChunks: false,
-          // Упрощенный splitChunks в dev для ускорения (но сохраняем базовое разделение)
-          splitChunks: {
-            chunks: "all",
-            cacheGroups: {
-              default: false,
-              vendors: false,
-              // Отдельный чанк для графиков (Recharts) - важно для lazy loading
-              charts: {
-                name: "charts",
-                test: /[\\/]node_modules[\\/](recharts)/,
-                priority: 15,
-                reuseExistingChunk: true,
-                enforce: true,
-              },
-              // Radix UI компоненты
-              radix: {
-                name: "radix",
-                test: /[\\/]node_modules[\\/](@radix-ui)/,
-                priority: 14,
-                reuseExistingChunk: true,
-                enforce: true,
-              },
-              // Общие библиотеки
-              vendor: {
-                name: "vendor",
-                test: /[\\/]node_modules[\\/]/,
-                priority: 10,
-                reuseExistingChunk: true,
-              },
-            },
-          },
         };
       } else {
         // Production: чанки по маршрутам (админка не в одном чанке), Recharts и Radix — отдельно

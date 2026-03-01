@@ -56,7 +56,8 @@ function generateTags(product: RawProduct, index: number): string[] {
 }
 
 /**
- * Сидинг товаров из данных клиента (raw_products_from_client.json).
+ * Сидинг товаров из данных клиента (products_with_id.json).
+ * - ID товаров берутся из файла (Product.id = id из JSON).
  * - Создаём продукты и варианты (items), генерируем SKU.
  * - Размеры: пустой sizes → ONE_SIZE.
  * - Фото не подставляем: images и imageUrls — пустые массивы (добавление вручную в админке).
@@ -105,6 +106,8 @@ export async function seedProducts(prisma: PrismaClient) {
       );
       continue;
     }
+
+    let firstInRaw = true;
 
     for (const [composition, variations] of variationsByComposition) {
       const productItemsToCreate: {
@@ -163,7 +166,14 @@ export async function seedProducts(prisma: PrismaClient) {
         continue;
       }
 
-      const slug = `product-${String(productIndex).padStart(3, "0")}`;
+      // ID из файла — только для первого продукта по этому rawProduct (в JSON один id на строку)
+      const productId = firstInRaw && rawProduct.id != null ? rawProduct.id : undefined;
+      firstInRaw = false;
+
+      const slug =
+        productId != null
+          ? `product-${String(productId).padStart(3, "0")}`
+          : `product-${String(productIndex).padStart(3, "0")}`;
 
       productIndex += 1;
 
@@ -172,6 +182,7 @@ export async function seedProducts(prisma: PrismaClient) {
 
       await prisma.product.create({
         data: {
+          ...(productId != null ? { id: productId } : {}),
           name: rawProduct.name,
           slug,
           categoryId,
@@ -185,6 +196,15 @@ export async function seedProducts(prisma: PrismaClient) {
         },
       });
     }
+  }
+
+  // Сбрасываем sequence для Product.id, чтобы следующий автоинкремент был корректен
+  try {
+    await prisma.$executeRawUnsafe(
+      `SELECT setval(pg_get_serial_sequence('"Product"', 'id'), COALESCE((SELECT MAX(id) FROM "Product"), 1))`
+    );
+  } catch {
+    // SQLite или другая БД — игнорируем
   }
 
   console.log(`[seedProducts] Закончено. Создано продуктов: ${productIndex - 1}`);

@@ -1,6 +1,7 @@
 import { Size } from "@prisma/client";
 
 export type RawProduct = {
+  id?: number; // id из products_with_id.json — подставляется в Product.id при сидинге
   name: string;
   categorySlug: string;
   description?: string;
@@ -14,4 +15,3 @@ export type RawProductVariation = {
   composition: string;
   isAvailable: boolean;
 };
-

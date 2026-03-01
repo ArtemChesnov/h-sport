@@ -36,6 +36,8 @@ export type DatePickerProps = {
  * DatePicker — выбор даты через Popover + Calendar.
  * Отображает дату в формате DD.MM.YYYY, возвращает YYYY-MM-DD.
  */
+const STABLE_CALENDAR_FALLBACK = { toYear: 2025, defaultMonth: new Date(2025, 0, 15) };
+
 function defaultDisplayFormat(date: Date): string {
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -62,6 +64,16 @@ export function DatePicker({
     if (!value) return undefined;
     return parseDateString(value) ?? undefined;
   }, [value]);
+
+  // Год и defaultMonth задаём после монтирования, чтобы избежать расхождения сервер/клиент
+  const [calendarContext, setCalendarContext] = React.useState<{
+    toYear: number;
+    defaultMonth: Date;
+  } | null>(null);
+  React.useEffect(() => {
+    const now = new Date();
+    setCalendarContext({ toYear: now.getFullYear(), defaultMonth: now });
+  }, []);
 
   // Обработчик выбора даты в календаре
   const handleSelect = React.useCallback(
@@ -114,8 +126,14 @@ export function DatePicker({
           locale={ru}
           captionLayout="dropdown"
           fromYear={1920}
-          toYear={new Date().getFullYear()}
-          defaultMonth={selectedDate ?? new Date()}
+          toYear={
+            calendarContext?.toYear ??
+            selectedDate?.getFullYear() ??
+            STABLE_CALENDAR_FALLBACK.toYear
+          }
+          defaultMonth={
+            selectedDate ?? calendarContext?.defaultMonth ?? STABLE_CALENDAR_FALLBACK.defaultMonth
+          }
           classNames={{
             // Стилизация под цвета магазина
             day: "relative w-full h-full p-0 text-center group/day aspect-square select-none",

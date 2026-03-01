@@ -202,7 +202,7 @@ export function ProductList({
 
           {desktopRemainder.length > 0 && (
             <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:gap-4 xl:gap-5">
-              {desktopRemainder.map((product, index) => (
+              {desktopRemainder.map((product) => (
                 <div
                   key={`remainder-${product.id}`}
                   className="catalog-card h-[360px] sm:h-[420px] lg:h-[520px] xl:h-[600px] min-h-0 overflow-hidden flex"

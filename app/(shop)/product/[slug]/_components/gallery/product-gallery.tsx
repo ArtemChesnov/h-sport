@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import Image from "next/image";
 import { cn } from "@/shared/lib/utils";
 interface ProductGalleryProps {
@@ -30,6 +30,14 @@ export function ProductGallery({
     setImageLoadingStates((prev) => ({ ...prev, [src]: true }));
   };
 
+  const handleThumbClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      const image = e.currentTarget.dataset.image;
+      if (image) onImageSelect(image);
+    },
+    [onImageSelect]
+  );
+
   if (!images || images.length === 0) {
     return (
       <div
@@ -54,7 +62,7 @@ export function ProductGallery({
           alt="Товар"
           fill
           className={cn(
-            "object-cover transition-opacity duration-300",
+            "object-contain transition-opacity duration-300",
             imageLoadingStates[activeImage || images[0]] && "opacity-0"
           )}
           priority
@@ -75,7 +83,9 @@ export function ProductGallery({
           {images.map((image, index) => (
             <button
               key={image}
-              onClick={() => onImageSelect(image)}
+              type="button"
+              data-image={image}
+              onClick={handleThumbClick}
               className={cn(
                 "relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200",
                 activeImage === image || (!activeImage && index === 0)

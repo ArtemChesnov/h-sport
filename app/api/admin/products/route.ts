@@ -13,6 +13,7 @@ import {
   createProduct,
   getAdminProductsList,
   normalizeProductPayload,
+  cleanupOrphanProductImages,
 } from "@/shared/services/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -71,6 +72,8 @@ async function postHandler(request: NextRequest) {
   if (!result.ok) {
     return createErrorResponse(result.message, result.status);
   }
+
+  await cleanupOrphanProductImages(process.cwd());
 
   const { revalidatePath } = await import("next/cache");
   revalidatePath("/", "layout");

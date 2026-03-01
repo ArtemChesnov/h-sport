@@ -1,5 +1,6 @@
 "use client";
 
+import { formatCompositionText } from "@/shared/lib/formatters";
 import { cn } from "@/shared/lib/utils";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -18,6 +19,8 @@ const TABS: Tab[] = [
 
 interface ProductTabsProps {
   description?: string | null;
+  /** Состав материала — форматируется (русские названия, неразрывный пробел перед %) */
+  composition?: string | null;
   className?: string;
 }
 
@@ -39,7 +42,7 @@ const RETURNS_TEXT = `Возврат товара возможен в течен
  * Табы с описанием, доставкой и возвратом
  * Анимированный индикатор активного таба
  */
-export function ProductTabs({ description, className }: ProductTabsProps) {
+export function ProductTabs({ description, composition, className }: ProductTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>("description");
   const [indicatorStyle, setIndicatorStyle] = useState({ width: 0, left: 0 });
   const tabRefs = useRef<Record<TabId, HTMLButtonElement | null>>({
@@ -78,8 +81,14 @@ export function ProductTabs({ description, className }: ProductTabsProps) {
 
   const getTabContent = (tabId: TabId): string => {
     switch (tabId) {
-      case "description":
-        return description || "Описание товара отсутствует.";
+      case "description": {
+        const formattedDesc = formatCompositionText(description ?? "");
+        const formattedComp = formatCompositionText(composition ?? "");
+        const parts: string[] = [];
+        if (formattedDesc) parts.push(formattedDesc);
+        if (formattedComp) parts.push(`Состав: ${formattedComp}`);
+        return parts.length > 0 ? parts.join("\n\n") : "Описание товара отсутствует.";
+      }
       case "delivery":
         return DELIVERY_TEXT;
       case "returns":
@@ -123,7 +132,10 @@ export function ProductTabs({ description, className }: ProductTabsProps) {
 
       {/* Контент таба */}
       <div className="mt-4 overflow-hidden">
-        <p key={activeTab} className="text-[16px] font-light leading-[150%] animate-fade-in-up">
+        <p
+          key={activeTab}
+          className="text-[16px] font-light leading-[150%] animate-fade-in-up whitespace-pre-line"
+        >
           {getTabContent(activeTab)}
         </p>
       </div>

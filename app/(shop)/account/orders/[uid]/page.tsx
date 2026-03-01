@@ -1,8 +1,10 @@
 "use client";
 
+import React from "react";
 import { OrderSummaryBlock, StoreEmptyBlock, SummaryCardLayout } from "@/shared/components/common";
 import { DesignButton } from "@/shared/components/ui";
 import { useOrderDetailQuery, usePayOrderMutation } from "@/shared/hooks/orders/orders.hooks";
+import { useAccountBreadcrumbLabel } from "@/app/(shop)/account/contexts/account-breadcrumb-context";
 import { cn } from "@/shared/lib/utils";
 import { formatOrderCardDate } from "@/shared/lib/formatters";
 import { getDeliveryMethodLabel, getOrderStatusInfo } from "@/shared/lib/styles";
@@ -10,8 +12,7 @@ import { Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
 
-import { ORDER_LABEL_CLASS, ORDER_VALUE_CLASS } from "@/shared/constants";
-import { TOAST } from "@/shared/constants";
+import { ORDER_LABEL_CLASS, ORDER_VALUE_CLASS, TOAST } from "@/shared/constants";
 import { OrderDetailItem } from "../_components/order-detail-item";
 import { OrderDetailSkeleton } from "../_components/order-detail-skeleton";
 
@@ -28,6 +29,15 @@ export default function AccountOrderDetailPage() {
 
   const { data, isLoading, isError } = useOrderDetailQuery(uid);
   const payOrderMutation = usePayOrderMutation();
+  const setBreadcrumbLabel = useAccountBreadcrumbLabel();
+
+  // Хлебные крошки: показываем номер заказа вместо uid
+  React.useEffect(() => {
+    if (data?.id != null) {
+      setBreadcrumbLabel(`Заказ #${data.id}`);
+    }
+    return () => setBreadcrumbLabel(null);
+  }, [data?.id, setBreadcrumbLabel]);
 
   // Если uid пустой — странный маршрут / битая ссылка.
   if (!uid) {
@@ -66,7 +76,7 @@ export default function AccountOrderDetailPage() {
       <div className="flex flex-col min-w-0">
         <div className="flex flex-col gap-6 min-[1024px]:gap-10.5">
           <div className="flex flex-col gap-2">
-            <h1 className="text-[22px] leading-[100%] font-semibold max-[576px]:text-[22px] min-[873px]:text-[32px] min-[1024px]:text-[38px]">
+            <h1 className="text-[22px] leading-[100%] font-semibold max-[576px]:text-[22px] min-[873px]:text-[32px] ">
               Заказ от {formatOrderCardDate(order.createdAt)}
             </h1>
             <div className="flex items-center gap-2.5">

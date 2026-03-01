@@ -2,6 +2,7 @@
  * Сервис для автокомплита городов и стран через DaData
  */
 
+import { env } from "@/shared/lib/config/env";
 import type { CitySuggestion, CountrySuggestion } from "./types";
 import { fetchWithTimeout } from "@/shared/lib/fetch-with-timeout";
 
@@ -10,7 +11,7 @@ import { fetchWithTimeout } from "@/shared/lib/fetch-with-timeout";
  */
 export async function getCitySuggestions(query: string): Promise<CitySuggestion[]> {
   try {
-    const apiKey = process.env.DADATA_TOKEN;
+    const apiKey = env.DADATA_TOKEN;
 
     if (!apiKey) {
       return [];
@@ -33,7 +34,7 @@ export async function getCitySuggestions(query: string): Promise<CitySuggestion[
           to_bound: { value: "city" },
         }),
       },
-      10000, // 10 секунд для подсказок по городам
+      10000 // 10 секунд для подсказок по городам
     );
 
     if (!response.ok) {
@@ -73,7 +74,7 @@ export async function getCitySuggestions(query: string): Promise<CitySuggestion[
  */
 export async function getCountrySuggestions(query: string): Promise<CountrySuggestion[]> {
   try {
-    const apiKey = process.env.DADATA_TOKEN;
+    const apiKey = env.DADATA_TOKEN;
 
     if (!apiKey) {
       return [];
@@ -92,7 +93,7 @@ export async function getCountrySuggestions(query: string): Promise<CountrySugge
           count: 10,
         }),
       },
-      10000, // 10 секунд для подсказок по странам
+      10000 // 10 секунд для подсказок по странам
     );
 
     if (!response.ok) {

@@ -5,7 +5,7 @@
  * Перенаправляет пользователя на страницу успеха
  */
 
-import { checkPaymentSignature } from "@/modules/payment/lib/robokassa";
+import { checkSuccessSignature } from "@/modules/payment/lib/robokassa";
 import { OrderForPaymentService } from "@/shared/services/server";
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { logger } from "@/shared/lib/logger";
@@ -23,7 +23,14 @@ async function handler(request: NextRequest) {
   }
 
   if (SignatureValue && SignatureValue !== "mock") {
-    const isValid = checkPaymentSignature({ InvId, OutSum, SignatureValue }, false);
+    const shpParams: Record<string, string> = {};
+    for (const [key, value] of searchParams.entries()) {
+      if (key.startsWith("Shp_") || key.startsWith("SHP_") || key.startsWith("shp_")) {
+        shpParams[key] = value;
+      }
+    }
+
+    const isValid = checkSuccessSignature({ InvId, OutSum, SignatureValue, Shp_: shpParams });
 
     if (!isValid) {
       logger.warn("GET /api/payment/success: Неверная подпись", { InvId, OutSum });

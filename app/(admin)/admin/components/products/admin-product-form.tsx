@@ -45,6 +45,7 @@ function isVariantPriceValid(priceRub: string): boolean {
 export function AdminProductForm({
   mode,
   initialValues,
+  initialCategoryName,
   isSubmitting,
   onSubmit,
   onDelete,
@@ -67,6 +68,7 @@ export function AdminProductForm({
     isError: isCategoriesError,
   } = useCategoriesQuery();
   const categories = categoriesData?.items ?? [];
+  const selectedCategory = categories.find((c) => Number(c.id) === Number(values.categoryId));
 
   function handleBaseChange<K extends keyof AdminProductFormValues>(
     field: K,
@@ -182,16 +184,23 @@ export function AdminProductForm({
                   Категория
                 </Label>
                 <Select
+                  key={`category-select-${categories.length}-${values.categoryId}`}
                   value={values.categoryId ? String(values.categoryId) : ""}
                   onValueChange={(val) => handleBaseChange("categoryId", Number(val) || 0)}
                   disabled={isCategoriesLoading || isCategoriesError}
                 >
                   <SelectTrigger id="categoryId" className="h-9">
-                    <SelectValue
-                      placeholder={
-                        isCategoriesLoading ? "Загрузка категорий..." : "Выбери категорию"
-                      }
-                    />
+                    {selectedCategory || (values.categoryId && initialCategoryName) ? (
+                      <span className="flex-1 text-left truncate">
+                        {selectedCategory?.name ?? initialCategoryName}
+                      </span>
+                    ) : (
+                      <SelectValue
+                        placeholder={
+                          isCategoriesLoading ? "Загрузка категорий..." : "Выбери категорию"
+                        }
+                      />
+                    )}
                   </SelectTrigger>
 
                   <SelectContent>
@@ -233,11 +242,12 @@ export function AdminProductForm({
                   <Input
                     id="sku"
                     value={values.sku}
-                    onChange={(e) => handleBaseChange("sku", e.target.value)}
+                    disabled
                     placeholder="TOP-001"
-                    className="pl-9 h-9 font-mono text-xs"
+                    className="pl-9 h-9 font-mono text-xs bg-muted/50 cursor-not-allowed"
                   />
                 </div>
+                <p className="text-[11px] text-muted-foreground">Генерируется автоматически</p>
                 <FieldErrorText message={getRootError("sku")} />
               </div>
             </div>

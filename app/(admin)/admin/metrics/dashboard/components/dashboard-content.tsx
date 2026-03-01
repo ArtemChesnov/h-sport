@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/shared/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { Badge } from "@/shared/components/ui/badge";
 import { Activity, Database, AlertTriangle, Clock, ShoppingCart } from "lucide-react";
@@ -13,14 +19,12 @@ import { SystemMetrics } from "./system-metrics";
 import { AlertsIncidents } from "./alerts-incidents";
 
 export function DashboardContent() {
-  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  const [lastUpdate, setLastUpdate] = useState<Date>(() => new Date());
 
-  // Автообновление каждые 30 секунд
   useEffect(() => {
     const interval = setInterval(() => {
       setLastUpdate(new Date());
     }, 30 * 1000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -29,9 +33,7 @@ export function DashboardContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Мониторинг</h1>
-          <p className="text-muted-foreground">
-            Дашборд производительности и бизнеса H-Sport
-          </p>
+          <p className="text-muted-foreground">Дашборд производительности и бизнеса H-Sport</p>
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="text-xs">

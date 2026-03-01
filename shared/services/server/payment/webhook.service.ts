@@ -1,15 +1,21 @@
 /** Webhook Robokassa: парсинг formData, проверка подписи, обновление платежа/заказа. */
 
 import {
-    createOrderEvent,
-    findPaymentByOrderId,
-    updateOrderOnPayment,
-    updatePaymentStatus,
+  createOrderEvent,
+  findPaymentByOrderId,
+  updateOrderOnPayment,
+  updatePaymentStatus,
 } from "@/modules/payment/lib/db";
 import { checkPaymentSignature } from "@/modules/payment/lib/robokassa";
 import { prisma } from "@/prisma/prisma-client";
+import { WEBHOOK_TTL_MS } from "@/shared/constants";
+import { getRedisClient } from "@/shared/lib/redis";
 import { logger } from "@/shared/lib/logger";
-import { generateWebhookKey, tryProcessWebhook } from "@/shared/lib/webhook-protection";
+import {
+  createRedisWebhookStore,
+  generateWebhookKey,
+  tryProcessWebhook,
+} from "@/shared/lib/webhook-protection";
 
 /** Данные webhook от Robokassa */
 export interface RobokassaWebhookData {
@@ -64,18 +70,22 @@ export function parseWebhookFormData(body: FormData): RobokassaWebhookData | nul
  */
 export async function processRobokassaWebhook(
   data: RobokassaWebhookData,
-  baseUrl: string,
+  baseUrl: string
 ): Promise<WebhookResult> {
-  const { InvId, OutSum, SignatureValue, Fee, EMail, PaymentMethod, IncCurrLabel, userParams } = data;
+  const { InvId, OutSum, SignatureValue, Fee, EMail, PaymentMethod, IncCurrLabel, userParams } =
+    data;
 
   const orderId = parseInt(InvId, 10);
   if (isNaN(orderId)) {
     return { ok: false, status: 400, message: "Неверный ID заказа" };
   }
 
-  // Replay protection
+  // Replay protection: Redis при наличии REDIS_URL, иначе in-memory
   const webhookKey = generateWebhookKey("robokassa", InvId, SignatureValue);
-  const canProcess = tryProcessWebhook(webhookKey);
+  const redis = await getRedisClient();
+  const canProcess = redis
+    ? await createRedisWebhookStore(redis).tryProcess(webhookKey, Math.floor(WEBHOOK_TTL_MS / 1000))
+    : tryProcessWebhook(webhookKey);
   if (!canProcess) {
     logger.info("Webhook already processed (replay protection)", { InvId, webhookKey });
     return { ok: true, invId: InvId }; // Уже обработан — OK
@@ -84,7 +94,7 @@ export async function processRobokassaWebhook(
   // Проверка подписи
   const isValid = checkPaymentSignature(
     { InvId, OutSum, SignatureValue, Fee, EMail, PaymentMethod, IncCurrLabel, Shp_: userParams },
-    true,
+    true
   );
 
   if (!isValid) {

@@ -3,6 +3,7 @@
 import { DesignButton } from "@/shared/components/ui";
 import { ORDER_LABEL_CLASS, ORDER_VALUE_CLASS } from "@/shared/constants";
 import { TOAST } from "@/shared/constants";
+import { useShopNav } from "@/shared/contexts";
 import { usePayOrderMutation } from "@/shared/hooks";
 import { formatMoney, formatOrderCardDate, formatOrderCardDateOnly } from "@/shared/lib/formatters";
 import { PLACEHOLDER_PRODUCT_IMAGE } from "@/shared/lib/constants/images";
@@ -25,8 +26,10 @@ interface OrderCardProps {
 
 export function OrderCard({ order }: OrderCardProps) {
   const payOrderMutation = usePayOrderMutation();
+  const { setPendingPath } = useShopNav();
   const statusInfo = getOrderStatusInfo(order.status);
   const showPayButton = canPayOrder(order.status);
+  const orderHref = `/account/orders/${order.uid}`;
 
   return (
     <div className="block overflow-visible rounded-lg border border-neutral-100 bg-white transition-shadow duration-200 hover:shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
@@ -88,7 +91,7 @@ export function OrderCard({ order }: OrderCardProps) {
                 .slice(0, 3)
                 .map((url, i) => (
                   <div
-                    key={i}
+                    key={url ?? `order-${order.uid}-img-${i}`}
                     className="relative max-[872px]:w-40 max-[872px]:h-40 max-[576px]:w-20 max-[576px]:h-20 min-[873px]:w-[140px] min-[873px]:h-[140px] min-[1841px]:w-[180px] min-[1841px]:h-[180px] rounded-[10px] bg-neutral-100 shrink-0"
                   >
                     <div className="absolute inset-0 overflow-hidden rounded-[10px]">
@@ -115,7 +118,8 @@ export function OrderCard({ order }: OrderCardProps) {
 
           <div className="flex flex-wrap gap-3 w-full max-[872px]:row-start-3 min-[873px]:row-start-2 min-[873px]:col-start-1 mt-4 max-[576px]:mt-4 min-[873px]:mt-6 min-[1024px]:mt-18.5 max-[872px]:grid max-[872px]:grid-cols-2 max-[872px]:gap-3 max-[576px]:grid-cols-1 max-[576px]:[&>*]:w-full min-[873px]:flex">
             <Link
-              href={`/account/orders/${order.uid}`}
+              href={orderHref}
+              onClick={() => setPendingPath(orderHref)}
               className="min-[873px]:inline-block min-w-0"
             >
               <DesignButton variant="default" className="w-full min-[873px]:w-[215px]">

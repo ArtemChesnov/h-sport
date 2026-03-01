@@ -1,9 +1,21 @@
 import { PrismaClient } from "@prisma/client";
 import { seedProducts } from "./seed-products";
 import { seedUsers } from "./seed-users";
+import { seedOrders } from "./seed-orders";
 import { SeedProgress, createStep } from "./seed-progress";
 
 export const prisma = new PrismaClient();
+
+/** Сбрасывает sequence для Category.id в 0, чтобы после createMany id были 1, 2, … 13. Только PostgreSQL. */
+async function resetCategorySequence(prismaInstance: PrismaClient) {
+  try {
+    await prismaInstance.$executeRawUnsafe(
+      `SELECT setval(pg_get_serial_sequence('"Category"', 'id'), 0)`
+    );
+  } catch {
+    // SQLite или другая БД — игнорируем
+  }
+}
 
 /**
  * Сидинг: один пользователь (админ), категории, товары из данных клиента.
@@ -14,6 +26,7 @@ async function up() {
     createStep("Пользователи", "👥", () => seedUsers(prisma)),
 
     createStep("Категории", "📁", async () => {
+      await resetCategorySequence(prisma);
       await prisma.category.createMany({
         data: [
           { name: "Топы", slug: "tops" },
@@ -35,6 +48,9 @@ async function up() {
     }),
 
     createStep("Товары и варианты", "🛍️", () => seedProducts(prisma)),
+    createStep("Заказы (только тестовый пользователь test@gmail.com)", "📦", () =>
+      seedOrders(prisma)
+    ),
   ]);
 
   await progress.execute();

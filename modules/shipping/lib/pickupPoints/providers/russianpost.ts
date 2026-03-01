@@ -2,6 +2,7 @@
  * Провайдер для работы с API Почты России через DaData (ПВЗ) и Postcalc.RU (тарифы).
  */
 
+import { env } from "@/shared/lib/config/env";
 import { fetchWithTimeout } from "@/shared/lib/fetch-with-timeout";
 import { gunzipSync } from "node:zlib";
 import type { PickupPoint } from "../../../types/pickup-points";
@@ -36,21 +37,22 @@ interface DaDataPostalUnit {
   };
 }
 
-
 /**
  * Получает список отделений Почты России
  */
 export async function getRussianPostPickupPoints(
   city: string,
   q?: string,
-  limit: number = 50,
+  limit: number = 50
 ): Promise<PickupPoint[]> {
   try {
-    const apiKey = process.env.DADATA_TOKEN;
+    const apiKey = env.DADATA_TOKEN;
 
     if (!apiKey) {
       const { logger } = await import("@/shared/lib/logger");
-      logger.error("[RussianPost] DaData token not configured. Please set DADATA_TOKEN in .env file. See API_SETUP.md for instructions.");
+      logger.error(
+        "[RussianPost] DaData token not configured. Please set DADATA_TOKEN in .env file. See API_SETUP.md for instructions."
+      );
       return [];
     }
 
@@ -71,13 +73,16 @@ export async function getRussianPostPickupPoints(
           locations: city ? [{ city }] : undefined,
         }),
       },
-      10000, // 10 секунд для получения отделений Почты России
+      10000 // 10 секунд для получения отделений Почты России
     );
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => response.statusText);
       const { logger } = await import("@/shared/lib/logger");
-      logger.error(`[RussianPost] DaData API error: ${response.status}`, new Error(errorText), { city, query: q });
+      logger.error(`[RussianPost] DaData API error: ${response.status}`, new Error(errorText), {
+        city,
+        query: q,
+      });
       throw new Error(`DaData API returned ${response.status}: ${errorText}`);
     }
 
@@ -100,9 +105,11 @@ export async function getRussianPostPickupPoints(
           const normalizedAddressCity = addressCity.toLowerCase().trim();
 
           // Проверяем совпадение города
-          return normalizedAddressCity === normalizedCity ||
-                 normalizedAddressCity.includes(normalizedCity) ||
-                 normalizedCity.includes(normalizedAddressCity);
+          return (
+            normalizedAddressCity === normalizedCity ||
+            normalizedAddressCity.includes(normalizedCity) ||
+            normalizedCity.includes(normalizedAddressCity)
+          );
         })
       : data.suggestions;
 
@@ -123,7 +130,10 @@ export async function getRussianPostPickupPoints(
 
       if (fullAddress) {
         // Разбиваем адрес по запятым
-        const parts = fullAddress.split(",").map(p => p.trim()).filter(Boolean);
+        const parts = fullAddress
+          .split(",")
+          .map((p) => p.trim())
+          .filter(Boolean);
 
         // Первая часть обычно город (убираем "г " префикс)
         if (parts.length > 0) {
@@ -135,7 +145,11 @@ export async function getRussianPostPickupPoints(
           street = parts[1].trim();
           // Убираем "ул " префикс если есть, добавляем " ул" в конец если нет
           street = street.replace(/^ул\.?\s*/i, "").trim();
-          if (street && !street.toLowerCase().endsWith(" ул") && !street.toLowerCase().endsWith(" улица")) {
+          if (
+            street &&
+            !street.toLowerCase().endsWith(" ул") &&
+            !street.toLowerCase().endsWith(" улица")
+          ) {
             street = `${street} ул`;
           }
         }
@@ -224,13 +238,13 @@ export async function calculateRussianPostTariff(
   toCityName: string,
   mode: "pvz" | "courier",
   weightGrams: number = 1000,
-  valuationRub: number = 1000,
+  valuationRub: number = 1000
 ): Promise<RussianPostTariffResult | null> {
   try {
-    const fromKey = (process.env.POSTCALC_FROM_CITY || "Нижний_Новгород").trim().replace(/\s+/g, "_");
+    const fromKey = (env.POSTCALC_FROM_CITY ?? "Нижний_Новгород").trim().replace(/\s+/g, "_");
     const toKey = postcalcCityKey(toCityName);
     const parcelCode = mode === "pvz" ? POSTCALC_PARCEL_PVZ : POSTCALC_PARCEL_COURIER;
-    const key = process.env.POSTCALC_KEY || "test";
+    const key = env.POSTCALC_KEY ?? "test";
 
     const params = new URLSearchParams({
       f: fromKey,
@@ -258,13 +272,22 @@ export async function calculateRussianPostTariff(
 
     const rawBuffer = Buffer.from(await response.arrayBuffer());
     const isGzip =
-      rawBuffer.length >= 3 && rawBuffer[0] === 0x1f && rawBuffer[1] === 0x8b && rawBuffer[2] === 0x08;
+      rawBuffer.length >= 3 &&
+      rawBuffer[0] === 0x1f &&
+      rawBuffer[1] === 0x8b &&
+      rawBuffer[2] === 0x08;
     const jsonText = isGzip
       ? gunzipSync(rawBuffer).toString("utf-8")
       : new TextDecoder().decode(rawBuffer);
     type ShipmentEntry = {
-      Доставка?: number; Тариф?: number; СрокДоставки?: string; Название?: string;
-      Total?: number; Rate?: number; DeliveryTerms?: string; Title?: string;
+      Доставка?: number;
+      Тариф?: number;
+      СрокДоставки?: string;
+      Название?: string;
+      Total?: number;
+      Rate?: number;
+      DeliveryTerms?: string;
+      Title?: string;
     };
     const data = JSON.parse(jsonText) as {
       Отправления?: Record<string, ShipmentEntry>;
@@ -294,7 +317,8 @@ export async function calculateRussianPostTariff(
       periodMin,
       periodMax,
       tariffCode: parcelCode,
-      tariffName: shipment.Название ?? shipment.Title ?? (mode === "pvz" ? "Ценная посылка" : "EMS"),
+      tariffName:
+        shipment.Название ?? shipment.Title ?? (mode === "pvz" ? "Ценная посылка" : "EMS"),
       currency: "RUB",
     };
   } catch (error) {

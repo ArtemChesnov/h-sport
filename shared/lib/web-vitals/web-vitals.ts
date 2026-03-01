@@ -1,5 +1,6 @@
 /**
  * Отслеживание Web Vitals для метрик производительности
+ * В development допустим console.debug для отладки отправки метрик
  */
 
 /**
@@ -38,12 +39,13 @@ async function sendToAnalytics(metric: WebVitals) {
 
     // В dev режиме допустим debug логирование
     if (process.env.NODE_ENV === "development" && !response.ok) {
+      // eslint-disable-next-line no-console -- development-only debug for metric send failure
       console.debug("Web Vitals request failed:", response.status, response.statusText);
     }
   } catch (error) {
     // Игнорируем ошибки отправки метрик (network errors и т.п.)
-    // Логируем только в development режиме
     if (process.env.NODE_ENV === "development") {
+      // eslint-disable-next-line no-console -- development-only debug for metric send failure
       console.debug("Failed to send web vitals:", error);
     }
   }

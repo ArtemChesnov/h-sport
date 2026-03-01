@@ -48,9 +48,8 @@ export function VirtualizedTable<T>({
 }: VirtualizedTableProps<T>) {
   const parentRef = React.useRef<HTMLDivElement>(null);
 
-  // Примечание: TanStack Virtual's useVirtualizer() возвращает функции, которые не могут быть
-  // безопасно мемоизированы React Compiler. Это ожидаемое поведение библиотеки и не является ошибкой.
-  // React Compiler автоматически пропускает мемоизацию этого компонента для предотвращения stale UI.
+  // TanStack Virtual: useVirtualizer несовместим с React Compiler (ожидаемо для этой библиотеки)
+  // eslint-disable-next-line react-hooks/incompatible-library -- известная несовместимость @tanstack/react-virtual
   const virtualizer = useVirtualizer({
     count: data.length,
     getScrollElement: () => parentRef.current,
@@ -63,9 +62,7 @@ export function VirtualizedTable<T>({
 
   if (data.length === 0) {
     return (
-      <div className="px-4 py-8 text-center text-sm text-muted-foreground">
-        {emptyMessage}
-      </div>
+      <div className="px-4 py-8 text-center text-sm text-muted-foreground">{emptyMessage}</div>
     );
   }
 
@@ -87,11 +84,7 @@ export function VirtualizedTable<T>({
         </TableHeader>
       </Table>
 
-      <div
-        ref={parentRef}
-        style={{ maxHeight, overflow: "auto" }}
-        className="relative"
-      >
+      <div ref={parentRef} style={{ maxHeight, overflow: "auto" }} className="relative">
         <div style={{ height: totalSize, position: "relative" }}>
           <Table>
             <TableBody>

@@ -32,7 +32,7 @@ export const PromoButton: React.FC<Props> = ({
 }) => {
   const { setPendingPath } = useShopNav();
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = (_e: React.MouseEvent) => {
     if (onClick) {
       onClick();
       return;

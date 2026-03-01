@@ -1,23 +1,22 @@
 "use client";
 
 import {
-    Button,
-    Skeleton,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Button,
+  Skeleton,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/shared/components/ui";
 import { TOAST } from "@/shared/constants";
 import { useCopyToClipboard } from "@/shared/hooks/common/use-copy-to-clipboard";
 import { PLACEHOLDER_PRODUCT_IMAGE } from "@/shared/lib/constants/images";
 import { DTO } from "@/shared/services";
-import { CheckCircle2, ChevronDown, Copy, PencilIcon, Trash2, XCircle } from "lucide-react";
+import { CheckCircle2, ChevronDown, Copy, Settings, Trash2, XCircle } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import React from "react";
 import { formatPrice, getPriceLabel } from "../../lib/utils";
 
@@ -64,7 +63,6 @@ type ProductsTableProps = {
  */
 export function ProductsTable(props: ProductsTableProps) {
   const { products, expandedProductIds, onToggleExpanded, onDelete, isDeleting } = props;
-  const router = useRouter();
   const { copyToClipboard } = useCopyToClipboard({
     successMessage: TOAST.SUCCESS.SKU_COPIED,
     errorMessage: TOAST.ERROR.FAILED_TO_COPY,
@@ -216,10 +214,13 @@ export function ProductsTable(props: ProductsTableProps) {
                           size="icon"
                           variant="ghost"
                           className="h-9 w-9 transition-all hover:bg-indigo-100 hover:text-indigo-700 hover:shadow-sm"
-                          onClick={() => router.push(`/admin/products/${slug}`)}
-                          aria-label={`Перейти к товару ${slug}`}
+                          onClick={() =>
+                            window.open(`/admin/products/${slug}`, "_blank", "noopener,noreferrer")
+                          }
+                          aria-label={`Редактировать товар ${name}`}
+                          title="Редактировать в новой вкладке"
                         >
-                          <PencilIcon className="h-4 w-4" />
+                          <Settings className="h-4 w-4" />
                         </Button>
 
                         <Button

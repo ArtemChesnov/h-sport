@@ -4,7 +4,7 @@
 
 - Переменные: `ROBOKASSA_MERCHANT_LOGIN`, `ROBOKASSA_PASSWORD_1`, `ROBOKASSA_PASSWORD_2`, опционально `ROBOKASSA_IS_TEST`, `ROBOKASSA_HASH_ALGORITHM`.
 - Без конфига создание платежа возвращает mock-URL на «успех»; webhook при вызове без конфига вернёт 500.
-- После настройки: в ЛК Робокассы указать Result URL: `https://<домен>/api/payment/webhook`.
+- После настройки: в ЛК Робокассы указать Result URL: `https://h-brand.ru/api/payment/webhook`.
 
 ## СДЭК (доставка)
 

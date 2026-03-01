@@ -46,8 +46,7 @@ export function ShopNavProvider({ children }: { children: React.ReactNode }) {
       // (например, FavoriteToggleButton — иначе показывается лоадер вместо перехода по карточке)
       if (target.closest("button, [role='button'], input, select, textarea")) return;
       const anchor = target.closest("a[href]") as HTMLAnchorElement | null;
-      if (!anchor || anchor.target === "_blank" || anchor.hasAttribute("download"))
-        return;
+      if (!anchor || anchor.target === "_blank" || anchor.hasAttribute("download")) return;
       const href = anchor.getAttribute("href");
       if (!href || !href.startsWith("/") || href.startsWith("//")) return;
       const path = href.split("?")[0].split("#")[0];
@@ -60,11 +59,14 @@ export function ShopNavProvider({ children }: { children: React.ReactNode }) {
 
   const isNavigating = pendingPath != null;
 
-  const value: ShopNavContextValue = {
-    pendingPath,
-    setPendingPath,
-    isNavigating,
-  };
+  const value = React.useMemo<ShopNavContextValue>(
+    () => ({
+      pendingPath,
+      setPendingPath,
+      isNavigating,
+    }),
+    [pendingPath, isNavigating, setPendingPath]
+  );
 
   return (
     <ShopNavContext.Provider value={value}>

@@ -110,6 +110,19 @@ export default function AdminProductEditPage() {
     };
   }, [data]);
 
+  const initialCategoryName =
+    data && "categoryName" in data && typeof data.categoryName === "string"
+      ? data.categoryName
+      : data &&
+          typeof data === "object" &&
+          data !== null &&
+          "category" in data &&
+          data.category &&
+          typeof data.category === "object" &&
+          "name" in data.category
+        ? String((data.category as { name: string }).name)
+        : undefined;
+
   const errorToastShownRef = useRef(false);
 
   useEffect(() => {
@@ -139,10 +152,24 @@ export default function AdminProductEditPage() {
         onSuccess: (updated) => {
           resetFormErrors();
 
-          // фиксируем снапшот с SKU/ID
-          setSavedSnapshot(updated);
+          const raw = updated as {
+            categoryId: number;
+            category?: { id: number; name: string; slug: string };
+            sku?: string;
+            [k: string]: unknown;
+          };
+          const snapshot: DTO.ProductDetailDto = {
+            ...updated,
+            categoryId: raw.categoryId,
+            categoryName:
+              raw.category?.name ?? (updated as DTO.ProductDetailDto).categoryName ?? "",
+            categorySlug:
+              raw.category?.slug ?? (updated as DTO.ProductDetailDto).categorySlug ?? "",
+            sku: raw.sku ?? data.sku ?? "",
+          } as DTO.ProductDetailDto;
 
-          // перемонтируем форму, чтобы она взяла updated в initialValues (без useEffect)
+          setSavedSnapshot(snapshot);
+
           setFormKey((k) => k + 1);
 
           toast.success(TOAST.SUCCESS.PRODUCT_SAVED, {
@@ -308,6 +335,7 @@ export default function AdminProductEditPage() {
         key={`${slug}:${formKey}`}
         mode="edit"
         initialValues={initialValues}
+        initialCategoryName={initialCategoryName}
         isSubmitting={updateMutation.isPending}
         onSubmit={handleSubmit}
         onDelete={handleDelete}

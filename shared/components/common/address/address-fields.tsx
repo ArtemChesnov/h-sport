@@ -54,7 +54,10 @@ export function AddressFields({
 
   // При 1090px и ниже: Страна, Город, Улица — столбик на всю ширину; Дом, Подъезд, Квартира — в одну строку втроём.
   const blockCountry = (
-    <label key="country" className="w-full flex flex-col gap-2 order-1 min-[1091px]:row-start-1 min-[1091px]:col-start-1">
+    <label
+      key="country"
+      className="w-full flex flex-col gap-2 order-1 min-[1091px]:row-start-1 min-[1091px]:col-start-1"
+    >
       <span className={INPUT_LABEL_CLASS}>Страна{req}</span>
       <CountryAutocomplete
         value={values.country}
@@ -67,7 +70,10 @@ export function AddressFields({
 
   // Город показываем всегда (нужен и для курьера, и для ПВЗ — по городу запрашиваются пункты выдачи)
   const blockCity = (
-    <label key="city" className="w-full flex flex-col gap-2 order-2 min-[1091px]:row-start-1 min-[1091px]:col-start-2">
+    <label
+      key="city"
+      className="w-full flex flex-col gap-2 order-2 min-[1091px]:row-start-1 min-[1091px]:col-start-2"
+    >
       <span className={INPUT_LABEL_CLASS}>Город{req}</span>
       <CityAutocomplete
         value={values.city}
@@ -86,12 +92,15 @@ export function AddressFields({
 
   // Улица только для курьерской доставки; при ПВЗ (СДЭК, Почта России) не показываем
   const blockStreet = showStreetBlock ? (
-    <label key="street" className="w-full flex flex-col gap-2 order-3 min-[1091px]:row-start-2 min-[1091px]:col-start-1">
+    <label
+      key="street"
+      className="w-full flex flex-col gap-2 order-3 min-[1091px]:row-start-2 min-[1091px]:col-start-1"
+    >
       <span className={INPUT_LABEL_CLASS}>Улица{req}</span>
       <input
         type="text"
         required
-        placeholder="Халтуринская"
+        placeholder="Улица"
         className={INPUT_FIELD_CLASS}
         value={values.street}
         onChange={(e) => onChange({ street: e.target.value })}
@@ -102,14 +111,17 @@ export function AddressFields({
   ) : null;
 
   const blockHouseRow = showStreetBlock ? (
-    <div key="houseRow" className="w-full flex flex-col gap-4 order-4 min-[1091px]:row-start-2 min-[1091px]:col-start-2">
+    <div
+      key="houseRow"
+      className="w-full flex flex-col gap-4 order-4 min-[1091px]:row-start-2 min-[1091px]:col-start-2"
+    >
       <div className="flex gap-5">
         <label className="w-full flex flex-col gap-2">
           <span className={INPUT_LABEL_CLASS}>Дом{req}</span>
           <input
             type="text"
             required
-            placeholder="17"
+            placeholder="Дом"
             className={INPUT_FIELD_CLASS}
             value={values.house}
             onChange={(e) => onChange({ house: e.target.value })}
@@ -121,7 +133,7 @@ export function AddressFields({
           <span className={INPUT_LABEL_CLASS}>Подъезд</span>
           <input
             type="text"
-            placeholder="1"
+            placeholder="Подъезд"
             className={INPUT_FIELD_CLASS}
             value={values.entrance}
             onChange={(e) => onChange({ entrance: e.target.value })}
@@ -154,4 +166,3 @@ export function AddressFields({
     </div>
   );
 }
-

@@ -21,6 +21,17 @@ export async function seedUsers(prisma: PrismaClient) {
       createdAt: daysAgo(100),
       updatedAt: daysAgo(100),
     },
+    {
+      name: "Тестовый",
+      secondName: "Пользователь",
+      email: "test@gmail.com",
+      passwordHash: hashSync("test1234", 10),
+      emailVerified: daysAgo(30),
+      role: "USER" as const,
+      phone: "+7 900 000-00-00",
+      createdAt: daysAgo(30),
+      updatedAt: daysAgo(30),
+    },
   ];
 
   await prisma.user.createMany({
@@ -28,5 +39,7 @@ export async function seedUsers(prisma: PrismaClient) {
     skipDuplicates: true,
   });
 
-  console.log(`[seedUsers] Создан пользователь: jaksan37@gmail.com (ADMIN)`);
+  console.log(
+    `[seedUsers] Созданы пользователи: jaksan37@gmail.com (ADMIN), test@gmail.com (USER, пароль: test1234)`
+  );
 }

@@ -1,7 +1,25 @@
 "use client";
 
-import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/shared/components/ui/sheet";
-import { Activity, ClipboardList, FileText, LayoutDashboard, type LucideIcon, Mail, Menu, Newspaper, Package, TicketPercent, Users, X } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+  SheetTrigger,
+} from "@/shared/components/ui/sheet";
+import {
+  Activity,
+  ClipboardList,
+  LayoutDashboard,
+  type LucideIcon,
+  Mail,
+  Menu,
+  Newspaper,
+  Package,
+  TicketPercent,
+  Users,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -16,14 +34,55 @@ type AdminNavItem = {
 };
 
 const ADMIN_NAV_ITEMS: AdminNavItem[] = [
-  { href: "/admin", label: "Главная", icon: LayoutDashboard, iconColor: "text-indigo-600", hoverGradient: "hover:from-indigo-50/50 hover:to-violet-50/50" },
-  { href: "/admin/orders", label: "Заказы", icon: ClipboardList, iconColor: "text-indigo-600", hoverGradient: "hover:from-indigo-50/50 hover:to-violet-50/50" },
-  { href: "/admin/products", label: "Товары", icon: Package, iconColor: "text-teal-600", hoverGradient: "hover:from-teal-50/50 hover:to-emerald-50/50" },
-  { href: "/admin/promos", label: "Промокоды", icon: TicketPercent, iconColor: "text-amber-600", hoverGradient: "hover:from-amber-50/50 hover:to-orange-50/50" },
-  { href: "/admin/newsletter", label: "Рассылки", icon: Newspaper, iconColor: "text-rose-600", hoverGradient: "hover:from-rose-50/50 hover:to-pink-50/50" },
-  { href: "/admin/email-templates", label: "Шаблоны писем", icon: FileText, iconColor: "text-orange-600", hoverGradient: "hover:from-orange-50/50 hover:to-amber-50/50" },
-  { href: "/admin/users", label: "Пользователи", icon: Users, iconColor: "text-slate-600", hoverGradient: "hover:from-slate-50/50 hover:to-zinc-50/50" },
-  { href: "/admin/metrics", label: "Метрики", icon: Activity, iconColor: "text-cyan-600", hoverGradient: "hover:from-cyan-50/50 hover:to-sky-50/50" },
+  {
+    href: "/admin",
+    label: "Главная",
+    icon: LayoutDashboard,
+    iconColor: "text-indigo-600",
+    hoverGradient: "hover:from-indigo-50/50 hover:to-violet-50/50",
+  },
+  {
+    href: "/admin/orders",
+    label: "Заказы",
+    icon: ClipboardList,
+    iconColor: "text-indigo-600",
+    hoverGradient: "hover:from-indigo-50/50 hover:to-violet-50/50",
+  },
+  {
+    href: "/admin/products",
+    label: "Товары",
+    icon: Package,
+    iconColor: "text-teal-600",
+    hoverGradient: "hover:from-teal-50/50 hover:to-emerald-50/50",
+  },
+  {
+    href: "/admin/promos",
+    label: "Промокоды",
+    icon: TicketPercent,
+    iconColor: "text-amber-600",
+    hoverGradient: "hover:from-amber-50/50 hover:to-orange-50/50",
+  },
+  {
+    href: "/admin/newsletter",
+    label: "Рассылки",
+    icon: Newspaper,
+    iconColor: "text-rose-600",
+    hoverGradient: "hover:from-rose-50/50 hover:to-pink-50/50",
+  },
+  {
+    href: "/admin/users",
+    label: "Пользователи",
+    icon: Users,
+    iconColor: "text-slate-600",
+    hoverGradient: "hover:from-slate-50/50 hover:to-zinc-50/50",
+  },
+  {
+    href: "/admin/metrics",
+    label: "Метрики",
+    icon: Activity,
+    iconColor: "text-cyan-600",
+    hoverGradient: "hover:from-cyan-50/50 hover:to-sky-50/50",
+  },
 ];
 
 function AdminSidebarLink(props: AdminNavItem & { onClick?: () => void }) {
@@ -55,7 +114,9 @@ function AdminSidebarLink(props: AdminNavItem & { onClick?: () => void }) {
           : `text-muted-foreground hover:bg-gradient-to-r ${hoverGradient} hover:text-foreground`,
       ].join(" ")}
     >
-      <Icon className={`h-4 w-4 shrink-0 transition-colors ${isActive ? "text-white" : `${iconColor} group-hover:${iconColor}`}`} />
+      <Icon
+        className={`h-4 w-4 shrink-0 transition-colors ${isActive ? "text-white" : `${iconColor} group-hover:${iconColor}`}`}
+      />
       <span className="truncate">{label}</span>
     </Link>
   );
@@ -74,7 +135,9 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
           </div>
           <div className="min-w-0">
             <div className="text-xs sm:text-sm font-bold text-foreground truncate">h-sport</div>
-            <span className="text-[9px] sm:text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Админ панель</span>
+            <span className="text-[9px] sm:text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+              Админ панель
+            </span>
           </div>
         </div>
       </div>
@@ -119,10 +182,15 @@ export function AdminSidebar() {
             <Menu className="h-4 w-4 sm:h-5 sm:w-5" />
           </button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-[280px] max-w-[85vw] sm:w-64 p-0 border-r border-border/50 bg-gradient-to-b from-white via-white to-slate-50/30">
+        <SheetContent
+          side="left"
+          className="w-[280px] max-w-[85vw] sm:w-64 p-0 border-r border-border/50 bg-gradient-to-b from-white via-white to-slate-50/30"
+        >
           {/* Accessibility: скрытые заголовок и описание для screen readers */}
           <SheetTitle className="sr-only">Навигация админ-панели</SheetTitle>
-          <SheetDescription className="sr-only">Меню навигации по разделам административной панели</SheetDescription>
+          <SheetDescription className="sr-only">
+            Меню навигации по разделам административной панели
+          </SheetDescription>
           <div className="flex flex-col h-full px-3 py-4 sm:px-4 sm:py-6">
             <div className="flex items-center justify-between mb-6 sm:mb-8 pb-3 sm:pb-4 border-b border-border/50">
               <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
@@ -130,8 +198,12 @@ export function AdminSidebar() {
                   <span className="text-white font-bold text-xs sm:text-sm">HS</span>
                 </div>
                 <div className="min-w-0">
-                  <div className="text-xs sm:text-sm font-bold text-foreground truncate">h-sport</div>
-                  <span className="text-[9px] sm:text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Админ панель</span>
+                  <div className="text-xs sm:text-sm font-bold text-foreground truncate">
+                    h-sport
+                  </div>
+                  <span className="text-[9px] sm:text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                    Админ панель
+                  </span>
                 </div>
               </div>
               <button

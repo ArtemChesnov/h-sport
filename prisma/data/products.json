@@ -1,0 +1,719 @@
+[
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [
+      { "color": "Желтый", "sizes": ["s", "m", "l"] },
+      { "color": "зеленый", "sizes": ["s", "m", "l"] },
+      { "color": "серый", "sizes": ["s", "m", "l"] },
+      { "color": "сиреневый", "sizes": ["s", "m", "l"] },
+      { "color": "фиолетовый", "sizes": ["s", "m", "l"] },
+      { "color": "голубой", "sizes": ["s", "m", "l"] }
+    ]
+  },
+  {
+    "name": "Леггинсы",
+    "price": 3000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [
+      { "color": "Желтый", "sizes": ["s", "m", "l"] },
+      { "color": "зеленый", "sizes": ["s", "m", "l"] },
+      { "color": "серый", "sizes": ["s", "m", "l"] },
+      { "color": "сиреневый", "sizes": ["s", "m", "l"] },
+      { "color": "фиолетовый", "sizes": ["s", "m", "l"] },
+      { "color": "голубой", "sizes": ["s", "m", "l"] }
+    ]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "90% nylon 10 % elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["m"] }]
+  },
+  {
+    "name": "Леггинсы",
+    "price": 3000,
+    "composition": "90% nylon 10 % elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["m"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "68% nylon 32% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Голубой", "sizes": ["l"] }]
+  },
+  {
+    "name": "Леггинсы",
+    "price": 3000,
+    "composition": "68% nylon 32% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Голубой", "sizes": ["l"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "68% nylon 32% elastane",
+    "isAvailable": true,
+    "variants": [
+      { "color": "Зелёный", "sizes": ["m"] },
+      { "color": "розовый", "sizes": ["m"] }
+    ]
+  },
+  {
+    "name": "Леггинсы",
+    "price": 3000,
+    "composition": "68% nylon 32% elastane",
+    "isAvailable": true,
+    "variants": [
+      { "color": "Зелёный", "sizes": ["m"] },
+      { "color": "розовый", "sizes": ["m"] }
+    ]
+  },
+  {
+    "name": "Платье",
+    "price": 5500,
+    "composition": "75% nylon 25% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Бежевый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Комбинезон",
+    "price": 5000,
+    "composition": "68% nylon 32% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Персиковый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Боди",
+    "price": 4500,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [{ "color": "Розовый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Юбка-шорты",
+    "price": 3000,
+    "composition": "90% polyester 10% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Синий", "sizes": ["m"] }]
+  },
+  {
+    "name": "Комбинезон",
+    "price": 5000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [{ "color": "Коричневый", "sizes": ["s"] }]
+  },
+  {
+    "name": "Юбка-шорты",
+    "price": 3000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [{ "color": "Коричневый", "sizes": ["s"] }]
+  },
+  {
+    "name": "Топ на молнии",
+    "price": 2000,
+    "composition": "90% polyamide 10% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["s"] }]
+  },
+  {
+    "name": "Леггинсы",
+    "price": 3000,
+    "composition": "90% polyamide 10% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["s"] }]
+  },
+  {
+    "name": "Кофта на молнии",
+    "price": 5000,
+    "composition": "75% nylon 25% Lycra",
+    "isAvailable": true,
+    "variants": [{ "color": "Малиновый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "75% nylon 25% Lycra",
+    "isAvailable": true,
+    "variants": [{ "color": "Малиновый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Юбка-шорты",
+    "price": 3000,
+    "composition": "75% nylon 25% Lycra",
+    "isAvailable": true,
+    "variants": [{ "color": "Малиновый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "78%nylon 22% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["m"] }]
+  },
+  {
+    "name": "Брюки спортивные",
+    "price": 3000,
+    "composition": "75% nylon 25% spandex",
+    "isAvailable": true,
+    "variants": [{ "color": "Бежевый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "90% polyamide 10% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Коричневый", "sizes": ["s", "m"] }]
+  },
+  {
+    "name": "Леггинсы",
+    "price": 3000,
+    "composition": "90% polyamide 10% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Коричневый", "sizes": ["s", "m"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "90% polyamide 10% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Коричневый", "sizes": ["s"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "78%polyamed 22% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Белый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Юбка-шорты",
+    "price": 3000,
+    "composition": "85%nylon 15%spandex",
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["l"] }]
+  },
+  {
+    "name": "Майка",
+    "price": 4500,
+    "composition": "85%nylon 15%spandex",
+    "isAvailable": true,
+    "variants": [{ "color": "Белый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Леггинсы",
+    "price": 3000,
+    "composition": "85% polyamide 15% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["s", "m", "l"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "80% nylon 20% spandex",
+    "isAvailable": true,
+    "variants": [
+      { "color": "Голубой", "sizes": ["s", "m", "l"] },
+      { "color": "оранжевый", "sizes": ["m"] },
+      { "color": "лимонный", "sizes": ["m"] },
+      { "color": "салатовый", "sizes": ["l"] },
+      { "color": "фиолетовый", "sizes": ["l"] }
+    ]
+  },
+  {
+    "name": "Юбка-шорты",
+    "price": 3000,
+    "composition": "80% nylon 20% spandex",
+    "isAvailable": true,
+    "variants": [{ "color": "Голубой", "sizes": ["s", "m"] }]
+  },
+  {
+    "name": "Ветровка",
+    "price": 6500,
+    "composition": "100% polyester",
+    "isAvailable": true,
+    "variants": [
+      { "color": "Розовый", "sizes": ["m"] },
+      { "color": "бежевый", "sizes": ["l"] }
+    ]
+  },
+  {
+    "name": "Юбка-шорты",
+    "price": 3000,
+    "composition": "90% polyester 10% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["m"] }]
+  },
+  {
+    "name": "Юбка-шорты",
+    "price": 3000,
+    "composition": "90% polyester 10% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["m"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "75% nylon 25% Lycra",
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["m"] }]
+  },
+  {
+    "name": "Юбка-шорты",
+    "price": 3000,
+    "composition": "75% nylon 25% Lycra",
+    "isAvailable": true,
+    "variants": [
+      { "color": "Чёрный", "sizes": ["m"] },
+      { "color": "зеленый", "sizes": ["m"] },
+      { "color": "фиолетовый", "sizes": ["m"] }
+    ]
+  },
+  {
+    "name": "Ветровка",
+    "price": 6000,
+    "composition": "88%polyamide 12% elastane",
+    "isAvailable": true,
+    "variants": [
+      { "color": "Чёрный", "sizes": ["l"] },
+      { "color": "бежевый", "sizes": ["l"] }
+    ]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "88%polyamide 12% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["s"] }]
+  },
+  {
+    "name": "Юбка-шорты",
+    "price": 3000,
+    "composition": "100% polyester",
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["m"] }]
+  },
+  {
+    "name": "Платье",
+    "price": 5500,
+    "composition": "75% nylon 25% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Белый", "sizes": ["l"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "80% nylon 20% spandex",
+    "isAvailable": true,
+    "variants": [{ "color": "Белый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Юбка-шорты",
+    "price": 3000,
+    "composition": "80% nylon 20% spandex",
+    "isAvailable": true,
+    "variants": [{ "color": "Белый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Платье",
+    "price": 5500,
+    "composition": "75% nylon 25% spandex",
+    "isAvailable": true,
+    "variants": [{ "color": "Желтый", "sizes": ["m", "l"] }]
+  },
+  {
+    "name": "Кофта на молнии флис",
+    "price": 4500,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["m"] }]
+  },
+  {
+    "name": "Куртка",
+    "price": 8000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["m"] }]
+  },
+  {
+    "name": "Жилет",
+    "price": 6000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["m"] }]
+  },
+  {
+    "name": "Жилет",
+    "price": 6000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [{ "color": "Бежевый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Куртка мех",
+    "price": 8000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [{ "color": "Бежевый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Комбинезон",
+    "price": 5000,
+    "composition": "90% nylon 10 % elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Бежевый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Платье",
+    "price": 5500,
+    "composition": "90% polyester 10% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Голубой", "sizes": ["m"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [{ "color": "Розовый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Велосипедки",
+    "price": 3000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [{ "color": "Розовый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "94% nylon 6% spandex",
+    "isAvailable": true,
+    "variants": [{ "color": "Белый", "sizes": ["s"] }]
+  },
+  {
+    "name": "Юбка-шорты",
+    "price": 3000,
+    "composition": "75%nylon 25% spandex",
+    "isAvailable": true,
+    "variants": [{ "color": "Сиреневый", "sizes": ["s"] }]
+  },
+  {
+    "name": "Платье",
+    "price": 5500,
+    "composition": "90% polyester 10% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Сиреневый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Платье",
+    "price": 5500,
+    "composition": "97% polyester 3% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Фиолетовый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "90% polyamide 10% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Бордовый", "sizes": ["s", "m"] }]
+  },
+  {
+    "name": "Леггинсы",
+    "price": 3000,
+    "composition": "90% polyamide 10% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Бордовый", "sizes": ["s", "m"] }]
+  },
+  {
+    "name": "Майка",
+    "price": 4500,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [{ "color": "Синий", "sizes": ["s"] }]
+  },
+  {
+    "name": "Леггинсы",
+    "price": 3000,
+    "composition": "80% nylon 20% spandex",
+    "isAvailable": true,
+    "variants": [{ "color": "Синий", "sizes": ["s"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "80% nylon 20% spandex",
+    "isAvailable": true,
+    "variants": [{ "color": "Синий", "sizes": ["s"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [
+      { "color": "Оранжевый", "sizes": ["m"] },
+      { "color": "красный", "sizes": ["m"] },
+      { "color": "голубой", "sizes": ["m"] },
+      { "color": "серый", "sizes": ["m"] }
+    ]
+  },
+  {
+    "name": "Леггинсы",
+    "price": 3000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [
+      { "color": "Оранжевый", "sizes": ["m"] },
+      { "color": "красный", "sizes": ["m"] },
+      { "color": "голубой", "sizes": ["m"] },
+      { "color": "серый", "sizes": ["m"] }
+    ]
+  },
+  {
+    "name": "Леггинсы",
+    "price": 3000,
+    "composition": "75% nylon 25% Lycra",
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["l"] }]
+  },
+  {
+    "name": "Лонгслив",
+    "price": 3000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [
+      { "color": "Голубой", "sizes": ["m"] },
+      { "color": "оранжевый", "sizes": ["m"] }
+    ]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "78%polyamed 22% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Бежевый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Леггинсы",
+    "price": 3000,
+    "composition": "78%polyamed 22% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Бежевый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "78%polyamed 22% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Сиреневый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Леггинсы",
+    "price": 3000,
+    "composition": "78%polyamed 22% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Сиреневый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Лонгслив",
+    "price": 3000,
+    "composition": "80% nylon 20% spandex",
+    "isAvailable": true,
+    "variants": [
+      { "color": "Серый", "sizes": ["s", "m"] },
+      { "color": "бежевый", "sizes": ["s", "m"] },
+      { "color": "оранжевый", "sizes": ["s", "m"] }
+    ]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "78%nylon 22% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["s", "m", "l"] }]
+  },
+  {
+    "name": "Сумка",
+    "price": 2500,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["one", "size"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [{ "color": "Желтый", "sizes": ["s"] }]
+  },
+  {
+    "name": "Велосипедки",
+    "price": 3000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [{ "color": "Желтый", "sizes": ["s"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "80% nylon 20% spandex",
+    "isAvailable": true,
+    "variants": [{ "color": "Коричневый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Леггинсы",
+    "price": 3000,
+    "composition": "80% nylon 20% spandex",
+    "isAvailable": true,
+    "variants": [{ "color": "Коричневый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Майка",
+    "price": 4500,
+    "composition": "91nylon 9% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["m"] }]
+  },
+  {
+    "name": "Майка",
+    "price": 4500,
+    "composition": "91nylon 9% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Бежевый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Футболка",
+    "price": 4500,
+    "composition": "91nylon 9% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Белый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Шорты",
+    "price": 3000,
+    "composition": "91nylon 9% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Белый", "sizes": ["m"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "54% nylon 34% polyester 12% spandex",
+    "isAvailable": true,
+    "variants": [{ "color": "Бежевый", "sizes": ["s"] }]
+  },
+  {
+    "name": "Леггинсы",
+    "price": 3000,
+    "composition": "54% nylon 34% polyester 12% spandex",
+    "isAvailable": true,
+    "variants": [{ "color": "Бежевый", "sizes": ["s"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "90% polyamide 10% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Бежевый", "sizes": ["s", "m"] }]
+  },
+  {
+    "name": "Леггинсы",
+    "price": 3000,
+    "composition": "90% polyamide 10% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Бежевый", "sizes": ["s", "m"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": "92% polyamide 8% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Красный", "sizes": ["m"] }]
+  },
+  {
+    "name": "Леггинсы",
+    "price": 3000,
+    "composition": "92% polyamide 8% elastane",
+    "isAvailable": true,
+    "variants": [{ "color": "Красный", "sizes": ["m"] }]
+  },
+  {
+    "name": "Топ",
+    "price": 2000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [{ "color": "Красный", "sizes": ["m"] }]
+  },
+  {
+    "name": "Леггинсы",
+    "price": 3000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [{ "color": "Красный", "sizes": ["m"] }]
+  },
+  {
+    "name": "Майка",
+    "price": 4500,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["m"] }]
+  },
+  {
+    "name": "Лонгслив",
+    "price": 3000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [
+      { "color": "Чёрный", "sizes": ["s", "m", "l"] },
+      { "color": "синий", "sizes": ["s", "m", "l"] }
+    ]
+  },
+  {
+    "name": "Леггинсы",
+    "price": 3000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [
+      { "color": "Чёрный", "sizes": ["s", "m", "l"] },
+      { "color": "синий", "sizes": ["s", "m", "l"] }
+    ]
+  },
+  {
+    "name": "Жилет",
+    "price": 2500,
+    "composition": "100% cotton",
+    "isAvailable": true,
+    "variants": [{ "color": "Красный", "sizes": ["m"] }]
+  },
+  {
+    "name": "Юбка",
+    "price": 3000,
+    "composition": "100% cotton",
+    "isAvailable": true,
+    "variants": [{ "color": "Красный", "sizes": ["m"] }]
+  },
+  {
+    "name": "Кофта на молнии",
+    "price": 5000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["s", "m", "l"] }]
+  },
+  {
+    "name": "Комбинезон",
+    "price": 5000,
+    "composition": null,
+    "isAvailable": true,
+    "variants": [{ "color": "Чёрный", "sizes": ["s", "m", "l"] }]
+  }
+]

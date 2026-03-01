@@ -1,6 +1,7 @@
 /** Экспорт метрик в CSV (api, slow-queries, ecommerce, orders). */
 
 import { MAX_METRICS_PERIOD_DAYS } from "@/shared/constants";
+import { getExcludeTestUserOrderWhere } from "@/shared/lib/auth/privileged";
 import type { PrismaClient } from "@prisma/client";
 
 export type MetricType = "api" | "slow-queries" | "ecommerce" | "orders";
@@ -49,7 +50,7 @@ export function toCSV(data: Record<string, unknown>[]): string {
         }
         return stringValue;
       })
-      .join(","),
+      .join(",")
   );
 
   return [headers.join(","), ...rows].join("\n");
@@ -61,7 +62,7 @@ export function toCSV(data: Record<string, unknown>[]): string {
 export async function exportMetrics(
   prisma: PrismaClient,
   type: MetricType,
-  days: number,
+  days: number
 ): Promise<ExportResult> {
   const now = new Date();
   const from = new Date();
@@ -84,7 +85,7 @@ async function exportApiMetrics(
   prisma: PrismaClient,
   from: Date,
   to: Date,
-  days: number,
+  days: number
 ): Promise<ExportResult> {
   const metrics = await prisma.apiMetric.findMany({
     where: { createdAt: { gte: from, lte: to } },
@@ -101,7 +102,7 @@ async function exportApiMetrics(
         statusCode: m.statusCode,
         duration: m.duration,
         createdAt: m.createdAt.toISOString(),
-      })),
+      }))
     ),
     filename: `api-metrics-${days}d.csv`,
   };
@@ -111,7 +112,7 @@ async function exportSlowQueries(
   prisma: PrismaClient,
   from: Date,
   to: Date,
-  days: number,
+  days: number
 ): Promise<ExportResult> {
   const queries = await prisma.slowQuery.findMany({
     where: { createdAt: { gte: from, lte: to } },
@@ -128,7 +129,7 @@ async function exportSlowQueries(
         endpoint: q.endpoint ?? "",
         userId: q.userId ?? "",
         createdAt: q.createdAt.toISOString(),
-      })),
+      }))
     ),
     filename: `slow-queries-${days}d.csv`,
   };
@@ -138,7 +139,7 @@ async function exportEcommerceMetrics(
   prisma: PrismaClient,
   from: Date,
   to: Date,
-  days: number,
+  days: number
 ): Promise<ExportResult> {
   const [views, cartActions, favorites] = await Promise.all([
     prisma.productView.findMany({
@@ -195,10 +196,13 @@ async function exportOrders(
   prisma: PrismaClient,
   from: Date,
   to: Date,
-  days: number,
+  days: number
 ): Promise<ExportResult> {
   const orders = await prisma.order.findMany({
-    where: { createdAt: { gte: from, lte: to } },
+    where: {
+      createdAt: { gte: from, lte: to },
+      ...getExcludeTestUserOrderWhere(),
+    },
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
@@ -234,7 +238,7 @@ async function exportOrders(
         total: o.total,
         promoCode: o.promoCodeCode ?? "",
         createdAt: o.createdAt.toISOString(),
-      })),
+      }))
     ),
     filename: `orders-${days}d.csv`,
   };

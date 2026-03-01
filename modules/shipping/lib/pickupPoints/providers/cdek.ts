@@ -2,12 +2,13 @@
  * Провайдер для работы с API СДЕК
  */
 
+import { env } from "@/shared/lib/config/env";
 import { fetchWithTimeout } from "@/shared/lib/fetch-with-timeout";
 import type { PickupPoint } from "../../../types/pickup-points";
 
 // delivery_mode в ответе tarifflist:
 // 1 = дверь → дверь, 2 = дверь → склад, 3 = склад → дверь, 4 = склад → склад
-const DELIVERY_MODE_PVZ = 4;     // склад → склад (ПВЗ)
+const DELIVERY_MODE_PVZ = 4; // склад → склад (ПВЗ)
 const DELIVERY_MODE_COURIER = 3; // склад → дверь (курьер)
 
 export interface CDEKTariffResult {
@@ -51,16 +52,16 @@ let tokenCache: {
   expiresAt: number;
 } | null = null;
 
-
 /**
  * Получает OAuth токен для API СДЕК
  */
 async function getCDEKToken(): Promise<string> {
-  const clientId = process.env.CDEK_CLIENT_ID;
-  const clientSecret = process.env.CDEK_CLIENT_SECRET;
+  const clientId = env.CDEK_CLIENT_ID;
+  const clientSecret = env.CDEK_CLIENT_SECRET;
 
   if (!clientId || !clientSecret) {
-    const errorMsg = "CDEK credentials not configured. Для работы СДЕК ПВЗ необходим договор с компанией СДЕК и API ключи. Обратитесь к администратору или заказчику для получения ключей.";
+    const errorMsg =
+      "CDEK credentials not configured. Для работы СДЕК ПВЗ необходим договор с компанией СДЕК и API ключи. Обратитесь к администратору или заказчику для получения ключей.";
     const { logger } = await import("@/shared/lib/logger");
     logger.error("[CDEK] Credentials not configured", new Error(errorMsg));
     throw new Error(errorMsg);
@@ -72,7 +73,7 @@ async function getCDEKToken(): Promise<string> {
   }
 
   const auth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
-  const isTest = process.env.CDEK_IS_TEST === "true";
+  const isTest = env.CDEK_IS_TEST ?? false;
 
   const response = await fetchWithTimeout(
     `https://${isTest ? "api.edu" : "api"}.cdek.ru/v2/oauth/token`,
@@ -84,7 +85,7 @@ async function getCDEKToken(): Promise<string> {
       },
       body: "grant_type=client_credentials",
     },
-    10000, // 10 секунд для OAuth
+    10000 // 10 секунд для OAuth
   );
 
   if (!response.ok) {
@@ -115,7 +116,7 @@ function normalizeCityName(name: string): string {
 export async function findCDEKCity(cityName: string): Promise<string | null> {
   try {
     const token = await getCDEKToken();
-    const isTest = process.env.CDEK_IS_TEST === "true";
+    const isTest = env.CDEK_IS_TEST ?? false;
 
     const response = await fetchWithTimeout(
       `https://${isTest ? "api.edu" : "api"}.cdek.ru/v2/location/cities?city=${encodeURIComponent(cityName)}&size=20`,
@@ -124,7 +125,7 @@ export async function findCDEKCity(cityName: string): Promise<string | null> {
           Authorization: `Bearer ${token}`,
         },
       },
-      10000,
+      10000
     );
 
     if (!response.ok) {
@@ -132,7 +133,7 @@ export async function findCDEKCity(cityName: string): Promise<string | null> {
     }
 
     const raw = await response.json();
-    const items: CDEKCity[] = Array.isArray(raw) ? raw : (raw.items || []);
+    const items: CDEKCity[] = Array.isArray(raw) ? raw : raw.items || [];
     if (items.length === 0) return null;
 
     const normalized = normalizeCityName(cityName);
@@ -145,7 +146,7 @@ export async function findCDEKCity(cityName: string): Promise<string | null> {
     const partial = items.find(
       (c) =>
         normalizeCityName(c.city).includes(normalized) ||
-        normalized.includes(normalizeCityName(c.city)),
+        normalized.includes(normalizeCityName(c.city))
     );
     if (partial) return String(partial.code);
 
@@ -176,22 +177,19 @@ function mapDeliveryPointsToPickup(items: CDEKDeliveryPoint[]): PickupPoint[] {
 /**
  * Запрашивает ПВЗ по URL и возвращает массив пунктов
  */
-async function fetchDeliveryPoints(
-  token: string,
-  url: string,
-): Promise<CDEKDeliveryPoint[]> {
+async function fetchDeliveryPoints(token: string, url: string): Promise<CDEKDeliveryPoint[]> {
   const response = await fetchWithTimeout(
     url,
     {
       headers: { Authorization: `Bearer ${token}` },
     },
-    10000,
+    10000
   );
   if (!response.ok) {
     throw new Error(`CDEK API error: ${response.statusText}`);
   }
   const raw = await response.json();
-  return Array.isArray(raw) ? raw : (raw.items || []);
+  return Array.isArray(raw) ? raw : raw.items || [];
 }
 
 /**
@@ -203,11 +201,11 @@ export async function getCDEKPickupPoints(
   city?: string,
   lat?: number,
   lon?: number,
-  limit: number = 50,
+  limit: number = 50
 ): Promise<PickupPoint[]> {
   try {
     const token = await getCDEKToken();
-    const isTest = process.env.CDEK_IS_TEST === "true";
+    const isTest = env.CDEK_IS_TEST ?? false;
     const baseUrl = `https://${isTest ? "api.edu" : "api"}.cdek.ru/v2/deliverypoints`;
 
     let url: string;
@@ -289,14 +287,14 @@ export async function getCDEKPickupPoints(
 export async function calculateCDEKTariff(
   toCityName: string,
   mode: "pvz" | "courier",
-  weightGrams: number = 1000,
+  weightGrams: number = 1000
 ): Promise<CDEKTariffResult | null> {
   try {
     const token = await getCDEKToken();
-    const isTest = process.env.CDEK_IS_TEST === "true";
+    const isTest = env.CDEK_IS_TEST ?? false;
     const baseUrl = `https://${isTest ? "api.edu" : "api"}.cdek.ru`;
 
-    const fromCityCode = process.env.CDEK_FROM_CITY_CODE || "137";
+    const fromCityCode = env.CDEK_FROM_CITY_CODE ?? "137";
     const toCityCode = await findCDEKCity(toCityName);
     if (!toCityCode) return null;
 
@@ -326,7 +324,7 @@ export async function calculateCDEKTariff(
         },
         body: JSON.stringify(body),
       },
-      10000,
+      10000
     );
 
     if (!response.ok) {
@@ -356,9 +354,7 @@ export async function calculateCDEKTariff(
     const matching = tariffs.filter((t) => t.delivery_mode === targetMode);
     if (matching.length === 0) return null;
 
-    const cheapest = matching.reduce((a, b) =>
-      a.delivery_sum <= b.delivery_sum ? a : b,
-    );
+    const cheapest = matching.reduce((a, b) => (a.delivery_sum <= b.delivery_sum ? a : b));
 
     return {
       deliverySum: Math.round(cheapest.delivery_sum * 100),

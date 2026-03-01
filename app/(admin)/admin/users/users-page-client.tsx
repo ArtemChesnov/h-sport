@@ -13,15 +13,15 @@ import { PaginationControls } from "../components/common/pagination-controls";
 import { SearchFilterCard } from "../components/common/search-filter-card";
 
 import {
-    Button,
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-    Separator,
-    Skeleton,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Separator,
+  Skeleton,
 } from "@/shared/components/ui";
 
 const UsersTable = dynamic(
@@ -32,12 +32,14 @@ const UsersTable = dynamic(
       <div className="w-full overflow-x-auto rounded-lg border border-border/50 bg-background">
         <div className="space-y-0">
           <div className="bg-muted/30 border-b border-border/50 h-12 flex items-center gap-4 px-4">
-            <Skeleton className="h-3 w-20" />
-            <Skeleton className="h-3 w-32" />
+            <Skeleton className="h-3 w-28" />
+            <Skeleton className="h-3 w-40" />
             <Skeleton className="h-3 w-28" />
             <Skeleton className="h-3 w-24" />
-            <Skeleton className="h-3 w-20 ml-auto" />
-            <Skeleton className="h-3 w-12" />
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-3 w-28" />
+            <Skeleton className="h-3 w-12 ml-auto" />
           </div>
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="border-b border-border/30 h-14 flex items-center gap-4 px-4">
@@ -45,7 +47,9 @@ const UsersTable = dynamic(
               <Skeleton className="h-4 w-32" />
               <Skeleton className="h-4 w-28" />
               <Skeleton className="h-5 w-20 rounded-full" />
-              <Skeleton className="h-4 w-16 ml-auto" />
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-24" />
               <Skeleton className="h-9 w-9 rounded ml-auto" />
             </div>
           ))}
@@ -58,9 +62,7 @@ const UsersTable = dynamic(
 /**
  * Читаем параметры из URL.
  */
-function readParams(
-  sp: ReturnType<typeof useSearchParams>,
-): DTO.AdminUsersQueryDto {
+function readParams(sp: ReturnType<typeof useSearchParams>): DTO.AdminUsersQueryDto {
   const page = Number(sp.get("page") ?? "1") || 1;
   const perPage = Number(sp.get("perPage") ?? "20") || 20;
   const searchRaw = (sp.get("search") ?? "").trim();
@@ -79,25 +81,19 @@ function buildSearchString(params: DTO.AdminUsersQueryDto): string {
   const sp = new URLSearchParams();
 
   if (params.page && params.page > 1) sp.set("page", String(params.page));
-  if (params.perPage && params.perPage !== 20)
-    sp.set("perPage", String(params.perPage));
+  if (params.perPage && params.perPage !== 20) sp.set("perPage", String(params.perPage));
   if (params.search) sp.set("search", params.search);
 
   const qs = sp.toString();
   return qs ? `?${qs}` : "";
 }
 
-
-
 export function UsersPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   // Истина для запроса — параметры из URL
-  const urlParams = React.useMemo(
-    () => readParams(searchParams),
-    [searchParams],
-  );
+  const urlParams = React.useMemo(() => readParams(searchParams), [searchParams]);
   const urlSearch = (urlParams.search ?? "").trim();
 
   // Инпут: локальный state, чтобы печатать свободно
@@ -150,8 +146,7 @@ export function UsersPageClient() {
   React.useEffect(() => {
     if (!isError) return;
     toast.error(TOAST.ERROR.LOAD_USERS, {
-      description:
-        error instanceof Error ? error.message : "Неизвестная ошибка",
+      description: error instanceof Error ? error.message : "Неизвестная ошибка",
     });
   }, [isError, error]);
 
@@ -237,7 +232,10 @@ export function UsersPageClient() {
                 </div>
                 {/* Строки таблицы */}
                 {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="border-b border-border/30 h-14 flex items-center gap-4 px-4">
+                  <div
+                    key={i}
+                    className="border-b border-border/30 h-14 flex items-center gap-4 px-4"
+                  >
                     <Skeleton className="h-4 w-24" />
                     <Skeleton className="h-4 w-32" />
                     <Skeleton className="h-4 w-28" />
@@ -263,7 +261,13 @@ export function UsersPageClient() {
               <CardTitle className="text-base font-semibold">Список пользователей</CardTitle>
             </div>
             <CardDescription className="text-xs">
-              Найдено {data.meta.total} {data.meta.total === 1 ? "пользователь" : data.meta.total < 5 ? "пользователя" : "пользователей"} · страница {data.meta.page} из {data.meta.pages}
+              Найдено {data.meta.total}{" "}
+              {data.meta.total === 1
+                ? "пользователь"
+                : data.meta.total < 5
+                  ? "пользователя"
+                  : "пользователей"}{" "}
+              · страница {data.meta.page} из {data.meta.pages}
             </CardDescription>
           </CardHeader>
 

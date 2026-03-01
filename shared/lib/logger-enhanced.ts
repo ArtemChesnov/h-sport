@@ -4,6 +4,7 @@
  *
  * ВАЖНО: Этот модуль работает только на сервере. fs/path импортируются лениво.
  */
+/* eslint-disable no-console -- слой вывода в консоль и файл, использование console.* осознанное */
 
 import { env } from "@/shared/lib/config/env";
 

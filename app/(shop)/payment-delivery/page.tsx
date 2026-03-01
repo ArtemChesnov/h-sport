@@ -43,6 +43,56 @@ export default function PaymentDeliveryPage() {
             </p>
           </section>
 
+          <section id="requisites">
+            <h2 className={sectionTitle}>Реквизиты продавца</h2>
+            <p className={paragraph}>
+              Для оплаты по счёту (безналичный расчёт для юридических лиц) и для связи с продавцом
+              используйте следующие реквизиты:
+            </p>
+            <ul className="mb-4 list-none space-y-2">
+              <li className={listItem}>
+                <strong>Полное наименование:</strong> ОТМАХОВА ДАРЬЯ ОЛЕГОВНА (ИП)
+              </li>
+              <li className={listItem}>
+                <strong>Сокращённое наименование:</strong> ИП ОТМАХОВА ДАРЬЯ ОЛЕГОВНА
+              </li>
+              <li className={listItem}>
+                <strong>Юридический адрес:</strong> 603000, Россия, Нижегородская область, г. Нижний
+                Новгород, ул. Октябрьская, 21а, кв. 14
+              </li>
+              <li className={listItem}>
+                <strong>ИНН:</strong> 526212822722
+              </li>
+            </ul>
+            <h3 className="mb-2 mt-6 text-[17px] font-semibold max-[576px]:text-[16px]">
+              Банковские реквизиты для оплаты по счёту
+            </h3>
+            <ul className="mb-4 list-none space-y-2">
+              <li className={listItem}>
+                <strong>Расчётный счёт:</strong> 40802810929080004801
+              </li>
+              <li className={listItem}>
+                <strong>Банк:</strong> Филиал «Нижегородский» АО «Альфа-Банк»
+              </li>
+              <li className={listItem}>
+                <strong>ИНН банка:</strong> 7728168971
+              </li>
+              <li className={listItem}>
+                <strong>БИК:</strong> 042202824
+              </li>
+              <li className={listItem}>
+                <strong>Корреспондентский счёт:</strong> 30101810200000000824
+              </li>
+              <li className={listItem}>
+                <strong>Валюта счёта:</strong> RUR
+              </li>
+              <li className={listItem}>
+                <strong>Адрес банка:</strong> 603035, Россия, Нижегородская область, г. Нижний
+                Новгород, Нижегородский район, ул. Максима Горького, д. 140, пом. П1
+              </li>
+            </ul>
+          </section>
+
           <section>
             <h2 className={sectionTitle}>Доставка</h2>
             <p className={paragraph}>Доставка осуществляется по территории Российской Федерации.</p>

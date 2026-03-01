@@ -22,10 +22,10 @@
 
 ```
 AUTH_SECRET=your-secret-key
-AUTH_URL=http://localhost:3000
+AUTH_URL=https://h-brand.ru
 SMTP_HOST=smtp.example.com
 SMTP_PORT=587
-SMTP_USER=your-email@example.com
+SMTP_USER=your-email
 SMTP_PASSWORD=your-password
-SMTP_FROM=noreply@example.com
+SMTP_FROM=noreply@h-brand.ru
 ```

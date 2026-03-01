@@ -1,18 +1,19 @@
 "use client";
 
 import {
-    CartIcon,
-    CartIconFilled,
-    FavoritesFilledIcon,
-    FavoritesIcon,
-    UserIcon,
-    UserIconFilled,
+  CartIcon,
+  CartIconFilled,
+  FavoritesFilledIcon,
+  FavoritesIcon,
+  UserIcon,
+  UserIconFilled,
 } from "@/shared/components/icons";
 import { CART_LABELS } from "@/shared/constants";
 import { useShopNav } from "@/shared/contexts";
 import { useAuthCheck, useCartCount, useFavoritesCount } from "@/shared/hooks";
 import { cn } from "@/shared/lib/utils";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { CountLoader } from "../../ui/count-loader";
@@ -107,11 +108,12 @@ export const Header: React.FC<Props> = ({ className }) => {
             onClick={handleLogoClick}
             className="cursor-pointer shrink-0 justify-self-center"
           >
-            <img
+            <Image
               alt="H Sport"
               src="/assets/logos/logo-big.png"
               width={55}
               height={104}
+              priority
               className="h-auto w-10 sm:w-12 md:w-[55px] max-h-[80px] sm:max-h-[90px] md:max-h-[104px] object-contain"
             />
           </Link>

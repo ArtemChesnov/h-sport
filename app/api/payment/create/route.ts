@@ -60,7 +60,7 @@ async function handler(
       email,
       userParameters: {
         ...userParameters,
-        payment_id: paymentId.toString(),
+        Shp_payment_id: paymentId.toString(),
       },
     });
     url = paymentUrl.url;

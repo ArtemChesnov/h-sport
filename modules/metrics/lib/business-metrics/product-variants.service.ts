@@ -3,6 +3,7 @@
  */
 
 import { prisma } from "@/prisma/prisma-client";
+import { getExcludeTestUserOrderWhere } from "@/shared/lib/auth/privileged";
 import { OrderStatus } from "@prisma/client";
 
 export interface ProductVariantsStats {
@@ -29,6 +30,7 @@ export async function getProductVariantsStats(days: number): Promise<ProductVari
       order: {
         createdAt: { gte: from, lte: now },
         status: { in: includedStatuses },
+        ...getExcludeTestUserOrderWhere(),
       },
     },
     select: {
@@ -74,7 +76,10 @@ export async function getProductVariantsStats(days: number): Promise<ProductVari
   });
 
   // Комбинации размер-цвет
-  const sizeColorCombos = new Map<string, { size: string; color: string; count: number; revenue: number }>();
+  const sizeColorCombos = new Map<
+    string,
+    { size: string; color: string; count: number; revenue: number }
+  >();
   orderItemsInPeriod.forEach((item) => {
     const size = (item.size && item.size.trim()) || "ONE_SIZE";
     const color = (item.color && item.color.trim()) || "Не указан";

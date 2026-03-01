@@ -1,11 +1,10 @@
+export { formatCompositionText } from "./composition";
 export {
-    formatBirthDateDisplay,
-    formatDateTime,
-    formatOrderCardDate,
-    formatOrderCardDateOnly,
-    formatRelativeDate,
-    formatShortDate
+  formatBirthDateDisplay,
+  formatOrderCardDate,
+  formatOrderCardDateOnly,
+  formatRelativeDate,
+  formatShortDate,
 } from "./date";
 export { formatMoney } from "./format-money";
-export { pluralize, pluralizeWithCount } from "./pluralize";
-
+export { pluralize } from "./pluralize";

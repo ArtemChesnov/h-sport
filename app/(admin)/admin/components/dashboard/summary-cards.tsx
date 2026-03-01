@@ -31,7 +31,7 @@ export function SummaryCards({ summary, isLoading }: SummaryCardsProps) {
     return (
       <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {[...Array(4)].map((_, i) => (
-          <Card key={i} className="rounded-2xl border shadow-sm">
+          <Card key={`summary-skeleton-${i}`} className="rounded-2xl border shadow-sm">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2 mb-2">
                 <Skeleton className="h-5 w-5 rounded" />

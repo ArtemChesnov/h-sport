@@ -18,14 +18,15 @@ const FILE_SIGNATURES: Record<string, number[][]> = {
   ".jpg": [[0xff, 0xd8, 0xff]],
   ".jpeg": [[0xff, 0xd8, 0xff]],
   ".png": [[0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]],
-  ".webp": [[0x52, 0x49, 0x46, 0x46], [0x57, 0x45, 0x42, 0x50]],
+  ".webp": [
+    [0x52, 0x49, 0x46, 0x46],
+    [0x57, 0x45, 0x42, 0x50],
+  ],
   ".avif": [[0x00, 0x00, 0x00, 0x20, 0x66, 0x74, 0x79, 0x70, 0x61, 0x76, 0x69, 0x66]],
 };
 
 /** Результат загрузки */
-export type UploadResult =
-  | { ok: true; paths: string[] }
-  | { ok: false; message: string };
+export type UploadResult = { ok: true; paths: string[] } | { ok: false; message: string };
 
 /** Параметры загрузки */
 export interface UploadParams {
@@ -68,10 +69,37 @@ export function sanitizeFolderName(folder: string): string {
  */
 export function slugifyRu(value: string): string {
   const map: Record<string, string> = {
-    а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "e", ж: "zh", з: "z",
-    и: "i", й: "y", к: "k", л: "l", м: "m", н: "n", о: "o", п: "p", р: "r",
-    с: "s", т: "t", у: "u", ф: "f", х: "h", ц: "c", ч: "ch", ш: "sh", щ: "sch",
-    ы: "y", э: "e", ю: "yu", я: "ya",
+    а: "a",
+    б: "b",
+    в: "v",
+    г: "g",
+    д: "d",
+    е: "e",
+    ё: "e",
+    ж: "zh",
+    з: "z",
+    и: "i",
+    й: "y",
+    к: "k",
+    л: "l",
+    м: "m",
+    н: "n",
+    о: "o",
+    п: "p",
+    р: "r",
+    с: "s",
+    т: "t",
+    у: "u",
+    ф: "f",
+    х: "h",
+    ц: "c",
+    ч: "ch",
+    ш: "sh",
+    щ: "sch",
+    ы: "y",
+    э: "e",
+    ю: "yu",
+    я: "ya",
   };
 
   return value
@@ -96,7 +124,7 @@ export function slugifyRu(value: string): string {
 export function validateFile(
   file: File,
   buffer: Buffer,
-  currentTotalSize: number,
+  currentTotalSize: number
 ): { ok: true } | { ok: false; message: string } {
   // Проверка размера файла
   if (file.size > UPLOAD_CONFIG.MAX_FILE_SIZE) {
@@ -115,7 +143,11 @@ export function validateFile(
 
   const ext = path.extname(file.name || "image").toLowerCase();
 
-  if (!UPLOAD_CONFIG.ALLOWED_EXTENSIONS.includes(ext as typeof UPLOAD_CONFIG.ALLOWED_EXTENSIONS[number])) {
+  if (
+    !UPLOAD_CONFIG.ALLOWED_EXTENSIONS.includes(
+      ext as (typeof UPLOAD_CONFIG.ALLOWED_EXTENSIONS)[number]
+    )
+  ) {
     return {
       ok: false,
       message: `Неподдерживаемый формат "${file.name}". Разрешены: ${UPLOAD_CONFIG.ALLOWED_EXTENSIONS.join(", ")}`,
@@ -123,7 +155,12 @@ export function validateFile(
   }
 
   const mimeType = file.type?.toLowerCase();
-  if (mimeType && !UPLOAD_CONFIG.ALLOWED_MIME_TYPES.includes(mimeType as typeof UPLOAD_CONFIG.ALLOWED_MIME_TYPES[number])) {
+  if (
+    mimeType &&
+    !UPLOAD_CONFIG.ALLOWED_MIME_TYPES.includes(
+      mimeType as (typeof UPLOAD_CONFIG.ALLOWED_MIME_TYPES)[number]
+    )
+  ) {
     return { ok: false, message: `Неподдерживаемый MIME-тип файла "${file.name}"` };
   }
 
@@ -140,7 +177,7 @@ export function validateFile(
 export async function uploadFiles(
   files: File[],
   params: UploadParams,
-  basePath: string,
+  basePath: string
 ): Promise<UploadResult> {
   if (!files || files.length === 0) {
     return { ok: false, message: "Файлы не переданы" };
@@ -208,4 +245,38 @@ export async function uploadFiles(
   }
 
   return { ok: true, paths: savedPaths };
+}
+
+/**
+ * Удаляет загруженные файлы по путям вида /assets/images/products/...
+ * basePath — корень проекта (process.cwd()).
+ * Игнорирует пути вне public/assets/images (безопасность).
+ */
+export async function deleteUploadedFiles(
+  paths: string[],
+  basePath: string
+): Promise<{ deleted: string[]; errors: { path: string; error: string }[] }> {
+  const publicAssets = path.resolve(basePath, "public", "assets", "images");
+  const deleted: string[] = [];
+  const errors: { path: string; error: string }[] = [];
+
+  for (const urlPath of paths) {
+    if (!urlPath || typeof urlPath !== "string") continue;
+    const normalized = urlPath.startsWith("/") ? urlPath.slice(1) : urlPath;
+    if (!normalized.startsWith("assets/images/")) continue;
+
+    const filePath = path.resolve(basePath, "public", normalized);
+    if (!filePath.startsWith(publicAssets)) continue;
+
+    try {
+      await fs.unlink(filePath);
+      deleted.push(urlPath);
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException)?.code !== "ENOENT") {
+        errors.push({ path: urlPath, error: (err as Error).message });
+      }
+    }
+  }
+
+  return { deleted, errors };
 }

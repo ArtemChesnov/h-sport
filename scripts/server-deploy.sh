@@ -21,6 +21,12 @@ npx prisma generate
 npx prisma migrate deploy
 npm run build
 
+# Standalone: скопировать статику и public в .next/standalone (нужно для работы сайта)
+if [ -d ".next/standalone" ]; then
+  cp -r .next/static .next/standalone/.next/ 2>/dev/null || true
+  [ -d "public" ] && cp -r public .next/standalone/ 2>/dev/null || true
+fi
+
 # Перезапуск PM2 (имя приложения по умолчанию h-sport)
 if command -v pm2 >/dev/null 2>&1; then
   pm2 restart "$PM2_APP_NAME" --update-env

@@ -128,7 +128,7 @@ export function PersonalInfoForm({ initialData, onSave, onReset }: PersonalInfoF
                   disabled={!isEditing}
                   aria-invalid={!!errors.fullName}
                   className={INPUT_FIELD_CLASS}
-                  placeholder="Иванова Анна Олеговна"
+                  placeholder="Иванова Анна"
                   value={form.fullName}
                   onChange={(e) => handleChange("fullName", e.target.value)}
                 />
@@ -160,7 +160,7 @@ export function PersonalInfoForm({ initialData, onSave, onReset }: PersonalInfoF
                   disabled={!isEditing}
                   aria-invalid={!!errors.phone}
                   className={INPUT_FIELD_CLASS}
-                  placeholder="+7 (901) 688 86 59"
+                  placeholder="+7 (___) ___ __ __"
                   value={form.phone}
                   onChange={(e) => handleChange("phone", e.target.value)}
                 />
@@ -174,7 +174,7 @@ export function PersonalInfoForm({ initialData, onSave, onReset }: PersonalInfoF
                   disabled={!isEditing}
                   aria-invalid={!!errors.email}
                   className={INPUT_FIELD_CLASS}
-                  placeholder="jaksan37@gmail.com"
+                  placeholder="example@email.com"
                   value={form.email}
                   onChange={(e) => handleChange("email", e.target.value)}
                 />

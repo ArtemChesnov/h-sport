@@ -43,7 +43,7 @@ export const ContactsBlock: React.FC<Props> = ({ className }) => {
   const phoneLinkClass = "leading-[120%] text-[19px] hover:text-primary transition-colors";
 
   return (
-    <div className={"flex flex-col gap-4 max-[1024px]:gap-3"}>
+    <div className={cn("flex flex-col gap-4 max-[1024px]:gap-3", className)}>
       <h3 className="text-[26px] leading-[120%] font-light max-[1280px]:text-[24px]">
         СВЯЖИТЕСЬ С НАМИ
       </h3>

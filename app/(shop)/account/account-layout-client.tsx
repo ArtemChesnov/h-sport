@@ -1,6 +1,10 @@
 "use client";
 
 import { AccountSidebar, Container, ShopBreadcrumbs } from "@/shared/components/common";
+import {
+  AccountBreadcrumbProvider,
+  useAccountBreadcrumbCustomLabel,
+} from "./contexts/account-breadcrumb-context";
 
 /**
  * Оболочка ЛК: сайдбар + контент.
@@ -9,11 +13,13 @@ import { AccountSidebar, Container, ShopBreadcrumbs } from "@/shared/components/
  *
  * Референс верстки: «Моя учетная запись» (account page).
  */
-export function AccountLayoutClient({ children }: { children: React.ReactNode }) {
+function AccountLayoutContent({ children }: { children: React.ReactNode }) {
+  const customLastLabel = useAccountBreadcrumbCustomLabel();
+
   return (
     <main className="">
       <Container className="space-y-6 max-[576px]:space-y-6 min-[873px]:space-y-8 min-[1024px]:space-y-10">
-        <ShopBreadcrumbs />
+        <ShopBreadcrumbs customLastLabel={customLastLabel ?? undefined} />
 
         <div className="mt-8 flex max-[872px]:flex-col max-[872px]:mt-6 max-[872px]:gap-8 max-[1600px]:gap-20 gap-63.75 min-[873px]:mt-12 min-[1024px]:mt-15">
           <AccountSidebar />
@@ -24,5 +30,13 @@ export function AccountLayoutClient({ children }: { children: React.ReactNode })
         </div>
       </Container>
     </main>
+  );
+}
+
+export function AccountLayoutClient({ children }: { children: React.ReactNode }) {
+  return (
+    <AccountBreadcrumbProvider>
+      <AccountLayoutContent>{children}</AccountLayoutContent>
+    </AccountBreadcrumbProvider>
   );
 }

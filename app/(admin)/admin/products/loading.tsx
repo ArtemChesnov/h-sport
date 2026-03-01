@@ -52,17 +52,21 @@ export default function AdminProductsLoading() {
               <Skeleton className="h-3 w-24 ml-auto" />
             </div>
             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div key={i} className="border-b border-border/30 last:border-b-0 h-14 flex items-center gap-4 px-4">
-                <Skeleton className="h-12 w-12 rounded-lg" />
-                <Skeleton className="h-4 w-10" />
-                <div className="flex flex-col gap-1">
+              <div
+                key={i}
+                className="border-b border-border/30 last:border-b-0 h-14 flex items-center gap-4 px-4"
+              >
+                <Skeleton className="h-12 w-12 rounded-lg shrink-0" />
+                <Skeleton className="h-4 w-10 shrink-0" />
+                <div className="flex flex-col gap-1 min-w-0">
                   <Skeleton className="h-4 w-40" />
                   <Skeleton className="h-3 w-24" />
                 </div>
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-4 w-20" />
-                <Skeleton className="h-4 w-20" />
-                <div className="flex gap-2 ml-auto">
+                <Skeleton className="h-4 w-24 shrink-0" />
+                <Skeleton className="h-4 w-20 shrink-0" />
+                <Skeleton className="h-4 w-20 shrink-0" />
+                <div className="flex gap-2 ml-auto shrink-0">
+                  <Skeleton className="h-9 w-9 rounded" />
                   <Skeleton className="h-9 w-9 rounded" />
                   <Skeleton className="h-9 w-9 rounded" />
                   <Skeleton className="h-9 w-9 rounded" />

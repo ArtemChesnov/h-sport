@@ -14,8 +14,6 @@ interface BestSellersListProps {
 export function BestSellersList(props: BestSellersListProps = {}) {
   const { initialData } = props;
 
-  const isClient = typeof window !== "undefined";
-
   const query = useProductsQuery(
     {
       page: 1,
@@ -26,15 +24,12 @@ export function BestSellersList(props: BestSellersListProps = {}) {
       initialData: initialData
         ? { items: initialData, meta: { page: 1, perPage: 4, total: initialData.length, pages: 1 } }
         : undefined,
-      enabled: isClient,
     }
   );
 
-  const items: DTO.ProductListItemDto[] = isClient
-    ? (query.data?.items ?? initialData ?? [])
-    : (initialData ?? []);
-  const showSkeleton = isClient && query.isLoading && items.length === 0;
-  const isError = isClient && (query.isError ?? false);
+  const items: DTO.ProductListItemDto[] = query.data?.items ?? initialData ?? [];
+  const showSkeleton = query.isLoading && items.length === 0;
+  const isError = query.isError ?? false;
 
   return (
     <Container className="mt-40 flex flex-col justify-between max-[1440px]:mt-25">

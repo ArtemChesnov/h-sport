@@ -53,13 +53,14 @@ export async function GET(request: NextRequest, context: RouteContext) {
               margin: 20px 0;
             }
             .info-row {
-              display: flex;
-              justify-content: space-between;
               padding: 8px 0;
               border-bottom: 1px solid #eee;
             }
-            .info-label {
+            .info-row td:first-child {
               font-weight: 600;
+            }
+            .info-row td:last-child {
+              text-align: right;
             }
             table {
               width: 100%;
@@ -100,38 +101,42 @@ export async function GET(request: NextRequest, context: RouteContext) {
           </div>
 
           <div class="info">
-            <div class="info-row">
-              <span class="info-label">Дата оплаты:</span>
-              <span>${new Date(payment.updatedAt).toLocaleString("ru-RU")}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">ID платежа:</span>
-              <span>${payment.id}</span>
-            </div>
+            <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%;">
+            <tbody>
+            <tr class="info-row">
+              <td><span class="info-label">Дата оплаты:</span></td>
+              <td>${new Date(payment.updatedAt).toLocaleString("ru-RU")}</td>
+            </tr>
+            <tr class="info-row">
+              <td><span class="info-label">ID платежа:</span></td>
+              <td>${payment.id}</td>
+            </tr>
             ${
               payment.externalId
                 ? `
-            <div class="info-row">
-              <span class="info-label">Внешний ID:</span>
-              <span>${payment.externalId}</span>
-            </div>
+            <tr class="info-row">
+              <td><span class="info-label">Внешний ID:</span></td>
+              <td>${payment.externalId}</td>
+            </tr>
             `
                 : ""
             }
-            <div class="info-row">
-              <span class="info-label">Email:</span>
-              <span>${order.email}</span>
-            </div>
+            <tr class="info-row">
+              <td><span class="info-label">Email:</span></td>
+              <td>${order.email}</td>
+            </tr>
             ${
               order.fullName
                 ? `
-            <div class="info-row">
-              <span class="info-label">Получатель:</span>
-              <span>${order.fullName}</span>
-            </div>
+            <tr class="info-row">
+              <td><span class="info-label">Получатель:</span></td>
+              <td>${order.fullName}</td>
+            </tr>
             `
                 : ""
             }
+            </tbody>
+            </table>
           </div>
 
           <table>
@@ -164,36 +169,40 @@ export async function GET(request: NextRequest, context: RouteContext) {
           </table>
 
           <div class="info">
+            <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%;">
+            <tbody>
             ${
               order.subtotal != null
                 ? `
-            <div class="info-row">
-              <span class="info-label">Товары:</span>
-              <span>${formatMoney(order.subtotal)}</span>
-            </div>
+            <tr class="info-row">
+              <td><span class="info-label">Товары:</span></td>
+              <td>${formatMoney(order.subtotal)}</td>
+            </tr>
             `
                 : ""
             }
             ${
               order.discount > 0
                 ? `
-            <div class="info-row">
-              <span class="info-label">Скидка${order.promoCodeCode ? ` (${order.promoCodeCode})` : ""}:</span>
-              <span>-${formatMoney(order.discount)}</span>
-            </div>
+            <tr class="info-row">
+              <td><span class="info-label">Скидка${order.promoCodeCode ? ` (${order.promoCodeCode})` : ""}:</span></td>
+              <td>-${formatMoney(order.discount)}</td>
+            </tr>
             `
                 : ""
             }
             ${
               order.deliveryFee > 0
                 ? `
-            <div class="info-row">
-              <span class="info-label">Доставка:</span>
-              <span>${formatMoney(order.deliveryFee)}</span>
-            </div>
+            <tr class="info-row">
+              <td><span class="info-label">Доставка:</span></td>
+              <td>${formatMoney(order.deliveryFee)}</td>
+            </tr>
             `
                 : ""
             }
+            </tbody>
+            </table>
           </div>
 
           <div class="total">

@@ -1,22 +1,52 @@
 import { Size } from "@prisma/client";
 import { RawProduct } from "./types";
 
-import clientProductsJson from "./data/raw_products_from_client.json";
+import productsJson from "./data/products_with_id.json";
 
-type ClientVariation = {
+type JsonVariant = {
   color: string;
   sizes: string[];
-  priceRub: number;
-  composition: string | null;
-  isAvailable: boolean;
+  isAvailable?: boolean;
 };
 
-type ClientProduct = {
+type JsonProduct = {
+  id?: number;
   name: string;
-  categorySlug: string;
-  description?: string;
-  variations: ClientVariation[];
+  price: number;
+  composition: string | null;
+  description?: string | null;
+  isAvailable?: boolean;
+  variants: JsonVariant[];
 };
+
+/** Маппинг названия товара на slug категории (из seed.ts) */
+const NAME_TO_CATEGORY: Record<string, string> = {
+  Топ: "tops",
+  "Топ на молнии": "tops",
+  Леггинсы: "leggings",
+  Платье: "dresses-jumpsuits",
+  Комбинезон: "dresses-jumpsuits",
+  Боди: "bodysuits",
+  "Юбка-шорты": "skirts",
+  Юбка: "skirts",
+  Майка: "tanks-tees",
+  Футболка: "tanks-tees",
+  Лонгслив: "longsleeves",
+  "Брюки спортивные": "pants",
+  Велосипедки: "shorts-bikers",
+  Шорты: "shorts",
+  Ветровка: "outerwear",
+  Куртка: "outerwear",
+  "Куртка мех": "outerwear",
+  Жилет: "outerwear",
+  "Кофта на молнии": "outerwear",
+  "Кофта на молнии флис": "outerwear",
+  Сумка: "accessories",
+};
+
+function getCategorySlug(name: string): string {
+  return NAME_TO_CATEGORY[name] ?? "tops";
+}
 
 function normalizeComposition(c: string | null): string {
   if (!c || !c.trim()) return "";
@@ -35,26 +65,41 @@ function normalizeComposition(c: string | null): string {
 function mapSizes(sizes: string[]): Size[] {
   if (!sizes || sizes.length === 0) return [Size.ONE_SIZE];
   const out: Size[] = [];
+  const seen = new Set<Size>();
   for (const s of sizes) {
-    const u = s.toUpperCase();
-    const size = (Size as Record<string, Size>)[u];
-    if (size) out.push(size);
-    else out.push(Size.ONE_SIZE);
+    const u = s.toLowerCase().trim();
+    if (u === "one" || u === "size") {
+      if (!seen.has(Size.ONE_SIZE)) {
+        out.push(Size.ONE_SIZE);
+        seen.add(Size.ONE_SIZE);
+      }
+      continue;
+    }
+    const sizeKey = u.toUpperCase();
+    const size = (Size as Record<string, Size>)[sizeKey];
+    if (size && !seen.has(size)) {
+      out.push(size);
+      seen.add(size);
+    } else if (!seen.has(Size.ONE_SIZE)) {
+      out.push(Size.ONE_SIZE);
+      seen.add(Size.ONE_SIZE);
+    }
   }
-  return out;
+  return out.length ? out : [Size.ONE_SIZE];
 }
 
-const clientProducts = clientProductsJson as ClientProduct[];
+const products = productsJson as JsonProduct[];
 
-export const RAW_PRODUCTS: RawProduct[] = clientProducts.map((p) => ({
+export const RAW_PRODUCTS: RawProduct[] = products.map((p) => ({
+  id: p.id,
   name: p.name,
-  categorySlug: p.categorySlug,
   description: p.description ?? undefined,
-  variations: p.variations.map((v) => ({
+  categorySlug: getCategorySlug(p.name),
+  variations: p.variants.map((v) => ({
     color: v.color.trim(),
     sizes: mapSizes(v.sizes),
-    priceRub: v.priceRub,
-    composition: normalizeComposition(v.composition),
-    isAvailable: v.isAvailable,
+    priceRub: p.price,
+    composition: normalizeComposition(p.composition),
+    isAvailable: v.isAvailable ?? p.isAvailable ?? true,
   })),
 }));

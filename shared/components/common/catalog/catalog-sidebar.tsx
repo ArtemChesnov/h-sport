@@ -41,8 +41,16 @@ const CatalogSidebarComponent = ({
   applyMode = "immediate",
   onApplyFilters,
 }: CatalogSidebarProps) => {
-  const { data: categoriesData, isLoading: isCategoriesLoading, isError: isCategoriesError } = useCategoriesQuery();
-  const { data: filtersData, isLoading: isFiltersLoading, isError: isFiltersError } = useCatalogFiltersQuery();
+  const {
+    data: categoriesData,
+    isLoading: isCategoriesLoading,
+    isError: isCategoriesError,
+  } = useCategoriesQuery();
+  const {
+    data: filtersData,
+    isLoading: isFiltersLoading,
+    isError: isFiltersError,
+  } = useCatalogFiltersQuery();
 
   const isLoading = isCategoriesLoading || isFiltersLoading || productsLoading;
   const hasFiltersError = isFiltersError || isCategoriesError;
@@ -64,11 +72,13 @@ const CatalogSidebarComponent = ({
     hasActiveFilters,
   } = useCatalogFilters(applyImmediately);
 
-  // Получаем категории - показываем все категории из API
+  // Получаем категории - показываем все категории из API (сортировка по копии, без мутации кэша React Query)
   const categoriesWithProducts = React.useMemo(() => {
     const allCategoriesFromAPI = categoriesData?.items ?? [];
     if (allCategoriesFromAPI.length === 0) return [];
-    return allCategoriesFromAPI.sort((a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name));
+    return [...allCategoriesFromAPI].sort((a: { name: string }, b: { name: string }) =>
+      a.name.localeCompare(b.name)
+    );
   }, [categoriesData?.items]);
 
   // Получаем все доступные цвета из endpoint фильтров, используя COLOR_PRESETS
@@ -78,9 +88,7 @@ const CatalogSidebarComponent = ({
     filtersData.colors.forEach((color: string) => {
       const trimmed = color.trim();
       if (trimmed) {
-        const preset = COLOR_PRESETS.find(
-          (p) => p.value.toLowerCase() === trimmed.toLowerCase(),
-        );
+        const preset = COLOR_PRESETS.find((p) => p.value.toLowerCase() === trimmed.toLowerCase());
         if (preset) {
           colorSet.add(preset.value);
         } else {
@@ -130,21 +138,12 @@ const CatalogSidebarComponent = ({
       />
 
       <div
-        className={cn(
-          "mb-6",
-          isLoading
-            ? "mt-8"
-            : categoriesWithProducts.length > 5
-              ? "mt-8"
-              : "",
-        )}
+        className={cn("mb-6", isLoading ? "mt-8" : categoriesWithProducts.length > 5 ? "mt-8" : "")}
       >
         {isLoading ? (
           <div className="h-[33px] w-24 bg-accent animate-pulse rounded" />
         ) : (
-          <h3 className="font-heading text-[22px] font-medium text-[#1f1e1e]">
-            Фильтры
-          </h3>
+          <h3 className="font-heading text-[22px] font-medium text-[#1f1e1e]">Фильтры</h3>
         )}
       </div>
 
@@ -172,7 +171,7 @@ const CatalogSidebarComponent = ({
       <div
         className={cn(
           "h-px bg-[#D8DAD9]",
-          allColors.length > 5 ? "my-[18px]" : "mt-[18px] mb-[18px]",
+          allColors.length > 5 ? "my-[18px]" : "mt-[18px] mb-[18px]"
         )}
       />
 

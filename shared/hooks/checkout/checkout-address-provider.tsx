@@ -3,12 +3,12 @@
 import React from "react";
 import { useUserProfileQuery } from "../user/user-profile.hooks";
 import {
-    CHECKOUT_ADDRESS_STORAGE_KEY,
-    CheckoutAddressFormData,
-    DEFAULT_CHECKOUT_ADDRESS_FORM,
-    loadCheckoutAddressFromStorage,
-    parseFullAddressLine,
-    saveCheckoutAddressToStorage,
+  CHECKOUT_ADDRESS_STORAGE_KEY,
+  CheckoutAddressFormData,
+  DEFAULT_CHECKOUT_ADDRESS_FORM,
+  loadCheckoutAddressFromStorage,
+  parseFullAddressLine,
+  saveCheckoutAddressToStorage,
 } from "./checkout.hooks";
 
 /**
@@ -65,8 +65,7 @@ export function CheckoutAddressProvider({ children }: { children: React.ReactNod
       setAddressState(initialAddress);
       saveCheckoutAddressToStorage(initialAddress);
     } else {
-      const hasStored =
-        stored && (stored.email || stored.fullName || stored.phone || stored.city);
+      const hasStored = stored && (stored.email || stored.fullName || stored.phone || stored.city);
       const base: CheckoutAddressFormData = hasStored
         ? { ...DEFAULT_CHECKOUT_ADDRESS_FORM, ...stored }
         : DEFAULT_CHECKOUT_ADDRESS_FORM;
@@ -76,6 +75,36 @@ export function CheckoutAddressProvider({ children }: { children: React.ReactNod
 
     setHasInitialized(true);
   }, [userProfile, hasInitialized, isLoadingProfile]);
+
+  // Синхронизация города (и адреса) из ЛК при последующей загрузке профиля — если инициализация уже прошла по storage/дефолту, а профиль подгрузился позже.
+  React.useEffect(() => {
+    if (!userProfile?.address || isLoadingProfile) return;
+
+    const profileAddress = userProfile.address;
+    const parsed = parseFullAddressLine(profileAddress?.street || "");
+
+    setAddressState((prev) => {
+      const hasProfileCity = (profileAddress?.city ?? "").trim().length > 0;
+      const hasProfileCountry = (profileAddress?.country ?? "").trim().length > 0;
+      if (!hasProfileCity && !hasProfileCountry && !parsed.street) return prev;
+
+      const next: CheckoutAddressFormData = {
+        ...prev,
+        ...(hasProfileCountry ? { country: profileAddress!.country! } : {}),
+        ...(hasProfileCity ? { city: profileAddress!.city } : {}),
+        ...(parsed.street
+          ? {
+              street: parsed.street,
+              house: parsed.house,
+              entrance: parsed.entrance,
+              apartment: parsed.apartment,
+            }
+          : {}),
+      };
+      saveCheckoutAddressToStorage(next);
+      return next;
+    });
+  }, [userProfile, isLoadingProfile]);
 
   // Слушаем изменения в sessionStorage от других вкладок/окон
   React.useEffect(() => {

@@ -12,6 +12,9 @@ import { usePathname } from "next/navigation";
 import React from "react";
 import { Container } from "./layout";
 
+/** Год для копирайта: один и тот же на сервере и при первом рендере клиента, затем обновляется в useEffect */
+const COPYRIGHT_INITIAL_YEAR = 2025;
+
 interface Props {
   className?: string;
 }
@@ -26,6 +29,10 @@ const AUTH_PATH_PREFIX = "/auth";
 export const Footer: React.FC<Props> = ({ className }) => {
   const pathname = usePathname();
   const { openNewsletterModal } = useNewsletterModal();
+
+  // Год только после монтирования, чтобы избежать расхождения сервер/клиент (часовой пояс, смена суток)
+  const [year, setYear] = React.useState(COPYRIGHT_INITIAL_YEAR);
+  React.useEffect(() => setYear(new Date().getFullYear()), []);
 
   if (pathname?.startsWith(AUTH_PATH_PREFIX)) {
     return null;
@@ -183,9 +190,7 @@ export const Footer: React.FC<Props> = ({ className }) => {
 
           {/* Копирайт */}
           <div className="mt-14 border-t border-border/50 pt-6 flex justify-between max-[768px]:flex-col max-[768px]:gap-3">
-            <p className="text-[12px] text-text-secondary">
-              © {new Date().getFullYear()} H-Sport. Все права защищены.
-            </p>
+            <p className="text-[12px] text-text-secondary">© {year} H-Sport. Все права защищены.</p>
             <Link
               href="/sales-rules"
               className="link-underline text-[12px] text-text-secondary hover:text-primary transition-colors"

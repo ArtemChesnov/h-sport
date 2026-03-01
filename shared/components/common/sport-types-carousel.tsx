@@ -14,15 +14,15 @@ interface Props {
 }
 
 const sportTypes = [
-  { type: "Фитнес", src: "/assets/images/fitness.webp" },
-  { type: "Бег", src: "/assets/images/running.webp" },
-  { type: "Паддл", src: "/assets/images/paddle.webp" },
-  { type: "Гимнастика", src: "/assets/images/gimnastic.webp" },
-  { type: "Йога", src: "/assets/images/yoga.webp" },
-  { type: "Теннис", src: "/assets/images/tennis.webp" },
-  { type: "Пилатес", src: "/assets/images/pilates.webp" },
-  { type: "Танцы", src: "/assets/images/dance.webp" },
-  { type: "Аэробика", src: "/assets/images/aerobic.webp" },
+  { type: "Фитнес", src: "/assets/images/sport-types/fitness.webp" },
+  { type: "Бег", src: "/assets/images/sport-types/running.webp" },
+  { type: "Паддл", src: "/assets/images/sport-types/paddle.webp" },
+  { type: "Гимнастика", src: "/assets/images/sport-types/gymnastic.webp" },
+  { type: "Йога", src: "/assets/images/sport-types/yoga.webp" },
+  { type: "Теннис", src: "/assets/images/sport-types/tennis.webp" },
+  { type: "Пилатес", src: "/assets/images/sport-types/pilates.webp" },
+  { type: "Танцы", src: "/assets/images/sport-types/dance.webp" },
+  { type: "Аэробика", src: "/assets/images/sport-types/aerobic.webp" },
 ];
 
 export const SportTypesCarousel: React.FC<Props> = ({ className }) => {

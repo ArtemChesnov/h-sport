@@ -1,7 +1,6 @@
-
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Image from "next/image";
 import { IconCloud } from "@tabler/icons-react";
 import { X, Star } from "lucide-react";
@@ -50,6 +49,7 @@ export function ColorImagesEditor({
   const [error, setError] = useState<string | null>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   async function handleFilesSelected(fileList: FileList | null) {
     if (!fileList || fileList.length === 0) return;
@@ -132,7 +132,14 @@ export function ColorImagesEditor({
     }
   }
 
-  function handleDragLeave() {
+  function handleDragLeave(event: React.DragEvent<HTMLDivElement>) {
+    if (
+      listRef.current &&
+      event.relatedTarget instanceof Node &&
+      listRef.current.contains(event.relatedTarget)
+    ) {
+      return;
+    }
     setHoverIndex(null);
   }
 
@@ -171,7 +178,7 @@ export function ColorImagesEditor({
 
         <EmptyContent className="space-y-4">
           {imageUrls.length > 0 ? (
-            <div className="flex flex-wrap gap-3">
+            <div ref={listRef} className="flex flex-wrap gap-3">
               {imageUrls.map((url, index) => {
                 const isCover = index === 0;
                 const isDragging = dragIndex === index;
@@ -179,10 +186,10 @@ export function ColorImagesEditor({
 
                 return (
                   <div
-                    key={`${url}-${index}`}
-                    className={`group relative cursor-move transition-all ${
+                    key={url}
+                    className={`group relative cursor-move transition-all duration-150 ${
                       isDragging ? "opacity-40" : ""
-                    } ${isHovered ? "scale-105" : ""}`}
+                    } ${isHovered ? "ring-2 ring-primary ring-offset-2 rounded-lg" : ""}`}
                     draggable
                     onDragStart={(e) => {
                       handleDragStart(index);
@@ -197,25 +204,25 @@ export function ColorImagesEditor({
                     onDrop={(e) => handleDrop(index, e)}
                   >
                     <div
-                      className={`relative h-32 w-32 overflow-hidden rounded-lg border transition-all ${
+                      className={`relative overflow-hidden rounded-lg border transition-colors ${
                         isCover
-                          ? "border-foreground/30 shadow-md"
-                          : "border-border hover:border-foreground/20 hover:shadow-sm"
-                      } ${isHovered ? "border-primary border-dashed border-2" : ""}`}
+                          ? "h-40 w-40 border-foreground/30 shadow-md"
+                          : "h-32 w-32 border-border hover:border-foreground/20 hover:shadow-sm"
+                      }`}
                     >
                       <Image
                         src={url}
                         alt={`Фото ${index + 1} для цвета ${color}`}
                         fill
-                        className="object-cover"
-                        sizes="128px"
+                        className="object-cover pointer-events-none select-none"
+                        sizes={isCover ? "160px" : "128px"}
                         draggable={false}
                       />
 
                       {isCover && (
                         <Badge
                           variant="outline"
-                          className="absolute top-2 left-2 h-5 bg-background/95 backdrop-blur-sm text-[10px] font-medium px-2 py-0.5 border-foreground/30 shadow-sm z-10"
+                          className="absolute top-2 left-2 h-5 bg-background/95 backdrop-blur-sm text-[10px] font-medium px-2 py-0.5 border-foreground/30 shadow-sm z-10 pointer-events-none"
                         >
                           <Star className="h-2.5 w-2.5 mr-1 fill-current text-foreground" />
                           Обложка
@@ -225,14 +232,14 @@ export function ColorImagesEditor({
                       {!isCover && (
                         <Badge
                           variant="outline"
-                          className="absolute top-2 left-2 h-5 bg-background/95 backdrop-blur-sm text-[10px] font-medium px-2 py-0.5 border-border/50 shadow-sm"
+                          className="absolute top-2 left-2 h-5 bg-background/95 backdrop-blur-sm text-[10px] font-medium px-2 py-0.5 border-border/50 shadow-sm pointer-events-none"
                         >
                           {index + 1}
                         </Badge>
                       )}
 
                       {isHovered && (
-                        <div className="absolute inset-0 bg-primary/10 border-2 border-dashed border-primary flex items-center justify-center z-10">
+                        <div className="absolute inset-0 bg-primary/10 border-2 border-dashed border-primary flex items-center justify-center z-10 pointer-events-none">
                           <span className="text-xs font-medium text-primary bg-background/95 px-2 py-1 rounded shadow-sm">
                             Сюда
                           </span>
@@ -275,14 +282,10 @@ export function ColorImagesEditor({
               {isUploading ? "Загрузка..." : "Выбрать файлы"}
             </Button>
 
-            <span className="text-xs text-muted-foreground">
-              Можно выбрать несколько файлов
-            </span>
+            <span className="text-xs text-muted-foreground">Можно выбрать несколько файлов</span>
           </div>
 
-          {error && (
-            <p className="text-xs text-destructive font-medium">{error}</p>
-          )}
+          {error && <p className="text-xs text-destructive font-medium">{error}</p>}
         </EmptyContent>
       </Empty>
 

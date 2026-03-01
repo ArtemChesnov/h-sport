@@ -190,7 +190,7 @@ export function ProductSlugClient({
 
               {/* Табы: Описание, Доставка, Возврат */}
               <div ref={tabsRef} className="motion-reduce:opacity-100">
-                <ProductTabs description={product.description} />
+                <ProductTabs description={product.description} composition={product.composition} />
               </div>
 
               {/* Статус доступности */}

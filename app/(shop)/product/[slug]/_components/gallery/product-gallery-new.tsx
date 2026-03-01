@@ -1,7 +1,13 @@
 "use client";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
 import { cn } from "@/shared/lib/utils";
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, X } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -27,6 +33,7 @@ export function ProductGalleryNew({
   className,
 }: ProductGalleryNewProps) {
   const [imageLoadingStates, setImageLoadingStates] = useState<Record<string, boolean>>({});
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [thumbnailsHovered, setThumbnailsHovered] = useState(false);
   const [mobileThumbnailsHovered, setMobileThumbnailsHovered] = useState(false);
   const [mainImageHovered, setMainImageHovered] = useState(false);
@@ -161,7 +168,7 @@ export function ProductGalleryNew({
   if (!images || images.length === 0) {
     return (
       <div
-        className={cn("relative aspect-[880/920] w-full overflow-hidden bg-muted/40", className)}
+        className={cn("relative aspect-[880/920] w-full overflow-hidden bg-neutral-900", className)}
       >
         <div className="flex h-full items-center justify-center">
           <span className="text-muted-foreground">Изображение недоступно</span>
@@ -240,14 +247,20 @@ export function ProductGalleryNew({
 
         {/* Главное изображение — высота 940px; при 1920+ ширина 880px */}
         <div
-          className="relative flex-1 min-w-[400px] max-w-[880px] min-[1920px]:w-[880px] min-[1920px]:min-w-[880px] min-[1920px]:max-w-[880px] min-[1920px]:flex-none h-full min-h-0 overflow-hidden bg-muted/40"
+          className="relative flex-1 min-w-[400px] max-w-[880px] min-[1920px]:w-[880px] min-[1920px]:min-w-[880px] min-[1920px]:max-w-[880px] min-[1920px]:flex-none h-full min-h-0 overflow-hidden bg-neutral-900"
           onMouseEnter={() => setMainImageHovered(true)}
           onMouseLeave={() => setMainImageHovered(false)}
         >
+          <button
+            type="button"
+            className="absolute inset-0 z-10 cursor-zoom-in focus:outline-none"
+            onClick={() => setLightboxOpen(true)}
+            aria-label="Открыть фото в полном размере"
+          />
           <div
             key={currentImage}
             className={cn(
-              "absolute inset-0 animate-in fade-in-0 zoom-in-95 duration-300 ease-out",
+              "absolute inset-0 z-0 animate-in fade-in-0 duration-300 ease-out",
               imageLoadingStates[currentImage] && "opacity-0 transition-opacity duration-200"
             )}
           >
@@ -255,7 +268,7 @@ export function ProductGalleryNew({
               src={currentImage}
               alt="Товар"
               fill
-              className="object-cover"
+              className="object-contain"
               priority
               sizes="880px"
               onLoad={() => handleImageLoad(currentImage)}
@@ -264,14 +277,18 @@ export function ProductGalleryNew({
           </div>
 
           {imageLoadingStates[currentImage] && (
-            <div className="absolute inset-0 animate-pulse bg-muted/40 rounded-[inherit]" />
+            <div className="absolute inset-0 animate-pulse bg-neutral-800 rounded-[inherit]" />
           )}
 
           {images.length > 1 && currentIndex > 0 && (
             <button
-              onClick={goToPrevImage}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                goToPrevImage();
+              }}
               className={cn(
-                "absolute left-4 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-12 h-12 rounded-full bg-white/60 backdrop-blur-sm transition-opacity duration-300 hover:bg-white/80 cursor-pointer",
+                "absolute left-4 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-12 h-12 rounded-full bg-white/60 backdrop-blur-sm transition-opacity duration-300 hover:bg-white/80 cursor-pointer",
                 mainImageHovered ? "opacity-100" : "opacity-0 pointer-events-none"
               )}
               aria-label="Предыдущее изображение"
@@ -282,9 +299,13 @@ export function ProductGalleryNew({
 
           {images.length > 1 && currentIndex < images.length - 1 && (
             <button
-              onClick={goToNextImage}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                goToNextImage();
+              }}
               className={cn(
-                "absolute right-4 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-12 h-12 rounded-full bg-white/60 backdrop-blur-sm transition-opacity duration-300 hover:bg-white/80 cursor-pointer",
+                "absolute right-4 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-12 h-12 rounded-full bg-white/60 backdrop-blur-sm transition-opacity duration-300 hover:bg-white/80 cursor-pointer",
                 mainImageHovered ? "opacity-100" : "opacity-0 pointer-events-none"
               )}
               aria-label="Следующее изображение"
@@ -299,14 +320,20 @@ export function ProductGalleryNew({
       <div className="flex flex-col gap-3 lg:hidden">
         {/* Главное изображение — мобайл */}
         <div
-          className="relative w-full aspect-[880/940] overflow-hidden bg-muted/40"
+          className="relative w-full aspect-[880/940] overflow-hidden bg-neutral-900"
           onMouseEnter={() => setMainImageHovered(true)}
           onMouseLeave={() => setMainImageHovered(false)}
         >
+          <button
+            type="button"
+            className="absolute inset-0 z-10 cursor-zoom-in focus:outline-none"
+            onClick={() => setLightboxOpen(true)}
+            aria-label="Открыть фото в полном размере"
+          />
           <div
             key={currentImage}
             className={cn(
-              "absolute inset-0 animate-in fade-in-0 zoom-in-95 duration-300 ease-out",
+              "absolute inset-0 z-0 animate-in fade-in-0 duration-300 ease-out",
               imageLoadingStates[currentImage] && "opacity-0 transition-opacity duration-200"
             )}
           >
@@ -314,24 +341,28 @@ export function ProductGalleryNew({
               src={currentImage}
               alt="Товар"
               fill
-              className="object-cover"
+              className="object-contain"
               priority
-              sizes="100vw"
+              sizes="(max-width: 1024px) 96vw, 0"
               onLoad={() => handleImageLoad(currentImage)}
               onLoadStart={() => handleImageLoadStart(currentImage)}
             />
           </div>
 
           {imageLoadingStates[currentImage] && (
-            <div className="absolute inset-0 animate-pulse bg-muted/40" />
+            <div className="absolute inset-0 animate-pulse bg-neutral-800" />
           )}
 
           {/* Кнопка "Назад" */}
           {images.length > 1 && currentIndex > 0 && (
             <button
-              onClick={goToPrevImage}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                goToPrevImage();
+              }}
               className={cn(
-                "absolute left-4 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-10 h-10 rounded-full bg-white/60 backdrop-blur-sm transition-opacity duration-300 hover:bg-white/80 cursor-pointer",
+                "absolute left-4 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-10 h-10 rounded-full bg-white/60 backdrop-blur-sm transition-opacity duration-300 hover:bg-white/80 cursor-pointer",
                 mainImageHovered ? "opacity-100" : "opacity-0 pointer-events-none"
               )}
               aria-label="Предыдущее изображение"
@@ -343,9 +374,13 @@ export function ProductGalleryNew({
           {/* Кнопка "Вперёд" */}
           {images.length > 1 && currentIndex < images.length - 1 && (
             <button
-              onClick={goToNextImage}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                goToNextImage();
+              }}
               className={cn(
-                "absolute right-4 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-10 h-10 rounded-full bg-white/60 backdrop-blur-sm transition-opacity duration-300 hover:bg-white/80 cursor-pointer",
+                "absolute right-4 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-10 h-10 rounded-full bg-white/60 backdrop-blur-sm transition-opacity duration-300 hover:bg-white/80 cursor-pointer",
                 mainImageHovered ? "opacity-100" : "opacity-0 pointer-events-none"
               )}
               aria-label="Следующее изображение"
@@ -421,6 +456,66 @@ export function ProductGalleryNew({
           </div>
         )}
       </div>
+
+      {/* Модальное окно просмотра фото */}
+      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+        <DialogContent
+          showCloseButton={false}
+          className="!fixed !inset-0 !top-0 !left-0 !right-0 !bottom-0 !w-screen !h-screen !max-w-none !max-h-none sm:!max-w-none sm:!max-h-none !rounded-none border-0 bg-neutral-950 p-0 overflow-hidden gap-0 !translate-x-0 !translate-y-0 shadow-none"
+        >
+          <DialogTitle className="sr-only">Просмотр фото товара</DialogTitle>
+          <DialogDescription className="sr-only">
+            Полноэкранный просмотр фото. Стрелки влево и вправо переключают изображения.
+          </DialogDescription>
+          <button
+            type="button"
+            onClick={() => setLightboxOpen(false)}
+            className="absolute top-4 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+            aria-label="Закрыть"
+          >
+            <X className="h-6 w-6" />
+          </button>
+
+          <div className="absolute inset-0 flex items-center justify-center bg-neutral-950 p-4">
+            <div className="relative w-full h-full max-w-full max-h-full">
+              <Image
+                src={currentImage}
+                alt="Товар — полноразмерный просмотр"
+                fill
+                className="object-contain"
+                sizes="90vw"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+
+            {images.length > 1 && currentIndex > 0 && (
+              <button
+                type="button"
+                onClick={goToPrevImage}
+                className="absolute left-2 top-1/2 z-50 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 sm:left-4"
+                aria-label="Предыдущее изображение"
+              >
+                <ChevronLeft className="h-8 w-8" />
+              </button>
+            )}
+
+            {images.length > 1 && currentIndex < images.length - 1 && (
+              <button
+                type="button"
+                onClick={goToNextImage}
+                className="absolute right-2 top-1/2 z-50 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 sm:right-4"
+                aria-label="Следующее изображение"
+              >
+                <ChevronRight className="h-8 w-8" />
+              </button>
+            )}
+
+            <span className="absolute bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-sm text-white/90">
+              {currentIndex + 1} / {images.length}
+            </span>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

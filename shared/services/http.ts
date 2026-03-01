@@ -56,26 +56,21 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Подавляем логирование 401 ошибок для /api/shop/profile (это ожидаемо при проверке авторизации)
+// Подавляем логирование 401 для проверки авторизации (ожидаемо для неавторизованных)
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Подавляем 401 ошибки для /api/shop/profile - это ожидаемо при проверке авторизации
     if (error.response?.status === 401) {
       const url = error.config?.url || error.response?.config?.url || "";
-      if (url.includes("/shop/profile")) {
-        // Возвращаем ошибку, но подавляем её логирование в консоли браузера
-        // Это ожидаемое поведение при проверке авторизации для неавторизованных пользователей
-        // Ошибка обрабатывается в React Query и не должна засорять консоль
+      const isAuthCheck = url.includes("/shop/profile") || url.includes("/auth/me");
+      if (isAuthCheck) {
         const mutedError = error;
-        // Подавляем вывод ошибки в консоль, но сохраняем её для обработки в React Query
         Object.defineProperty(mutedError, "mute", { value: true, writable: false });
         return Promise.reject(mutedError);
       }
     }
-    // Для всех остальных ошибок - стандартное поведение
     return Promise.reject(error);
-  },
+  }
 );
 
 /**
@@ -119,7 +114,6 @@ export enum ApiRoutes {
   ADMIN_DASHBOARD = "/admin/dashboard",
   ADMIN_BUSINESS_METRICS = "/admin/business-metrics",
 
-
   ADMIN_USERS = "/admin/users",
 
   ADMIN_NEWSLETTER_SUBSCRIBERS = "/admin/newsletter/subscribers",
@@ -129,14 +123,12 @@ export enum ApiRoutes {
 /**
  * /api/shop/cart/items/:id
  */
-export const buildCartItemUrl = (id: number | string) =>
-  `${ApiRoutes.CART_ITEMS}/${id}`;
+export const buildCartItemUrl = (id: number | string) => `${ApiRoutes.CART_ITEMS}/${id}`;
 
 /**
  * /api/shop/product/:slug
  */
-export const buildProductItemUrl = (slug: string) =>
-  `${ApiRoutes.PRODUCT_ITEM}/${slug}`;
+export const buildProductItemUrl = (slug: string) => `${ApiRoutes.PRODUCT_ITEM}/${slug}`;
 
 /**
  * /api/shop/favorites/:productId
@@ -147,38 +139,32 @@ export const buildFavoriteUrl = (productId: number | string) =>
 /**
  * /api/shop/orders/:uid
  */
-export const buildOrderUrl = (uid: string | number) =>
-  `${ApiRoutes.ORDERS}/${uid}`;
+export const buildOrderUrl = (uid: string | number) => `${ApiRoutes.ORDERS}/${uid}`;
 
 /**
  * /api/(admin)/products/:slug
  */
-export const buildAdminProductUrl = (slug: string) =>
-  `${ApiRoutes.ADMIN_PRODUCTS}/${slug}`;
+export const buildAdminProductUrl = (slug: string) => `${ApiRoutes.ADMIN_PRODUCTS}/${slug}`;
 
 /**
  * /api/(admin)/orders/:id
  */
-export const buildAdminOrderUrl = (id: number | string) =>
-  `${ApiRoutes.ADMIN_ORDERS}/${id}`;
+export const buildAdminOrderUrl = (id: number | string) => `${ApiRoutes.ADMIN_ORDERS}/${id}`;
 
 /**
  * /api/shop/orders/:uid/cancel
  */
-export const buildOrderCancelUrl = (uid: string | number) =>
-  `${ApiRoutes.ORDERS}/${uid}/cancel`;
+export const buildOrderCancelUrl = (uid: string | number) => `${ApiRoutes.ORDERS}/${uid}/cancel`;
 
 /**
  * /api/(admin)/promos/:id
  */
-export const buildAdminPromoCodesUrl = (id: string | number) =>
-  `${ApiRoutes.ADMIN_PROMOS}/${id}`;
+export const buildAdminPromoCodesUrl = (id: string | number) => `${ApiRoutes.ADMIN_PROMOS}/${id}`;
 
 /**
  * /api/(admin)/users/:id
  */
-export const buildAdminUserUrl = (id: string | number) =>
-  `${ApiRoutes.ADMIN_USERS}/${id}`;
+export const buildAdminUserUrl = (id: string | number) => `${ApiRoutes.ADMIN_USERS}/${id}`;
 
 /**
  * /api/admin/newsletter/subscribers/:id

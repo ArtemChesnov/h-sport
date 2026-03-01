@@ -1,12 +1,13 @@
 /** Расширенные метрики: корзины, заказы, пользователи, доставка, платежи (лимиты). */
 
 import {
-    ADVANCED_METRICS_CART_SAMPLE_LIMIT,
-    ADVANCED_METRICS_ORDER_ITEMS_LIMIT,
-    ADVANCED_METRICS_USERS_ORDERS_LIMIT,
-    MAX_METRICS_QUERY_LIMIT,
-    PRODUCT_IDS_BATCH_SIZE,
+  ADVANCED_METRICS_CART_SAMPLE_LIMIT,
+  ADVANCED_METRICS_ORDER_ITEMS_LIMIT,
+  ADVANCED_METRICS_USERS_ORDERS_LIMIT,
+  MAX_METRICS_QUERY_LIMIT,
+  PRODUCT_IDS_BATCH_SIZE,
 } from "@/shared/constants";
+import { getExcludeTestUserOrderWhere } from "@/shared/lib/auth/privileged";
 import type { PrismaClient } from "@prisma/client";
 import { OrderStatus, PaymentStatus } from "@prisma/client";
 
@@ -81,14 +82,19 @@ export interface AdvancedMetricsResponse {
   categories: CategoryMetrics;
 }
 
-const PAID_ORDER_STATUSES = [OrderStatus.PAID, OrderStatus.PROCESSING, OrderStatus.SHIPPED, OrderStatus.DELIVERED];
+const PAID_ORDER_STATUSES = [
+  OrderStatus.PAID,
+  OrderStatus.PROCESSING,
+  OrderStatus.SHIPPED,
+  OrderStatus.DELIVERED,
+];
 
 /**
  * Получает все расширенные метрики
  */
 export async function getAdvancedMetrics(
   prisma: PrismaClient,
-  periodDays: number,
+  periodDays: number
 ): Promise<AdvancedMetricsResponse> {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - periodDays);
@@ -142,8 +148,11 @@ async function getCartMetrics(prisma: PrismaClient, cutoff: Date): Promise<CartM
   });
 
   const orderedCartTokens = new Set(ordersFromCarts.map((o) => o.cartToken).filter(Boolean));
-  const abandonedCarts = cartsWithToken.filter((c) => c.cartToken && !orderedCartTokens.has(c.cartToken as string));
-  const abandonedCartRate = cartTokens.length > 0 ? (abandonedCarts.length / cartTokens.length) * 100 : 0;
+  const abandonedCarts = cartsWithToken.filter(
+    (c) => c.cartToken && !orderedCartTokens.has(c.cartToken as string)
+  );
+  const abandonedCartRate =
+    cartTokens.length > 0 ? (abandonedCarts.length / cartTokens.length) * 100 : 0;
 
   const cartItemsAgg = await prisma.cartItem.aggregate({
     where: { cart: { createdAt: { gte: cutoff }, items: { some: {} } } },
@@ -163,7 +172,11 @@ async function getCartMetrics(prisma: PrismaClient, cutoff: Date): Promise<CartM
  * Метрики заказов
  */
 async function getOrderMetrics(prisma: PrismaClient, cutoff: Date): Promise<OrderMetrics> {
-  const where = { createdAt: { gte: cutoff }, status: { in: PAID_ORDER_STATUSES } };
+  const where = {
+    createdAt: { gte: cutoff },
+    status: { in: PAID_ORDER_STATUSES },
+    ...getExcludeTestUserOrderWhere(),
+  };
 
   const [orderAgg, totalOrders] = await Promise.all([
     prisma.order.aggregate({ where, _avg: { total: true } }),
@@ -180,7 +193,11 @@ async function getOrderMetrics(prisma: PrismaClient, cutoff: Date): Promise<Orde
  * Метрики пользователей
  */
 async function getUserMetrics(prisma: PrismaClient, cutoff: Date): Promise<UserMetrics> {
-  const orderWhere = { createdAt: { gte: cutoff }, status: { in: PAID_ORDER_STATUSES } };
+  const orderWhere = {
+    createdAt: { gte: cutoff },
+    status: { in: PAID_ORDER_STATUSES },
+    ...getExcludeTestUserOrderWhere(),
+  };
 
   const [newUsers, allUsersWithOrders, ordersWithTotals] = await Promise.all([
     prisma.user.count({ where: { createdAt: { gte: cutoff } } }),
@@ -209,7 +226,9 @@ async function getUserMetrics(prisma: PrismaClient, cutoff: Date): Promise<UserM
   const totalCustomers = allUsersWithOrders.length;
   const newCustomers = allUsersWithOrders.filter((u) => {
     const firstOrder = u.orders[0];
-    return firstOrder && firstOrder.createdAt.getTime() - u.createdAt.getTime() < 24 * 60 * 60 * 1000;
+    return (
+      firstOrder && firstOrder.createdAt.getTime() - u.createdAt.getTime() < 24 * 60 * 60 * 1000
+    );
   }).length;
 
   const returningCustomers = totalCustomers - newCustomers;
@@ -238,7 +257,11 @@ async function getUserMetrics(prisma: PrismaClient, cutoff: Date): Promise<UserM
  */
 async function getDeliveryMetrics(prisma: PrismaClient, cutoff: Date): Promise<DeliveryMetrics> {
   const deliveryWhere = {
-    order: { createdAt: { gte: cutoff }, status: { in: PAID_ORDER_STATUSES } },
+    order: {
+      createdAt: { gte: cutoff },
+      status: { in: PAID_ORDER_STATUSES },
+      ...getExcludeTestUserOrderWhere(),
+    },
   };
 
   const [deliveryMethodCounts, deliveryFeeAgg] = await Promise.all([
@@ -270,7 +293,11 @@ async function getDeliveryMetrics(prisma: PrismaClient, cutoff: Date): Promise<D
  * Метрики оплаты
  */
 async function getPaymentMetrics(prisma: PrismaClient, cutoff: Date): Promise<PaymentMetrics> {
-  const paymentWhere = { createdAt: { gte: cutoff }, status: PaymentStatus.PAID };
+  const paymentWhere = {
+    createdAt: { gte: cutoff },
+    status: PaymentStatus.PAID,
+    order: getExcludeTestUserOrderWhere(),
+  };
 
   const [paymentMethodCounts, totalPayments] = await Promise.all([
     prisma.payment.groupBy({
@@ -293,7 +320,11 @@ async function getPaymentMetrics(prisma: PrismaClient, cutoff: Date): Promise<Pa
  * Метрики категорий
  */
 async function getCategoryMetrics(prisma: PrismaClient, cutoff: Date): Promise<CategoryMetrics> {
-  const orderWhere = { createdAt: { gte: cutoff }, status: { in: PAID_ORDER_STATUSES } };
+  const orderWhere = {
+    createdAt: { gte: cutoff },
+    status: { in: PAID_ORDER_STATUSES },
+    ...getExcludeTestUserOrderWhere(),
+  };
 
   const orderItems = await prisma.orderItem.findMany({
     where: { order: orderWhere },
@@ -304,20 +335,26 @@ async function getCategoryMetrics(prisma: PrismaClient, cutoff: Date): Promise<C
 
   const productIds = [...new Set(orderItems.map((i) => i.productId))];
 
-  const batchPromises: Array<Promise<Array<{ id: number; category: { name: string } | null }>>> = [];
+  const batchPromises: Array<Promise<Array<{ id: number; category: { name: string } | null }>>> =
+    [];
   for (let i = 0; i < productIds.length; i += PRODUCT_IDS_BATCH_SIZE) {
     const batch = productIds.slice(i, i + PRODUCT_IDS_BATCH_SIZE);
     batchPromises.push(
       prisma.product.findMany({
         where: { id: { in: batch } },
         select: { id: true, category: { select: { name: true } } },
-      }),
+      })
     );
   }
   const products = (await Promise.all(batchPromises)).flat();
 
-  const productCategoryMap = new Map(products.map((p) => [p.id, p.category?.name || "Без категории"]));
-  const categoryStats: Record<string, { views: number; orders: number; revenue: number; items: number }> = {};
+  const productCategoryMap = new Map(
+    products.map((p) => [p.id, p.category?.name || "Без категории"])
+  );
+  const categoryStats: Record<
+    string,
+    { views: number; orders: number; revenue: number; items: number }
+  > = {};
 
   orderItems.forEach((item) => {
     const categoryName = productCategoryMap.get(item.productId) || "Без категории";

@@ -46,7 +46,7 @@ export const NewProductsCard: React.FC<Props> = ({
           <Image
             width={607}
             height={1014}
-            src={imageUrl || "/assets/images/fitness.webp"}
+            src={imageUrl || "/assets/images/sport-types/fitness.webp"}
             alt={name}
             className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
             sizes="(max-width: 1280px) 50vw, (max-width: 1920px) 50vw, 607px"

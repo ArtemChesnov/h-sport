@@ -18,9 +18,14 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform((val) => val === "true"),
+  CDEK_FROM_CITY_CODE: z.string().optional(),
 
   // DaData API
   DADATA_TOKEN: z.string().optional(),
+
+  // Postcalc.RU (тарифы Почты России)
+  POSTCALC_FROM_CITY: z.string().optional(),
+  POSTCALC_KEY: z.string().optional(),
 
   // Авторизация
   AUTH_SECRET: z.string().optional(),

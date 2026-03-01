@@ -8,6 +8,13 @@ import { createErrorResponse } from "@/shared/lib/api/error-response";
 import { applyRateLimit } from "@/shared/lib/api/rate-limit-middleware";
 import { logger } from "@/shared/lib/logger";
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+
+const clientErrorBodySchema = z.object({
+  message: z.string().max(10_000),
+  stack: z.string().max(50_000).optional(),
+  componentStack: z.string().max(50_000).optional(),
+});
 
 async function handler(request: NextRequest): Promise<NextResponse> {
   const rateLimitResponse = await applyRateLimit(request, "clientErrors");
@@ -18,8 +25,16 @@ async function handler(request: NextRequest): Promise<NextResponse> {
     return sizeCheck.response;
   }
 
-  const body = await request.json();
-  const { message, stack, componentStack } = body;
+  const raw = await request.json();
+  const parsed = clientErrorBodySchema.safeParse(raw);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { success: false, error: "Invalid body: message required" },
+      { status: 400 }
+    );
+  }
+
+  const { message, stack, componentStack } = parsed.data;
 
   const errorData = {
     message: "Client-side error from ErrorBoundary",

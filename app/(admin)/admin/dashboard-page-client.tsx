@@ -46,8 +46,8 @@ function MetricsSectionSkeleton() {
         <Skeleton className="h-3 w-64" />
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {[1, 2, 3, 4].map((i) => (
-          <Card key={i} className="rounded-2xl border shadow-sm">
+        {[1, 2, 3, 4].map((id) => (
+          <Card key={`dashboard-skeleton-${id}`} className="rounded-2xl border shadow-sm">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2 mb-2">
                 <Skeleton className="h-5 w-5 rounded" />
@@ -67,7 +67,8 @@ function MetricsSectionSkeleton() {
 
 // Динамические импорты для тяжелых компонентов с графиками (Recharts) - ускоряет первоначальную компиляцию
 const RevenueChart = dynamic(
-  () => import("./components/dashboard/revenue-chart").then((mod) => ({ default: mod.RevenueChart })),
+  () =>
+    import("./components/dashboard/revenue-chart").then((mod) => ({ default: mod.RevenueChart })),
   { ssr: false, loading: () => <ChartSkeleton /> }
 );
 
@@ -77,17 +78,26 @@ const OrdersChart = dynamic(
 );
 
 const EcommerceMetricsCard = dynamic(
-  () => import("./components/dashboard/ecommerce-metrics-card").then((mod) => ({ default: mod.EcommerceMetricsCard })),
+  () =>
+    import("./components/dashboard/ecommerce-metrics-card").then((mod) => ({
+      default: mod.EcommerceMetricsCard,
+    })),
   { ssr: false, loading: () => <MetricsSectionSkeleton /> }
 );
 
 const AdvancedMetricsCard = dynamic(
-  () => import("./components/dashboard/advanced-metrics-card").then((mod) => ({ default: mod.AdvancedMetricsCard })),
+  () =>
+    import("./components/dashboard/advanced-metrics-card").then((mod) => ({
+      default: mod.AdvancedMetricsCard,
+    })),
   { ssr: false, loading: () => <MetricsSectionSkeleton /> }
 );
 
 const BusinessMetricsCard = dynamic(
-  () => import("./components/dashboard/business-metrics-card").then((mod) => ({ default: mod.BusinessMetricsCard })),
+  () =>
+    import("./components/dashboard/business-metrics-card").then((mod) => ({
+      default: mod.BusinessMetricsCard,
+    })),
   { ssr: false, loading: () => <MetricsSectionSkeleton /> }
 );
 
@@ -96,8 +106,7 @@ const BusinessMetricsCard = dynamic(
  * Премиум дизайн в едином стиле.
  */
 export function DashboardPageClient() {
-  const [period, setPeriod] =
-    React.useState<DTO.AdminDashboardPeriodDto>("30d");
+  const [period, setPeriod] = React.useState<DTO.AdminDashboardPeriodDto>("30d");
 
   const { data, isLoading, isError, error } = useAdminDashboardQuery({
     period,
@@ -108,7 +117,9 @@ export function DashboardPageClient() {
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 md:gap-4">
         <div className="min-w-0 flex-1">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">Главная</h1>
-          <p className="text-[11px] sm:text-xs md:text-sm text-muted-foreground mt-0.5 sm:mt-1">Панель управления и статистика</p>
+          <p className="text-[11px] sm:text-xs md:text-sm text-muted-foreground mt-0.5 sm:mt-1">
+            Панель управления и статистика
+          </p>
         </div>
         <div className="w-full sm:w-auto">
           <PeriodSwitcher period={period} onChange={setPeriod} />
@@ -145,7 +156,9 @@ export function DashboardPageClient() {
           <div>
             <div className="mb-4">
               <h2 className="text-lg font-semibold">Динамика</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">Графики выручки и заказов по дням</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Графики выручки и заказов по дням
+              </p>
             </div>
             <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2">
               <RevenueChart data={data?.chart} isLoading={isLoading} />

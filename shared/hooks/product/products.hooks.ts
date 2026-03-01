@@ -6,7 +6,8 @@ import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 /**
  * Хук для получения списка товаров (каталог витрины).
  *
- * SSR-safe: использует enabled: false на сервере.
+ * SSR-safe: при передаче initialData запрос не выполняется на сервере (данные уже есть).
+ * Без initialData запрос выполняется на клиенте.
  */
 export function useProductsQuery(
   params: DTO.ProductsQueryDto = {},
@@ -15,14 +16,7 @@ export function useProductsQuery(
     enabled?: boolean;
   }
 ): UseQueryResult<DTO.ProductsListResponseDto, Error> {
-  // Стабильный ключ: разные комбинации фильтров/сортировок — разные записи в кэше
   const stableKey = ["products", JSON.stringify(params)] as const;
-
-  // Проверяем, что мы на клиенте
-  const isClient = typeof window !== "undefined";
-
-  // На клиенте используем React Query, на сервере отключаем запрос
-  const shouldEnable = isClient && (options?.enabled ?? true);
 
   return useQuery({
     queryKey: stableKey,
@@ -30,6 +24,7 @@ export function useProductsQuery(
     staleTime: 5 * 60_000,
     gcTime: 10 * 60 * 1000,
     placeholderData: (previousData) => previousData,
+    enabled: options?.enabled ?? true,
     ...(options?.initialData && {
       initialData: options.initialData,
       refetchOnMount: false,
@@ -37,7 +32,6 @@ export function useProductsQuery(
       refetchOnReconnect: false,
       staleTime: 5 * 60_000,
     }),
-    enabled: shouldEnable,
   });
 }
 

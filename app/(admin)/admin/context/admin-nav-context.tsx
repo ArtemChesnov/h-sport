@@ -17,7 +17,11 @@ const AdminNavContext = React.createContext<AdminNavContextValue | null>(null);
  */
 export function AdminNavProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [pendingPath, setPendingPath] = React.useState<string | null>(null);
+  const [pendingPath, setPendingPathState] = React.useState<string | null>(null);
+
+  const setPendingPath = React.useCallback((path: string | null) => {
+    setPendingPathState(path);
+  }, []);
 
   React.useEffect(() => {
     if (pendingPath == null) return;
@@ -26,21 +30,22 @@ export function AdminNavProvider({ children }: { children: React.ReactNode }) {
         ? pathname === "/admin"
         : pathname === pendingPath || pathname.startsWith(pendingPath + "/");
     if (matches) {
-      setPendingPath(null);
+      setPendingPathState(null);
     }
   }, [pathname, pendingPath]);
 
   const isNavigating = pendingPath != null;
 
-  const value: AdminNavContextValue = {
-    pendingPath,
-    setPendingPath,
-    isNavigating,
-  };
-
-  return (
-    <AdminNavContext.Provider value={value}>{children}</AdminNavContext.Provider>
+  const value = React.useMemo<AdminNavContextValue>(
+    () => ({
+      pendingPath,
+      setPendingPath,
+      isNavigating,
+    }),
+    [pendingPath, isNavigating, setPendingPath]
   );
+
+  return <AdminNavContext.Provider value={value}>{children}</AdminNavContext.Provider>;
 }
 
 export function useAdminNav() {

@@ -15,6 +15,7 @@ import {
   favoriteActions,
   conversions,
 } from "./ecommerce-metrics-storage";
+import { TEST_USER_EMAIL } from "@/shared/lib/auth/privileged";
 import { MAX_METRICS_QUERY_LIMIT } from "@/shared/constants";
 
 /**
@@ -24,7 +25,7 @@ import { MAX_METRICS_QUERY_LIMIT } from "@/shared/constants";
  */
 export async function loadMetricsFromDb(
   cutoff: Date,
-  now: Date,
+  now: Date
 ): Promise<{
   views: ProductViewMetric[];
   cartActions: CartActionMetric[];
@@ -48,7 +49,10 @@ export async function loadMetricsFromDb(
         take: MAX_METRICS_QUERY_LIMIT,
       }),
       prisma.conversion.findMany({
-        where: { createdAt: { gte: cutoff } },
+        where: {
+          createdAt: { gte: cutoff },
+          OR: [{ orderId: null }, { order: { email: { not: TEST_USER_EMAIL } } }],
+        },
         take: MAX_METRICS_QUERY_LIMIT,
       }),
     ]);
@@ -124,9 +128,17 @@ export interface AggregatedMetricsResult {
   };
 }
 
-interface CountResult { count: bigint }
-interface ProductCountResult { product_id: number; count: bigint }
-interface ConversionCountResult { type: string; count: bigint }
+interface CountResult {
+  count: bigint;
+}
+interface ProductCountResult {
+  product_id: number;
+  count: bigint;
+}
+interface ConversionCountResult {
+  type: string;
+  count: bigint;
+}
 
 /**
  * Получает агрегированные метрики напрямую из БД (без загрузки в память)
@@ -134,7 +146,7 @@ interface ConversionCountResult { type: string; count: bigint }
  */
 export async function getAggregatedMetricsFromDb(
   cutoff: Date,
-  now: Date,
+  now: Date
 ): Promise<AggregatedMetricsResult> {
   try {
     const { prisma } = await import("@/prisma/prisma-client");
@@ -222,12 +234,14 @@ export async function getAggregatedMetricsFromDb(
         ORDER BY count DESC
         LIMIT 10
       `,
-      // Conversions by type
+      // Conversions by type (исключаем конверсии, привязанные к заказам тестового пользователя)
       prisma.$queryRaw<ConversionCountResult[]>`
-        SELECT type, COUNT(*)::bigint AS count
-        FROM "Conversion"
-        WHERE "createdAt" >= ${cutoff} AND "createdAt" <= ${now}
-        GROUP BY type
+        SELECT c.type, COUNT(*)::bigint AS count
+        FROM "Conversion" c
+        LEFT JOIN "Order" o ON o.id = c."orderId"
+        WHERE c."createdAt" >= ${cutoff} AND c."createdAt" <= ${now}
+          AND (c."orderId" IS NULL OR o.email <> ${TEST_USER_EMAIL})
+        GROUP BY c.type
       `,
       // Engaged users (those who added to cart OR favorites)
       prisma.$queryRaw<[CountResult]>`
@@ -260,8 +274,10 @@ export async function getAggregatedMetricsFromDb(
 
     // Рассчитываем rates
     const viewToCartRate = totalViews > 0 ? Math.round((viewToCart / totalViews) * 10000) / 100 : 0;
-    const cartToOrderRate = totalCartAdds > 0 ? Math.round((cartToOrder / totalCartAdds) * 10000) / 100 : 0;
-    const engagementRate = uniqueViewers > 0 ? Math.round((totalEngagedUsers / uniqueViewers) * 10000) / 100 : 0;
+    const cartToOrderRate =
+      totalCartAdds > 0 ? Math.round((cartToOrder / totalCartAdds) * 10000) / 100 : 0;
+    const engagementRate =
+      uniqueViewers > 0 ? Math.round((totalEngagedUsers / uniqueViewers) * 10000) / 100 : 0;
 
     return {
       views: {
@@ -307,7 +323,13 @@ export async function getAggregatedMetricsFromDb(
       views: { total: 0, uniqueUsers: 0, topProducts: [] },
       cart: { totalAdds: 0, uniqueUsers: 0, topProducts: [] },
       favorites: { totalAdds: 0, uniqueUsers: 0, topProducts: [] },
-      conversions: { viewToCart: 0, cartToOrder: 0, viewToOrder: 0, viewToCartRate: 0, cartToOrderRate: 0 },
+      conversions: {
+        viewToCart: 0,
+        cartToOrder: 0,
+        viewToOrder: 0,
+        viewToCartRate: 0,
+        cartToOrderRate: 0,
+      },
       engagement: { rate: 0, engagedUsers: 0, totalViewers: 0 },
     };
   }

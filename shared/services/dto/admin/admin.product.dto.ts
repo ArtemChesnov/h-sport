@@ -162,6 +162,8 @@ export type AdminProductFormValues = {
 export type AdminProductFormProps = {
   mode: "create" | "edit";
   initialValues: AdminProductFormValues;
+  /** Имя категории товара (для отображения в селекте до загрузки списка категорий) */
+  initialCategoryName?: string;
   isSubmitting?: boolean;
   onSubmit: (values: AdminProductFormValues) => void;
   onDelete?: () => void;

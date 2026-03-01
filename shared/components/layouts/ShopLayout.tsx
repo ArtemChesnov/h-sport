@@ -1,10 +1,14 @@
+"use client";
+
 import { CookieConsentBanner, Footer, Header } from "@/shared/components/common";
+import { ShopErrorBoundary } from "@/shared/components/error-boundaries/ShopErrorBoundary";
 import { ShopNavProvider } from "@/shared/contexts";
 import { NewsletterModalProvider } from "@/shared/contexts/newsletter-modal-context";
 import { cn } from "@/shared/lib/utils";
 /**
  * Общий layout магазина: Header, Footer, провайдеры.
- * Используется в app/(shop)/layout и в app/cart, app/catalog для единого UI.
+ * Error Boundary оборачивает только контент страницы — тогда Fast Refresh не делает
+ * full reload при правках компонентов внутри страницы (родитель остаётся функциональным).
  */
 export function ShopLayout({
   children,
@@ -17,7 +21,9 @@ export function ShopLayout({
         <ShopNavProvider>
           <NewsletterModalProvider>
             <Header />
-            <div className="min-h-[50vh]">{children}</div>
+            <ShopErrorBoundary>
+              <div className="min-h-[50vh]">{children}</div>
+            </ShopErrorBoundary>
             <Footer />
           </NewsletterModalProvider>
         </ShopNavProvider>

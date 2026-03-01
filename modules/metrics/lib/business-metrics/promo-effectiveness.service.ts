@@ -3,6 +3,7 @@
  */
 
 import { prisma } from "@/prisma/prisma-client";
+import { getExcludeTestUserOrderWhere } from "@/shared/lib/auth/privileged";
 import { OrderStatus } from "@prisma/client";
 import {
   calculateAverageDiscountPerOrder,
@@ -46,6 +47,7 @@ export async function getPromoEffectiveness(days: number): Promise<PromoEffectiv
       createdAt: { gte: from, lte: now },
       status: { in: includedStatuses },
       promoCodeId: { not: null },
+      ...getExcludeTestUserOrderWhere(),
     },
     include: {
       promoCode: {
@@ -95,6 +97,7 @@ export async function getPromoEffectiveness(days: number): Promise<PromoEffectiv
     where: {
       createdAt: { gte: from, lte: now },
       status: { in: includedStatuses },
+      ...getExcludeTestUserOrderWhere(),
     },
   });
 

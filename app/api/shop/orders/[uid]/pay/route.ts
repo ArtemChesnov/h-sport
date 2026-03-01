@@ -47,7 +47,7 @@ export async function POST(
           amount: total,
           description: `Заказ №${orderId}`,
           email,
-          userParameters: { payment_method: "CARD", payment_id: paymentId.toString() },
+          userParameters: { Shp_payment_method: "CARD", Shp_payment_id: paymentId.toString() },
         });
         url = paymentUrl.url;
       } catch (err) {

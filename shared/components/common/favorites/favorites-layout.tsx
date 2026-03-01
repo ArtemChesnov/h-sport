@@ -61,7 +61,7 @@ export function FavoritesLayout({
   return (
     <div
       className={cn(
-        "space-y-6 min-h-100 max-[576px]:space-y-6 min-[768px]:space-y-8 min-[1024px]:space-y-10 mt-8 max-[768px]:mt-0 min-[768px]:mt-12 min-[1024px]:mt-15",
+        "space-y-6 min-h-100 max-[576px]:space-y-6 min-[768px]:space-y-8 min-[1024px]:space-y-10 mt-8 max-[768px]:mt-0 min-[768px]:mt-12 min-[1024px]:mt-0 ",
         className
       )}
       {...(dataAccountSection ? { "data-account-favorites-section": true } : {})}

@@ -4,7 +4,6 @@
  */
 
 declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace -- глобальный namespace для ProcessEnv
   namespace NodeJS {
     interface ProcessEnv {
       // Обязательные переменные
@@ -22,6 +21,7 @@ declare global {
       CDEK_CLIENT_ID?: string;
       CDEK_CLIENT_SECRET?: string;
       CDEK_IS_TEST?: string;
+      CDEK_FROM_CITY_CODE?: string;
       DADATA_TOKEN?: string;
       DB_POOL_MAX?: string;
       DB_POOL_TIMEOUT_MS?: string;
@@ -35,6 +35,13 @@ declare global {
       SMTP_PASSWORD?: string;
       SMTP_PORT?: string;
       SMTP_USER?: string;
+      POSTCALC_FROM_CITY?: string;
+      POSTCALC_KEY?: string;
+      ROBOKASSA_MERCHANT_LOGIN?: string;
+      ROBOKASSA_PASSWORD_1?: string;
+      ROBOKASSA_PASSWORD_2?: string;
+      ROBOKASSA_IS_TEST?: string;
+      ROBOKASSA_HASH_ALGORITHM?: string;
       UPSTASH_REDIS_REST_TOKEN?: string;
       UPSTASH_REDIS_REST_URL?: string;
 

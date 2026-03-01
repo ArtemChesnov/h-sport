@@ -9,9 +9,9 @@ import React from "react";
 import { toast } from "sonner";
 import { useCreateOrderMutation } from "../orders/orders.hooks";
 import {
-    buildFullAddressLine,
-    CHECKOUT_ADDRESS_STORAGE_KEY,
-    loadCheckoutAddressFromStorage,
+  buildFullAddressLine,
+  CHECKOUT_ADDRESS_STORAGE_KEY,
+  loadCheckoutAddressFromStorage,
 } from "./checkout.hooks";
 
 /** Страница оплаты: адрес из storage, создание заказа/платежа, редирект. */
@@ -90,7 +90,7 @@ export function useCheckoutPayment() {
             description: `Заказ №${order.id}`,
             email,
             userParameters: {
-              payment_method: paymentMethod,
+              Shp_payment_method: paymentMethod,
             },
           }),
         });

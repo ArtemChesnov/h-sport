@@ -1,5 +1,7 @@
 /** Админка: создание товара, список с фильтрами и сортировкой, get/update/delete по slug. */
 
+import fs from "fs";
+import path from "path";
 import { prisma } from "@/prisma/prisma-client";
 import { calculateSkip } from "@/shared/lib/pagination";
 import { slugify } from "@/shared/lib/generators";
@@ -11,6 +13,7 @@ import {
   getProductsWithMinPrice,
   mapProductToDetailDto,
 } from "@/shared/lib/products";
+import { deleteUploadedFiles } from "./upload.service";
 import type * as DTO from "@/shared/services/dto";
 import type { Prisma } from "@prisma/client";
 import type { Size as PrismaSize } from "@prisma/client";
@@ -40,69 +43,81 @@ export function normalizeProductPayload(raw: DTO.ProductCreateDto): DTO.ProductC
  * Создаёт товар с вариантами в транзакции
  */
 export async function createProduct(payload: DTO.ProductCreateDto): Promise<CreateProductResult> {
-  const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    // Проверяем категорию
-    const category = await tx.category.findUnique({
-      where: { id: payload.categoryId },
-    });
+  const result = await prisma.$transaction(
+    async (tx: Prisma.TransactionClient) => {
+      // Проверяем категорию
+      const category = await tx.category.findUnique({
+        where: { id: payload.categoryId },
+      });
 
-    if (!category) {
-      return { ok: false as const, status: 400, message: "Категория не найдена" };
-    }
+      if (!category) {
+        return { ok: false as const, status: 400, message: "Категория не найдена" };
+      }
 
-    // Генерируем уникальный slug
-    const baseSlug = payload.slug || slugify(payload.name);
-    const uniqueSlug = await ensureUniqueSlug(tx, baseSlug);
+      // Генерируем уникальный slug
+      const baseSlug = payload.slug || slugify(payload.name);
+      const uniqueSlug = await ensureUniqueSlug(tx, baseSlug);
 
-    // Создаём товар
-    const createdProduct = await tx.product.create({
-      data: {
-        name: payload.name,
-        slug: uniqueSlug,
-        categoryId: payload.categoryId,
-        description: payload.description,
-        composition: payload.composition,
-        tags: payload.tags,
-        images: payload.images,
-      },
-    });
+      // Создаём товар
+      // Синхронизируем product.images из imageUrls вариантов
+      let resolvedImages = payload.images ?? [];
+      if (payload.items.length > 0) {
+        const fromItems = payload.items.flatMap((it) => it.imageUrls ?? []);
+        const unique = Array.from(new Set(fromItems));
+        if (unique.length > 0) resolvedImages = unique;
+      }
 
-    // Генерируем базовый SKU
-    const baseSku =
-      payload.sku?.trim() || generateProductSku(createdProduct.id, { categorySlug: category.slug });
+      const createdProduct = await tx.product.create({
+        data: {
+          name: payload.name,
+          slug: uniqueSlug,
+          categoryId: payload.categoryId,
+          description: payload.description,
+          composition: payload.composition,
+          tags: payload.tags,
+          images: resolvedImages,
+        },
+      });
 
-    // Создаём варианты товара
-    const itemsData = payload.items.map((it, i) => {
-      const itemSku =
-        it.sku?.trim() || generateVariantSku(baseSku, i, { color: it.color, size: it.size });
+      // Генерируем базовый SKU
+      const baseSku =
+        payload.sku?.trim() ||
+        generateProductSku(createdProduct.id, { categorySlug: category.slug });
 
-      return {
-        productId: createdProduct.id,
-        sku: itemSku,
-        color: it.color,
-        size: it.size,
-        price: it.price,
-        isAvailable: Boolean(it.isAvailable),
-        imageUrls: it.imageUrls ?? [],
-      };
-    });
+      // Создаём варианты товара
+      const itemsData = payload.items.map((it, i) => {
+        const itemSku =
+          it.sku?.trim() || generateVariantSku(baseSku, i, { color: it.color, size: it.size });
 
-    if (itemsData.length > 0) {
-      await tx.productItem.createMany({ data: itemsData });
-    }
+        return {
+          productId: createdProduct.id,
+          sku: itemSku,
+          color: it.color,
+          size: it.size,
+          price: it.price,
+          isAvailable: Boolean(it.isAvailable),
+          imageUrls: Array.from(new Set(it.imageUrls ?? [])),
+        };
+      });
 
-    // Загружаем полные данные товара
-    const full = await tx.product.findUnique({
-      where: { id: createdProduct.id },
-      select: PRODUCT_DETAIL_SELECT,
-    });
+      if (itemsData.length > 0) {
+        await tx.productItem.createMany({ data: itemsData });
+      }
 
-    if (!full) {
-      return { ok: false as const, status: 500, message: "Не удалось прочитать созданный товар" };
-    }
+      // Загружаем полные данные товара
+      const full = await tx.product.findUnique({
+        where: { id: createdProduct.id },
+        select: PRODUCT_DETAIL_SELECT,
+      });
 
-    return { ok: true as const, product: full };
-  });
+      if (!full) {
+        return { ok: false as const, status: 500, message: "Не удалось прочитать созданный товар" };
+      }
+
+      return { ok: true as const, product: full };
+    },
+    { timeout: 15000 }
+  );
 
   if (!result.ok) {
     return { ok: false, status: result.status, message: result.message };
@@ -297,6 +312,7 @@ async function getProductsSortedByPopularity(
 
 /**
  * Деталка товара по slug для админки (форма редактирования).
+ * Если у товара битая ссылка на категорию (category удалена), подставляем первую существующую категорию.
  */
 export async function getAdminProductBySlug(slug: string): Promise<DTO.ProductDetailDto | null> {
   const product = await prisma.product.findUnique({
@@ -304,7 +320,24 @@ export async function getAdminProductBySlug(slug: string): Promise<DTO.ProductDe
     select: PRODUCT_DETAIL_SELECT,
   });
   if (!product) return null;
-  return mapProductToDetailDto(product as Parameters<typeof mapProductToDetailDto>[0]);
+
+  type ProductForMapper = Parameters<typeof mapProductToDetailDto>[0];
+  let productForMapper = product as ProductForMapper;
+
+  if (!productForMapper.category) {
+    const firstCategory = await prisma.category.findFirst({
+      orderBy: { id: "asc" },
+      select: { id: true, slug: true, name: true },
+    });
+    if (!firstCategory) return null;
+    productForMapper = {
+      ...productForMapper,
+      categoryId: firstCategory.id,
+      category: firstCategory,
+    } as ProductForMapper;
+  }
+
+  return mapProductToDetailDto(productForMapper);
 }
 
 function extractBaseSkuFromItems(items: { sku: string | null }[]): string | null {
@@ -341,10 +374,13 @@ export type UpdateAdminProductResult = {
 
 /**
  * Обновляет товар по slug (транзакция: продукт + варианты).
+ * Если передан basePath (например process.cwd()), после сохранения удаляет с диска
+ * файлы фото, которые больше не привязаны к товару.
  */
 export async function updateAdminProduct(
   slug: string,
-  body: DTO.ProductUpdateDto
+  body: DTO.ProductUpdateDto,
+  options?: { basePath?: string }
 ): Promise<UpdateAdminProductResult | null> {
   const {
     categoryId: incomingCategoryId,
@@ -358,113 +394,244 @@ export async function updateAdminProduct(
     items,
   } = body;
 
-  return prisma.$transaction(async (tx) => {
-    const existing = await tx.product.findUnique({
-      where: { slug },
-      select: {
-        id: true,
-        categoryId: true,
-        name: true,
-        slug: true,
-        description: true,
-        composition: true,
-        images: true,
-        tags: true,
-        category: { select: { slug: true } },
-        items: { select: { sku: true } },
-      },
-    });
-
-    if (!existing) return null;
-
-    const nextCategoryId = incomingCategoryId ?? existing.categoryId;
-    let categorySlug = existing.category.slug;
-
-    if (incomingCategoryId != null && incomingCategoryId !== existing.categoryId) {
-      const newCategory = await tx.category.findUnique({ where: { id: incomingCategoryId } });
-      if (!newCategory) throw new Error(`Категория с id=${incomingCategoryId} не найдена`);
-      categorySlug = newCategory.slug;
-    }
-
-    let baseSku: string;
-    if (typeof incomingSku === "string" && incomingSku.trim()) {
-      baseSku = incomingSku.trim();
-    } else {
-      const fromItems = extractBaseSkuFromItems(existing.items);
-      baseSku = fromItems ?? generateProductSku(existing.id, { categorySlug });
-    }
-
-    const updatedProduct = await tx.product.update({
-      where: { id: existing.id },
-      data: {
-        name: name ?? existing.name,
-        slug: newSlug ?? existing.slug,
-        categoryId: nextCategoryId,
-        description: description !== undefined ? description : existing.description,
-        composition: composition !== undefined ? composition : existing.composition,
-        images: images ?? existing.images,
-        tags: tags ?? existing.tags,
-      },
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        categoryId: true,
-        description: true,
-        composition: true,
-        images: true,
-        tags: true,
-        category: { select: { id: true, name: true, slug: true } },
-      },
-    });
-
-    if (!items) {
-      const existingItems = await tx.productItem.findMany({
-        where: { productId: existing.id },
-      });
-      return { ...updatedProduct, items: existingItems } as UpdateAdminProductResult;
-    }
-
-    if (items.length === 0) {
-      await tx.productItem.deleteMany({ where: { productId: existing.id } });
-      return { ...updatedProduct, items: [] } as UpdateAdminProductResult;
-    }
-
-    await tx.productItem.deleteMany({ where: { productId: existing.id } });
-
-    const itemsData = items.map((item, index) => ({
-      productId: existing.id,
-      sku:
-        item.sku?.trim() ||
-        generateVariantSku(baseSku, index, { size: item.size, color: item.color }),
-      color: item.color,
-      size: item.size as PrismaSize,
-      price: item.price,
-      isAvailable: item.isAvailable ?? true,
-      imageUrls: item.imageUrls ?? [],
-    }));
-
-    const createdItems = await Promise.all(
-      itemsData.map((data) => tx.productItem.create({ data }))
-    );
-
-    return { ...updatedProduct, items: createdItems } as UpdateAdminProductResult;
+  const existingForImages = await prisma.product.findUnique({
+    where: { slug },
+    select: { images: true, items: { select: { imageUrls: true } } },
   });
+  const oldImageUrls = existingForImages
+    ? [
+        ...(existingForImages.images ?? []),
+        ...existingForImages.items.flatMap((i) => i.imageUrls ?? []),
+      ]
+    : [];
+
+  const result = await prisma.$transaction(
+    async (tx) => {
+      const existing = await tx.product.findUnique({
+        where: { slug },
+        select: {
+          id: true,
+          categoryId: true,
+          name: true,
+          slug: true,
+          description: true,
+          composition: true,
+          images: true,
+          tags: true,
+          category: { select: { slug: true } },
+          items: { select: { sku: true } },
+        },
+      });
+
+      if (!existing) return null;
+
+      let nextCategoryId = incomingCategoryId ?? existing.categoryId;
+      let categorySlug: string;
+
+      if (existing.category) {
+        categorySlug = existing.category.slug;
+      } else {
+        const firstCategory = await tx.category.findFirst({
+          orderBy: { id: "asc" },
+          select: { id: true, slug: true },
+        });
+        if (!firstCategory) throw new Error("В базе нет ни одной категории");
+        nextCategoryId = firstCategory.id;
+        categorySlug = firstCategory.slug;
+      }
+
+      if (incomingCategoryId != null && incomingCategoryId !== existing.categoryId) {
+        const newCategory = await tx.category.findUnique({ where: { id: incomingCategoryId } });
+        if (!newCategory) {
+          nextCategoryId = existing.category ? existing.categoryId : nextCategoryId;
+          categorySlug = existing.category ? existing.category.slug : categorySlug;
+        } else {
+          nextCategoryId = newCategory.id;
+          categorySlug = newCategory.slug;
+        }
+      }
+
+      let baseSku: string;
+      if (typeof incomingSku === "string" && incomingSku.trim()) {
+        baseSku = incomingSku.trim();
+      } else {
+        const fromItems = extractBaseSkuFromItems(existing.items);
+        baseSku = fromItems ?? generateProductSku(existing.id, { categorySlug });
+      }
+
+      // Синхронизируем product.images из imageUrls вариантов:
+      // берём уникальные URL из всех вариантов, сохраняя порядок.
+      // Это гарантирует, что обложка (images[0]) всегда актуальна.
+      let resolvedImages = images ?? existing.images;
+      if (items && items.length > 0) {
+        const fromItems = items.flatMap((it) => it.imageUrls ?? []);
+        const unique = Array.from(new Set(fromItems));
+        if (unique.length > 0) {
+          resolvedImages = unique;
+        }
+      }
+
+      const updatedProduct = await tx.product.update({
+        where: { id: existing.id },
+        data: {
+          name: name ?? existing.name,
+          slug: newSlug ?? existing.slug,
+          categoryId: nextCategoryId,
+          description: description !== undefined ? description : existing.description,
+          composition: composition !== undefined ? composition : existing.composition,
+          images: resolvedImages,
+          tags: tags ?? existing.tags,
+        },
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          categoryId: true,
+          description: true,
+          composition: true,
+          images: true,
+          tags: true,
+          category: { select: { id: true, name: true, slug: true } },
+        },
+      });
+
+      if (!items) {
+        const existingItems = await tx.productItem.findMany({
+          where: { productId: existing.id },
+        });
+        return { ...updatedProduct, items: existingItems } as UpdateAdminProductResult;
+      }
+
+      if (items.length === 0) {
+        await tx.productItem.deleteMany({ where: { productId: existing.id } });
+        return { ...updatedProduct, items: [] } as UpdateAdminProductResult;
+      }
+
+      await tx.productItem.deleteMany({ where: { productId: existing.id } });
+
+      const itemsData = items.map((item, index) => ({
+        productId: existing.id,
+        sku:
+          item.sku?.trim() ||
+          generateVariantSku(baseSku, index, { size: item.size, color: item.color }),
+        color: item.color,
+        size: item.size as PrismaSize,
+        price: item.price,
+        isAvailable: item.isAvailable ?? true,
+        imageUrls: Array.from(new Set(item.imageUrls ?? [])),
+      }));
+
+      const createdItems = await Promise.all(
+        itemsData.map((data) => tx.productItem.create({ data }))
+      );
+
+      return { ...updatedProduct, items: createdItems } as UpdateAdminProductResult;
+    },
+    { timeout: 15000 }
+  );
+
+  if (result && options?.basePath && oldImageUrls.length > 0) {
+    const newImageUrls = [
+      ...(result.images ?? []),
+      ...result.items.flatMap((i) => i.imageUrls ?? []),
+    ];
+    const orphaned = oldImageUrls.filter((u) => !newImageUrls.includes(u));
+    if (orphaned.length > 0) {
+      await deleteUploadedFiles(orphaned, options.basePath);
+    }
+  }
+  return result;
 }
 
 /**
- * Удаляет товар по slug (и все варианты). Возвращает true, если удалён.
+ * Удаляет товар по slug (и все варианты). При передаче basePath удаляет с диска
+ * все фото товара (product.images + items.imageUrls). Возвращает true, если удалён.
  */
-export async function deleteAdminProduct(slug: string): Promise<boolean> {
-  const result = await prisma.$transaction(async (tx) => {
-    const existing = await tx.product.findUnique({
-      where: { slug },
-      include: { items: true },
-    });
-    if (!existing) return null;
-    await tx.productItem.deleteMany({ where: { productId: existing.id } });
-    await tx.product.delete({ where: { id: existing.id } });
-    return existing;
+export async function deleteAdminProduct(
+  slug: string,
+  options?: { basePath?: string }
+): Promise<boolean> {
+  const existingForImages = await prisma.product.findUnique({
+    where: { slug },
+    select: { images: true, items: { select: { imageUrls: true } } },
   });
+
+  const result = await prisma.$transaction(
+    async (tx) => {
+      const existing = await tx.product.findUnique({
+        where: { slug },
+        include: { items: true },
+      });
+      if (!existing) return null;
+      await tx.productItem.deleteMany({ where: { productId: existing.id } });
+      await tx.product.delete({ where: { id: existing.id } });
+      return existing;
+    },
+    { timeout: 10000 }
+  );
+
+  if (result && options?.basePath) {
+    const urls = [
+      ...(existingForImages?.images ?? []),
+      ...(existingForImages?.items?.flatMap((i) => i.imageUrls ?? []) ?? []),
+    ];
+    if (urls.length > 0) {
+      await deleteUploadedFiles(urls, options.basePath);
+    }
+  }
+
   return result != null;
+}
+
+const PRODUCTS_IMAGES_DIR = "products";
+
+/**
+ * Удаляет из public/assets/images/products файлы, не привязанные ни к одному товару.
+ * Вызывается автоматически после PATCH/DELETE товара, можно вызывать вручную.
+ */
+export async function cleanupOrphanProductImages(basePath: string): Promise<{
+  deleted: number;
+  errors: number;
+}> {
+  const products = await prisma.product.findMany({
+    select: { images: true, items: { select: { imageUrls: true } } },
+  });
+
+  const referenced = new Set<string>();
+  for (const p of products) {
+    for (const url of p.images ?? []) {
+      const n = (url || "").trim();
+      if (n && n.includes("assets/images/")) {
+        referenced.add(n.startsWith("/") ? n : `/${n}`);
+      }
+    }
+    for (const item of p.items) {
+      for (const url of item.imageUrls ?? []) {
+        const n = (url || "").trim();
+        if (n && n.includes("assets/images/")) {
+          referenced.add(n.startsWith("/") ? n : `/${n}`);
+        }
+      }
+    }
+  }
+
+  const dir = path.join(basePath, "public", "assets", "images", PRODUCTS_IMAGES_DIR);
+  if (!fs.existsSync(dir)) {
+    return { deleted: 0, errors: 0 };
+  }
+
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  const files = entries.filter((e) => e.isFile()).map((e) => e.name);
+  const orphanedUrls: string[] = [];
+  for (const name of files) {
+    const url = `/assets/images/products/${name}`;
+    if (!referenced.has(url)) orphanedUrls.push(url);
+  }
+
+  if (orphanedUrls.length === 0) {
+    return { deleted: 0, errors: 0 };
+  }
+
+  const { deleted, errors } = await deleteUploadedFiles(orphanedUrls, basePath);
+  return { deleted: deleted.length, errors: errors.length };
 }

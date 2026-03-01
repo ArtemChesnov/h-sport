@@ -15,7 +15,7 @@ function normalizeQuery(query: string): string {
   return normalized;
 }
 
-const IGNORED_QUERY_PATTERNS = [/^\s*SELECT\s+1\s*$/i];
+const IGNORED_QUERY_PATTERNS = [/^\s*SELECT\s+1\s*$/i, /^\s*COMMIT\s*$/i];
 
 export async function logSlowQuery(params: {
   query: string;

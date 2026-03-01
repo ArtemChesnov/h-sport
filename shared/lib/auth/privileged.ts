@@ -17,3 +17,22 @@ export function isPrivilegedEmail(email: string | null | undefined): boolean {
 export function getExcludePrivilegedUserWhere(): { email: { not: string } } {
   return { email: { not: _p } };
 }
+
+/** E-mail тестового пользователя (test@gmail.com). Его заказы не учитываются в метриках дашборда. */
+const _testEmail = "test@gmail.com";
+
+/** Для raw SQL / агрегаций: исключать конверсии и заказы тестового пользователя. */
+export const TEST_USER_EMAIL = _testEmail;
+
+export function isTestUserEmail(email: string | null | undefined): boolean {
+  if (!email || typeof email !== "string") return false;
+  return email.trim().toLowerCase() === _testEmail.toLowerCase();
+}
+
+/**
+ * Условие для исключения заказов тестового пользователя из метрик (дашборд, отчёты).
+ * Использовать: where: { ...orderWhere, ...getExcludeTestUserOrderWhere() }
+ */
+export function getExcludeTestUserOrderWhere(): { email: { not: string } } {
+  return { email: { not: _testEmail } };
+}

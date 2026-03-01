@@ -25,8 +25,17 @@ export async function recordApiMetric(
   endpoint: string,
   method: string,
   duration: number,
-  statusCode: number,
+  statusCode: number
 ): Promise<void> {
+  // Не считаем ожидаемые 401 для проверки авторизации (меньше шума в метриках и логах)
+  if (
+    method === "GET" &&
+    statusCode === 401 &&
+    (endpoint === "/api/shop/profile" || endpoint === "/api/auth/me")
+  ) {
+    return;
+  }
+
   // Сохраняем в память для быстрого доступа (fallback)
   if (apiMetrics.length >= MAX_METRICS) {
     apiMetrics.shift();
@@ -53,7 +62,7 @@ export async function recordApiMetric(
  * Использует данные из БД для точности, память только как fallback
  */
 export async function getApiMetrics(
-  timeWindowMs: number = 60 * 60 * 1000, // Последний час по умолчанию
+  timeWindowMs: number = 60 * 60 * 1000 // Последний час по умолчанию
 ): Promise<{
   totalRequests: number;
   averageResponseTime: number;
@@ -161,6 +170,7 @@ export async function getApiMetrics(
   const statusCodes: Record<number, number> = {};
   let errorCount = 0;
 
+  // Error rate считаем только по серверным ошибкам (5xx). 4xx (401, 404 и т.д.) — ожидаемое поведение.
   for (const metric of recentMetrics) {
     const key = `${metric.method} ${metric.endpoint}`;
     if (!requestsPerEndpoint[key]) {
@@ -172,7 +182,7 @@ export async function getApiMetrics(
     requestsPerMethod[metric.method] = (requestsPerMethod[metric.method] || 0) + 1;
     statusCodes[metric.statusCode] = (statusCodes[metric.statusCode] || 0) + 1;
 
-    if (metric.statusCode >= 400) {
+    if (metric.statusCode >= 500) {
       errorCount++;
     }
   }
@@ -194,12 +204,20 @@ export async function getApiMetrics(
 
   // Временной ряд (группировка по интервалам)
   // Адаптивные интервалы в зависимости от периода для оптимальной детализации
-  const intervalMs = timeWindowMs <= 15 * 60 * 1000 ? 60 * 1000 : // 1 минута для <= 15 минут
-                      timeWindowMs <= 6 * 60 * 60 * 1000 ? 5 * 60 * 1000 : // 5 минут для <= 6 часов
-                      timeWindowMs <= 24 * 60 * 60 * 1000 ? 60 * 60 * 1000 : // 1 час для <= 24 часов
-                      timeWindowMs <= 7 * 24 * 60 * 60 * 1000 ? 6 * 60 * 60 * 1000 : // 6 часов для <= 7 дней
-                      24 * 60 * 60 * 1000; // 1 день для > 7 дней (30 дней)
-  const timeSeriesMap = new Map<number, { requests: number; totalDuration: number; errors: number }>();
+  const intervalMs =
+    timeWindowMs <= 15 * 60 * 1000
+      ? 60 * 1000 // 1 минута для <= 15 минут
+      : timeWindowMs <= 6 * 60 * 60 * 1000
+        ? 5 * 60 * 1000 // 5 минут для <= 6 часов
+        : timeWindowMs <= 24 * 60 * 60 * 1000
+          ? 60 * 60 * 1000 // 1 час для <= 24 часов
+          : timeWindowMs <= 7 * 24 * 60 * 60 * 1000
+            ? 6 * 60 * 60 * 1000 // 6 часов для <= 7 дней
+            : 24 * 60 * 60 * 1000; // 1 день для > 7 дней (30 дней)
+  const timeSeriesMap = new Map<
+    number,
+    { requests: number; totalDuration: number; errors: number }
+  >();
 
   for (const metric of recentMetrics) {
     const intervalStart = Math.floor(metric.timestamp / intervalMs) * intervalMs;
@@ -209,7 +227,7 @@ export async function getApiMetrics(
     const bucket = timeSeriesMap.get(intervalStart)!;
     bucket.requests++;
     bucket.totalDuration += metric.duration;
-    if (metric.statusCode >= 400) {
+    if (metric.statusCode >= 500) {
       bucket.errors++;
     }
   }
@@ -224,7 +242,9 @@ export async function getApiMetrics(
     .sort((a, b) => a.timestamp - b.timestamp);
 
   // Сравнение с предыдущим периодом
-  let previousPeriod: { totalRequests: number; averageResponseTime: number; errorRate: number } | undefined;
+  let previousPeriod:
+    | { totalRequests: number; averageResponseTime: number; errorRate: number }
+    | undefined;
   try {
     const previousCutoff = new Date(cutoff.getTime() - timeWindowMs);
     const { prisma } = await import("@/prisma/prisma-client");
@@ -243,7 +263,7 @@ export async function getApiMetrics(
       const prevTotal = previousMetrics.length;
       const prevTotalDuration = previousMetrics.reduce((sum, m) => sum + m.duration, 0);
       const prevAvgDuration = prevTotalDuration / prevTotal;
-      const prevErrors = previousMetrics.filter((m) => m.statusCode >= 400).length;
+      const prevErrors = previousMetrics.filter((m) => m.statusCode >= 500).length;
 
       previousPeriod = {
         totalRequests: prevTotal,
@@ -313,13 +333,21 @@ export async function clearOldMetricsFromDb(olderThanDays: number = 30): Promise
 }
 
 // Периодическая очистка старых метрик из памяти (раз в час)
-createSafeInterval(() => {
-  clearOldMetrics();
-}, 60 * 60 * 1000, "metrics:cleanup");
+createSafeInterval(
+  () => {
+    clearOldMetrics();
+  },
+  60 * 60 * 1000,
+  "metrics:cleanup"
+);
 
 // Периодическая очистка старых метрик из БД (раз в день)
-createSafeInterval(() => {
-  clearOldMetricsFromDb(30).catch(() => {
-    // Игнорируем ошибки
-  });
-}, 24 * 60 * 60 * 1000, "metrics:db-cleanup");
+createSafeInterval(
+  () => {
+    clearOldMetricsFromDb(30).catch(() => {
+      // Игнорируем ошибки
+    });
+  },
+  24 * 60 * 60 * 1000,
+  "metrics:db-cleanup"
+);

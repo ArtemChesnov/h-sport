@@ -56,7 +56,7 @@ function ProductCardComponent({
         <div className={cn("relative bg-neutral-100", imageFill && "flex flex-col h-full min-h-0")}>
           <div className={imageContainerClass}>
             <Image
-              src={previewImage || "/assets/images/fitness.webp"}
+              src={previewImage || "/assets/images/sport-types/fitness.webp"}
               alt={name}
               fill
               sizes={imageSizes ?? "(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"}
@@ -93,7 +93,7 @@ function ProductCardComponent({
       >
         <div className="relative h-full w-full">
           <Image
-            src={previewImage || "/assets/images/fitness.webp"}
+            src={previewImage || "/assets/images/sport-types/fitness.webp"}
             alt={name}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

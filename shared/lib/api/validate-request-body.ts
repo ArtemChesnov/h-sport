@@ -24,6 +24,16 @@ export async function validateRequestBody<T>(
   schema: ZodSchema<T>,
   options?: { maxSize?: number }
 ): Promise<ValidateBodyResult<T>> {
+  if (options?.maxSize) {
+    const contentLength = request.headers.get("content-length");
+    if (contentLength) {
+      const size = parseInt(contentLength, 10);
+      if (!Number.isNaN(size) && size > options.maxSize) {
+        return { error: createErrorResponse("Тело запроса слишком большое", 413) };
+      }
+    }
+  }
+
   let raw: unknown;
   try {
     raw = await request.json();

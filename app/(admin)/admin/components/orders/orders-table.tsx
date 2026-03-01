@@ -11,7 +11,7 @@ import { getOrderStatusBadgeStyles } from "@/shared/lib/styles";
 import { DTO } from "@/shared/services";
 import { CheckCircle2, Copy, Hash, PencilIcon, Truck, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useCallback } from "react";
 import { getOrderStatusLabel } from "../../orders/lib/constants";
 
 type OrdersTableProps = {
@@ -32,6 +32,21 @@ export function OrdersTable(props: OrdersTableProps) {
     errorMessage: TOAST.ERROR.FAILED_TO_COPY,
   });
 
+  const handleCopyUid = useCallback(
+    (e: React.MouseEvent, uid: string) => {
+      e.stopPropagation();
+      copyToClipboard(uid, TOAST.SUCCESS.UID_COPIED);
+    },
+    [copyToClipboard]
+  );
+
+  const handleRowClick = useCallback(
+    (order: DTO.AdminOrderListItemDto) => {
+      router.push(`/admin/orders/${order.id}`);
+    },
+    [router]
+  );
+
   if (orders.length === 0) {
     return (
       <div className="px-2 py-6 text-sm text-muted-foreground">
@@ -39,15 +54,6 @@ export function OrdersTable(props: OrdersTableProps) {
       </div>
     );
   }
-
-  const handleCopyUid = (e: React.MouseEvent, uid: string) => {
-    e.stopPropagation();
-    copyToClipboard(uid, TOAST.SUCCESS.UID_COPIED);
-  };
-
-  const handleRowClick = (order: DTO.AdminOrderListItemDto) => {
-    router.push(`/admin/orders/${order.id}`);
-  };
 
   // Определяем колонки для виртуализованной таблицы
   const columns: VirtualizedTableColumn<DTO.AdminOrderListItemDto>[] = [

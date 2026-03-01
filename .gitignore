@@ -49,15 +49,24 @@ next-env.d.ts
 /lib/generated/prisma
 node_modules
 
-# internal docs (not for public repo — содержат IP, пароли, внутренние отчёты)
+# Prisma: данные для сидов (локальные дампы, CSV, JSON) — не коммитить
+/prisma/seed-data/
+/prisma/seeds/
+
+# internal docs (not for public repo)
 /docs/DEPLOY_INSTRUCTIONS.md
 /docs/DEPLOY.md
+/docs/DEPLOY-VERCEL.md
+/docs/DEPLOY-QUICK-REF.md
+/docs/DEPLOYMENT.md
+/docs/DEVELOPMENT.md
 /docs/BACKUPS.md
 /docs/OPERATIONS.md
 /docs/MONITORING.md
 /docs/DEEP_ANALYSIS_REPORT.md
 /docs/PRE_DEPLOY_ANALYSIS_AND_ASSESSMENT.md
 /docs/REFACTORING_ANALYSIS_PRE_DEPLOY.md
+/docs/REPORT-*.md
 /PRE_PROD_CHECKLIST.md
 /PROJECT_ANALYSIS_AND_DEPLOY_REPORT.md
 /RISK_PATCH_PLAN.md
@@ -65,3 +74,10 @@ node_modules
 /PERFORMANCE_*.md
 /REFACTORING_PLAN.md
 /SHOP_PERFORMANCE_ANALYSIS.md
+
+# IDE and editor
+.idea/
+*.swp
+*.swo
+.vscode/settings.json
+.vscode/*.env*

@@ -198,20 +198,13 @@ export function sendOrderConfirmationEmailAsync(
                 <tbody>${itemsHtml}</tbody>
               </table>
               <div style="margin-top: 20px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
-                  <span style="color: #6b7280;">Товары</span>
-                  <span style="color: #EB6081; font-weight: 500;">${orderData.subtotal !== undefined ? formatMoney(orderData.subtotal) : formatMoney(orderData.items.reduce((s, i) => s + i.qty * i.price, 0))}</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
-                  <span style="color: #6b7280;">Доставка</span>
-                  <span style="color: #EB6081; font-weight: 500;">${orderData.deliveryFee === 0 || orderData.deliveryFee == null ? "Бесплатно" : formatMoney(orderData.deliveryFee)}</span>
-                </div>
-                ${orderData.discount ? `<div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;"><span style="color: #6b7280;">Промокод${orderData.promoCode ? ` (${orderData.promoCode})` : ""}</span><span style="color: #EB6081; font-weight: 500;">−${formatMoney(orderData.discount)}</span></div>` : ""}
-                <div style="height: 1px; background-color: #EB6081; margin: 16px 0;"></div>
-                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 22px; font-weight: 500;">
-                  <span style="color: #1a1a1a; text-transform: uppercase;">Итого</span>
-                  <span style="color: #EB6081;">${formatMoney(orderData.total)}</span>
-                </div>
+                <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; border: none;">
+                  <tr><td style="color: #6b7280; font-size: 14px; padding-bottom: 12px;">Товары</td><td style="text-align: right; color: #EB6081; font-weight: 500; font-size: 14px; padding-bottom: 12px;">${orderData.subtotal !== undefined ? formatMoney(orderData.subtotal) : formatMoney(orderData.items.reduce((s, i) => s + i.qty * i.price, 0))}</td></tr>
+                  <tr><td style="color: #6b7280; font-size: 14px; padding-bottom: 12px;">Доставка</td><td style="text-align: right; color: #EB6081; font-weight: 500; font-size: 14px; padding-bottom: 12px;">${orderData.deliveryFee === 0 || orderData.deliveryFee == null ? "Бесплатно" : formatMoney(orderData.deliveryFee)}</td></tr>
+                ${orderData.discount ? `<tr><td style="color: #6b7280; font-size: 14px; padding-bottom: 12px;">Промокод${orderData.promoCode ? ` (${orderData.promoCode})` : ""}</td><td style="text-align: right; color: #EB6081; font-weight: 500; font-size: 14px; padding-bottom: 12px;">−${formatMoney(orderData.discount)}</td></tr>` : ""}
+                <tr><td colspan="2" style="height: 1px; background-color: #EB6081; padding: 0; line-height: 0;"></td></tr>
+                <tr><td style="padding-top: 16px; padding-bottom: 0; color: #1a1a1a; font-size: 22px; font-weight: 500; text-transform: uppercase;">Итого</td><td style="text-align: right; padding-top: 16px; padding-bottom: 0; color: #EB6081; font-size: 22px; font-weight: 500;">${formatMoney(orderData.total)}</td></tr>
+                </table>
               </div>
             </div>
 
@@ -486,20 +479,13 @@ export async function sendOrderConfirmationEmail(
                 <tbody>${itemsHtml}</tbody>
               </table>
               <div style="margin-top: 20px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
-                  <span style="color: #6b7280;">Товары</span>
-                  <span style="color: #EB6081; font-weight: 500;">${subtotalDisplay}</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
-                  <span style="color: #6b7280;">Доставка</span>
-                  <span style="color: #EB6081; font-weight: 500;">${deliveryDisplay}</span>
-                </div>
-                ${orderData.discount ? `<div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;"><span style="color: #6b7280;">Промокод${orderData.promoCode ? ` (${orderData.promoCode})` : ""}</span><span style="color: #EB6081; font-weight: 500;">−${formatMoney(orderData.discount)}</span></div>` : ""}
-                <div style="height: 1px; background-color: #EB6081; margin: 16px 0;"></div>
-                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 22px; font-weight: 500;">
-                  <span style="color: #1a1a1a; text-transform: uppercase;">Итого</span>
-                  <span style="color: #EB6081;">${formatMoney(orderData.total)}</span>
-                </div>
+                <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; border: none;">
+                  <tr><td style="color: #6b7280; font-size: 14px; padding-bottom: 12px;">Товары</td><td style="text-align: right; color: #EB6081; font-weight: 500; font-size: 14px; padding-bottom: 12px;">${subtotalDisplay}</td></tr>
+                  <tr><td style="color: #6b7280; font-size: 14px; padding-bottom: 12px;">Доставка</td><td style="text-align: right; color: #EB6081; font-weight: 500; font-size: 14px; padding-bottom: 12px;">${deliveryDisplay}</td></tr>
+                ${orderData.discount ? `<tr><td style="color: #6b7280; font-size: 14px; padding-bottom: 12px;">Промокод${orderData.promoCode ? ` (${orderData.promoCode})` : ""}</td><td style="text-align: right; color: #EB6081; font-weight: 500; font-size: 14px; padding-bottom: 12px;">−${formatMoney(orderData.discount)}</td></tr>` : ""}
+                <tr><td colspan="2" style="height: 1px; background-color: #EB6081; padding: 0; line-height: 0;"></td></tr>
+                <tr><td style="padding-top: 16px; padding-bottom: 0; color: #1a1a1a; font-size: 22px; font-weight: 500; text-transform: uppercase;">Итого</td><td style="text-align: right; padding-top: 16px; padding-bottom: 0; color: #EB6081; font-size: 22px; font-weight: 500;">${formatMoney(orderData.total)}</td></tr>
+                </table>
               </div>
             </div>
 

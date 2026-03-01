@@ -45,9 +45,9 @@ export function TopProductsSection({ topProducts, isLoading }: TopProductsSectio
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {Array.from({ length: METRICS_CONSTANTS.TOP_ITEMS_COUNT }).map((_, i) => (
+              {Array.from({ length: METRICS_CONSTANTS.TOP_ITEMS_COUNT }, (_, i) => (
                 <div
-                  key={i}
+                  key={`top-product-skeleton-${i}`}
                   className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
                 >
                   <div className="flex items-center gap-3 flex-1">

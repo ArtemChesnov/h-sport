@@ -253,6 +253,7 @@ let currentStore: RateLimitStore = new InMemoryRateLimitStore();
 /**
  * Устанавливает store для rate limiting
  * Вызвать в app/providers.tsx или middleware для переключения на Redis
+ * @internal Используется при инициализации Redis, не для публичного API
  */
 export function setRateLimitStore(store: RateLimitStore): void {
   currentStore = store;
@@ -260,6 +261,7 @@ export function setRateLimitStore(store: RateLimitStore): void {
 
 /**
  * Получает текущий store
+ * @internal Для тестов и отладки, не для публичного API
  */
 export function getRateLimitStore(): RateLimitStore {
   return currentStore;

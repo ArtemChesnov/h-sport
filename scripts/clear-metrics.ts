@@ -1,30 +1,28 @@
 /**
- * Скрипт для очистки API метрик и Web Vitals метрик
+ * Очистка таблиц метрик перед деплоем.
+ * Запуск: npx ts-node --project tsconfig.seed.json scripts/clear-metrics.ts
  */
 
 import { prisma } from "../prisma/prisma-client";
 
-async function clearMetrics() {
-  console.log("🧹 Очистка API метрик и Web Vitals метрик...\n");
+async function main() {
+  const [api, webVitals, slowQuery, server] = await Promise.all([
+    prisma.apiMetric.deleteMany(),
+    prisma.webVitalsMetric.deleteMany(),
+    prisma.slowQuery.deleteMany(),
+    prisma.serverMetrics.deleteMany(),
+  ]);
 
-  try {
-    // Удаляем API метрики
-    const apiMetricsCount = await prisma.apiMetric.count();
-    await prisma.apiMetric.deleteMany({});
-    console.log(`✅ Удалено API метрик: ${apiMetricsCount}`);
+  console.log("Очищено:");
+  console.log("  ApiMetric:", api.count);
+  console.log("  WebVitalsMetric:", webVitals.count);
+  console.log("  SlowQuery:", slowQuery.count);
+  console.log("  ServerMetrics:", server.count);
 
-    // Удаляем Web Vitals метрики
-    const webVitalsCount = await prisma.webVitalsMetric.count();
-    await prisma.webVitalsMetric.deleteMany({});
-    console.log(`✅ Удалено Web Vitals метрик: ${webVitalsCount}`);
-
-    console.log("\n✨ Очистка завершена успешно!");
-  } catch (error) {
-    console.error("❌ Ошибка при очистке метрик:", error);
-    process.exit(1);
-  } finally {
-    await prisma.$disconnect();
-  }
+  await prisma.$disconnect();
 }
 
-clearMetrics();
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
