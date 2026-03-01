@@ -7,7 +7,7 @@
  * PM2 при start загрузит их, если запускать из этого каталога (--env production при необходимости).
  *
  * max_memory_restart: PM2 перезапускает процесс при превышении этого порога (RSS).
- * node_args --max-old-space-size: лимит heap V8 (без этого под heap выделяется мало, т.к. процесс упирается в 500M и перезапускается).
+ * node_args / interpreter_args: флаги для node (--max-old-space-size). Если heap в метриках всё ещё мал, попробуй interpreter_args вместо node_args и pm2 restart.
  */
 module.exports = {
   apps: [
@@ -16,7 +16,7 @@ module.exports = {
       cwd: __dirname,
       script: "node",
       args: ".next/standalone/server.js",
-      node_args: "--max-old-space-size=1400",
+      interpreter_args: "--max-old-space-size=1400",
       instances: 1,
       exec_mode: "fork",
       env: { NODE_ENV: "production" },
