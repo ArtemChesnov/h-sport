@@ -2,7 +2,13 @@
  * Next.js Middleware для настройки CORS, CSRF и безопасности
  */
 
-import { CSRF_COOKIE_NAME, CSRF_HEADER_NAME, generateCsrfToken, timingSafeEqual } from "@/shared/lib/csrf";
+import {
+  CSRF_COOKIE_NAME,
+  CSRF_HEADER_NAME,
+  generateCsrfToken,
+  timingSafeEqual,
+} from "@/shared/lib/csrf";
+import { isSecureCookies } from "@/shared/lib/config/env";
 import { applyCorsPreflightHeaders, applySecurityHeaders } from "@/shared/lib/security/headers";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -50,7 +56,8 @@ function isCsrfWhitelisted(pathname: string): boolean {
  * Получает разрешенные origins из переменных окружения
  */
 function getAllowedOrigins(): string[] {
-  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",").map((origin) => origin.trim()) || [];
+  const allowedOrigins =
+    process.env.ALLOWED_ORIGINS?.split(",").map((origin) => origin.trim()) || [];
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
   // Добавляем локальный origin для development
@@ -89,7 +96,6 @@ function isOriginAllowed(origin: string | null, allowedOrigins: string[]): boole
   return allowedOrigins.includes(origin);
 }
 
-
 /**
  * Защищённые маршруты, требующие авторизации (для прямого ввода URL)
  * /account покрывает все подстраницы: /account/favorites, /account/orders и т.д.
@@ -100,9 +106,7 @@ const PROTECTED_ROUTES = ["/account"];
  * Проверяет, требует ли путь авторизации
  */
 function isProtectedRoute(pathname: string): boolean {
-  return PROTECTED_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`)
-  );
+  return PROTECTED_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 }
 
 const isApiRoute = (pathname: string) => pathname.startsWith("/api/");
@@ -114,7 +118,7 @@ const isApiRoute = (pathname: string) => pathname.startsWith("/api/");
 function handlePageRoute(
   request: NextRequest,
   requestId: string,
-  requestHeaders: Headers,
+  requestHeaders: Headers
 ): NextResponse {
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set(REQUEST_ID_HEADER, requestId);
@@ -127,7 +131,7 @@ function handlePageRoute(
   if (!existingCsrfToken) {
     response.cookies.set(CSRF_COOKIE_NAME, generateCsrfToken(), {
       httpOnly: false,
-      secure: isProduction,
+      secure: isSecureCookies(),
       sameSite: "strict",
       path: "/",
       maxAge: 60 * 60 * 24,
@@ -186,7 +190,7 @@ export function middleware(request: NextRequest) {
   if (!existingCsrfToken) {
     response.cookies.set(CSRF_COOKIE_NAME, generateCsrfToken(), {
       httpOnly: false,
-      secure: isProduction,
+      secure: isSecureCookies(),
       sameSite: "strict",
       path: "/",
       maxAge: 60 * 60 * 24,
@@ -199,16 +203,10 @@ export function middleware(request: NextRequest) {
     const csrfCookie = request.cookies.get(CSRF_COOKIE_NAME)?.value;
     const csrfHeader = request.headers.get(CSRF_HEADER_NAME);
     if (!csrfCookie || !csrfHeader) {
-      return NextResponse.json(
-        { message: "Invalid or missing CSRF token" },
-        { status: 403 }
-      );
+      return NextResponse.json({ message: "Invalid or missing CSRF token" }, { status: 403 });
     }
     if (!timingSafeEqual(csrfCookie, csrfHeader)) {
-      return NextResponse.json(
-        { message: "Invalid or missing CSRF token" },
-        { status: 403 }
-      );
+      return NextResponse.json({ message: "Invalid or missing CSRF token" }, { status: 403 });
     }
   }
 
@@ -218,7 +216,5 @@ export function middleware(request: NextRequest) {
 // Matcher: все пути кроме _next/static, _next/image, favicon.
 // Внутри middleware три ветки: страницы → лёгкий путь; protected → auth + лёгкий; API → полный.
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

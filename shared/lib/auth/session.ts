@@ -4,7 +4,7 @@
 
 import { SignJWT, jwtVerify } from "jose";
 import { NextRequest, NextResponse } from "next/server";
-import { env } from "@/shared/lib/config/env";
+import { env, isSecureCookies } from "@/shared/lib/config/env";
 
 /**
  * Минимальная длина AUTH_SECRET для безопасного HS256
@@ -147,7 +147,7 @@ export async function getSessionUserFromRequest(request: NextRequest): Promise<S
 export function setSessionCookie(response: NextResponse, token: string): void {
   response.cookies.set("session", token, {
     httpOnly: true,
-    secure: env.NODE_ENV === "production",
+    secure: isSecureCookies(),
     sameSite: "strict",
     maxAge: SESSION_TTL_SECONDS,
     path: "/",

@@ -138,6 +138,15 @@ export const env = (() => {
 export const APP_DOMAIN_PRODUCTION = "https://h-brand.ru";
 
 /**
+ * Определяет, нужен ли флаг Secure на куках.
+ * Привязано к протоколу APP_URL, а не к NODE_ENV,
+ * чтобы сайт корректно работал в production на HTTP (до настройки SSL).
+ */
+export function isSecureCookies(): boolean {
+  return getAppUrl().startsWith("https://");
+}
+
+/**
  * Базовый URL приложения на сервере (для webhook, письма, sitemap и т.д.).
  * Приоритет: AUTH_URL → NEXT_PUBLIC_APP_URL → production: h-brand.ru, иначе localhost.
  */
