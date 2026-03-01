@@ -1,8 +1,7 @@
 # Деплой на прод-сервер по пушу в master.
 # Секреты в репозитории: Settings → Secrets and variables → Actions:
 #   SSH_HOST, SSH_USER, SSH_PRIVATE_KEY
-# Опционально: DEPLOY_PATH (каталог проекта на сервере, по умолчанию /home/deploy/h-sport)
-# Проверки (lint, typecheck, test) выполняются в workflow checks.yml на push и pull_request.
+# Опционально: DEPLOY_PATH (по умолчанию /root/h-sport)
 
 name: Deploy to production
 
@@ -17,6 +16,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: ${{ vars.DEPLOY_ENABLED == 'true' }}
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -25,6 +25,6 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ${{ secrets.DEPLOY_PATH || '/home/deploy/h-sport' }}
+            cd ${{ secrets.DEPLOY_PATH || '/root/h-sport' }}
             ./scripts/server-deploy.sh
           script_stop: true
