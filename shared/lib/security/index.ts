@@ -3,7 +3,7 @@
  */
 
 export {
-    applyCorsPreflightHeaders, applySecurityHeaders, getContentSecurityPolicy,
-    getRequestNonce
+  applyCorsPreflightHeaders,
+  applySecurityHeaders,
+  getContentSecurityPolicy,
 } from "./headers";
-
