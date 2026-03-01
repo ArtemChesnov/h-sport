@@ -10,6 +10,10 @@ APP_DIR="$(pwd)"
 PM2_APP_NAME="${PM2_APP_NAME:-h-sport}"
 BRANCH="${BRANCH:-master}"
 
+# При запуске по SSH (например из GitHub Actions) PATH может не содержать pm2
+export PATH="/usr/local/bin:/usr/bin:$PATH"
+[ -s "$HOME/.nvm/nvm.sh" ] && . "$HOME/.nvm/nvm.sh"
+
 echo "=== Deploy $APP_DIR (branch: $BRANCH) ==="
 
 # ── Swap: создаём 2 ГБ swap-файл, если его ещё нет ──
