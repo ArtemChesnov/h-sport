@@ -3,12 +3,42 @@
  * Запуск: pm2 start ecosystem.config.cjs
  * Перезапуск после деплоя: pm2 restart h-sport --update-env
  *
- * На сервере задайте переменные окружения в .env в каталоге приложения;
- * PM2 при start загрузит их, если запускать из этого каталога (--env production при необходимости).
- *
  * max_memory_restart: PM2 перезапускает процесс при превышении этого порога (RSS).
- * node_args / interpreter_args: флаги для node (--max-old-space-size). Если heap в метриках всё ещё мал, попробуй interpreter_args вместо node_args и pm2 restart.
+ * interpreter_args: флаги для node (--max-old-space-size).
+ *
+ * .env загружается автоматически из каталога приложения и передаётся процессу.
  */
+const path = require("path");
+const fs = require("fs");
+
+function loadEnvFile() {
+  const envPath = path.join(__dirname, ".env");
+  const vars = {};
+  try {
+    const content = fs.readFileSync(envPath, "utf8");
+    for (const line of content.split("\n")) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) continue;
+      const eqIdx = trimmed.indexOf("=");
+      if (eqIdx === -1) continue;
+      const key = trimmed.slice(0, eqIdx).trim();
+      let value = trimmed.slice(eqIdx + 1).trim();
+      if (
+        (value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))
+      ) {
+        value = value.slice(1, -1);
+      }
+      vars[key] = value;
+    }
+  } catch {
+    // .env not found — rely on system env vars
+  }
+  return vars;
+}
+
+const dotenvVars = loadEnvFile();
+
 module.exports = {
   apps: [
     {
@@ -19,7 +49,7 @@ module.exports = {
       interpreter_args: "--max-old-space-size=1400",
       instances: 1,
       exec_mode: "fork",
-      env: { NODE_ENV: "production" },
+      env: { NODE_ENV: "production", ...dotenvVars },
       max_memory_restart: "1600M",
       error_file: "./logs/pm2-error.log",
       out_file: "./logs/pm2-out.log",
