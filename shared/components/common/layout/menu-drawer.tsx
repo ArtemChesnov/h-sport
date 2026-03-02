@@ -15,7 +15,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../../ui/sheet";
-import { ContactsBlock } from "../ui";
 
 interface Props {
   className?: string;
@@ -82,9 +81,8 @@ export const MenuDrawer: React.FC<React.PropsWithChildren<Props>> = ({ className
           </nav>
         </div>
 
-        {/* Контакты */}
-        <div className="mt-auto flex flex-col gap-15 menu-drawer-contacts">
-          {/* Покупателям */}
+        {/* Покупателям — прижат к низу с отступом */}
+        <div className="mt-auto flex flex-col gap-15 pb-8 menu-drawer-contacts">
           <nav className="flex flex-col menu-drawer-customer">
             <h3
               className={cn(
@@ -111,8 +109,6 @@ export const MenuDrawer: React.FC<React.PropsWithChildren<Props>> = ({ className
               ))}
             </div>
           </nav>
-
-          <ContactsBlock className="menu-drawer-contacts-block" />
         </div>
       </SheetContent>
     </Sheet>
