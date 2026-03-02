@@ -11,12 +11,12 @@ import { useSearchParams } from "next/navigation";
 import React from "react";
 
 import {
-    CatalogPagination,
-    CatalogSortButton,
-    Container,
-    ShopBreadcrumbs,
-    type ViewMode,
-    ViewToggle,
+  CatalogPagination,
+  CatalogSortButton,
+  Container,
+  ShopBreadcrumbs,
+  type ViewMode,
+  ViewToggle,
 } from "@/shared/components/common";
 import { CatalogSidebar } from "@/shared/components/common/catalog/catalog-sidebar";
 import { ProductList } from "@/shared/components/common/product/product-list";
@@ -73,6 +73,11 @@ const CatalogClientComponent = ({ initialProducts, initialMeta }: CatalogClientP
   const meta = data?.meta ?? (hasInitialData ? initialMeta : undefined);
   const hasData = !!products;
   const actualIsLoading = isLoading && !hasData;
+
+  // При переходе на каталог (с главной «Смотреть все» и т.д.) всегда открывать с начала страницы
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   React.useEffect(() => {
     if (meta && meta.page < meta.pages) {
@@ -140,7 +145,11 @@ const CatalogClientComponent = ({ initialProducts, initialMeta }: CatalogClientP
           <div className="flex min-w-0 flex-1 flex-col gap-5">
             <div className="flex items-center justify-between">
               <CatalogSortButton />
-              <ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} className="hidden min-[410px]:flex" />
+              <ViewToggle
+                viewMode={viewMode}
+                onViewModeChange={setViewMode}
+                className="hidden min-[410px]:flex"
+              />
             </div>
             <ProductList
               products={products}

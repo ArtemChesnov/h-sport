@@ -15,6 +15,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../../ui/sheet";
+import { ContactsBlock } from "../ui";
 
 interface Props {
   className?: string;
@@ -109,6 +110,11 @@ export const MenuDrawer: React.FC<React.PropsWithChildren<Props>> = ({ className
               ))}
             </div>
           </nav>
+
+          {/* Свяжитесь с нами — только от 1280px */}
+          <div className="hidden min-[1280px]:flex flex-col">
+            <ContactsBlock className="menu-drawer-contacts-block" />
+          </div>
         </div>
       </SheetContent>
     </Sheet>
