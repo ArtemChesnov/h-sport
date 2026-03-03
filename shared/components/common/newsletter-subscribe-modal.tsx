@@ -108,7 +108,7 @@ export function NewsletterSubscribeModal({
             письме.
           </DialogDescription>
           <label htmlFor="newsletter-email" className="flex flex-col gap-2">
-            <span className={INPUT_LABEL_CLASS}>Email</span>
+            <span className={INPUT_LABEL_CLASS}>Электронная почта</span>
             <Input
               id="newsletter-email"
               type="email"

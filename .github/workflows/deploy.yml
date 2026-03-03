@@ -1,6 +1,6 @@
 # Деплой на прод-сервер по пушу в master.
 # Секреты: SSH_HOST, SSH_USER, SSH_PRIVATE_KEY
-# Переменные: DEPLOY_ENABLED = true, DEPLOY_PATH (по умолчанию /root/h-sport)
+# Переменные: DEPLOY_ENABLED, DEPLOY_PATH, SSH_PORT
 
 name: Deploy to production
 
@@ -21,6 +21,7 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ vars.SSH_PORT || '2222' }}
         run: |
           set -e
           mkdir -p ~/.ssh
@@ -31,12 +32,13 @@ jobs:
             echo "::error::SSH_PRIVATE_KEY is empty or not set"
             exit 1
           fi
-          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts || true
+          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts || true
 
       - name: Deploy via SSH
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
-          DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/root/h-sport' }}
+          SSH_PORT: ${{ vars.SSH_PORT || '2222' }}
+          DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/home/admin/h-sport' }}
         run: |
-          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -i ~/.ssh/id_ed25519 "$SSH_USER@$SSH_HOST" "cd $DEPLOY_PATH && bash scripts/server-deploy.sh"
+          ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -i ~/.ssh/id_ed25519 "$SSH_USER@$SSH_HOST" "cd $DEPLOY_PATH && bash scripts/server-deploy.sh"
