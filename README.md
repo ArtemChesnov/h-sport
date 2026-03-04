@@ -98,7 +98,7 @@ shared/                 # Общий код
 
 modules/                # Модули (auth, payment, shipping)
 prisma/                 # Prisma schema и миграции
-```
+``
 
 ## Архитектура API
 
@@ -109,11 +109,13 @@ prisma/                 # Prisma schema и миграции
 3. **Repository** — Prisma-запросы к БД, без бизнес-логики
 
 ```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   API Route     │────▶│    Service      │────▶│   Repository    │────▶│   PostgreSQL    │
-│   (Validation)  │     │ (Business Logic)│     │  (Prisma)       │     │   (Database)    │
-└─────────────────┘     └─────────────────┘     └─────────────────┘     └─────────────────┘
-```
+
+┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+│ API Route │────▶│ Service │────▶│ Repository │────▶│ PostgreSQL │
+│ (Validation) │ │ (Business Logic)│ │ (Prisma) │ │ (Database) │
+└─────────────────┘ └─────────────────┘ └─────────────────┘ └─────────────────┘
+
+````
 
 **Пример использования:**
 
@@ -141,7 +143,7 @@ export class CategoriesRepository {
     return prisma.category.findMany({ orderBy: { id: "asc" } });
   }
 }
-```
+````
 
 ## Rate Limiting
 
