@@ -129,7 +129,7 @@ export function UsersTable(props: UsersTableProps) {
     {
       id: "created",
       header: "Регистрация",
-      width: "140px",
+      width: "150px",
       cell: (user) => (
         <span className="text-sm text-muted-foreground">{formatDate(user.createdAt)}</span>
       ),

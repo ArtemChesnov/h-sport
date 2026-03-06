@@ -117,14 +117,6 @@ const ConversionFunnelCard = dynamic(
   { ssr: false, loading: () => <MetricsSectionSkeleton /> }
 );
 
-const ProductPerformanceCard = dynamic(
-  () =>
-    import("./components/dashboard/product-performance-card").then((mod) => ({
-      default: mod.ProductPerformanceCard,
-    })),
-  { ssr: false, loading: () => <MetricsSectionSkeleton /> }
-);
-
 /**
  * Главная страница админки (dashboard) с карточками + графиками.
  * Премиум дизайн в едином стиле.
@@ -212,13 +204,12 @@ export function DashboardPageClient() {
             <div className="mb-4">
               <h2 className="text-lg font-semibold">Retention и воронка</h2>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Удержание клиентов, воронка конверсий и производительность товаров
+                Удержание клиентов и воронка конверсий
               </p>
             </div>
             <div className="space-y-6">
               <RetentionMetricsCard period={period} />
               <ConversionFunnelCard period={period} />
-              <ProductPerformanceCard period={period} />
             </div>
           </div>
         </>
