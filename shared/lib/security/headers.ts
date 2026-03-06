@@ -6,14 +6,14 @@ import type { NextRequest, NextResponse } from "next/server";
  * Production: 'unsafe-inline' в script-src необходим для Next.js App Router,
  * который генерирует inline-скрипты для RSC-payload и гидрации.
  * Middleware не может модифицировать HTML body, поэтому nonce-подход не применим.
+ *
+ * Защита от криптомайнеров (cryptojacking):
+ * - worker-src 'self' — только свои воркеры, блокирует сторонние майнеры в Web Workers
+ * - object-src 'none' — блокирует плагины (Flash и т.п.), часто используемые майнерами
+ * - base-uri 'self' — запрет подмены base URL для загрузки скриптов с чужих доменов
  */
 export function getContentSecurityPolicy(isProduction: boolean): string {
   if (isProduction) {
-    // Production CSP.
-    // Next.js App Router генерирует inline-скрипты для RSC-payload и гидрации,
-    // которые невозможно пометить nonce через middleware (middleware не модифицирует HTML body).
-    // Поэтому используем 'unsafe-inline' для script-src — это стандартная практика для Next.js.
-    // Остальные директивы остаются строгими.
     return [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline'",
@@ -21,10 +21,12 @@ export function getContentSecurityPolicy(isProduction: boolean): string {
       "img-src 'self' data: https:",
       "font-src 'self' data: https://fonts.gstatic.com",
       "connect-src 'self' https:",
+      "worker-src 'self'",
+      "object-src 'none'",
+      "base-uri 'self'",
       "frame-ancestors 'none'",
     ].join("; ");
   } else {
-    // Development: расслабленная CSP для hot reload и dev-инструментов
     return [
       "default-src 'self'",
       "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
@@ -32,6 +34,9 @@ export function getContentSecurityPolicy(isProduction: boolean): string {
       "img-src 'self' data: https: http:",
       "font-src 'self' data: https://fonts.gstatic.com",
       "connect-src 'self' https: http: ws: wss:",
+      "worker-src 'self'",
+      "object-src 'none'",
+      "base-uri 'self'",
     ].join("; ");
   }
 }
@@ -70,10 +75,26 @@ export function applySecurityHeaders(
   // Referrer-Policy: контроль передачи referrer
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
 
-  // Permissions-Policy: контроль доступа к API браузера
+  // Permissions-Policy: ограничение API браузера (в т.ч. защита от криптомайнеров:
+  // отключены фоновое выполнение, датчики и возможности, часто используемые майнерами)
   response.headers.set(
     "Permissions-Policy",
-    "geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=()"
+    [
+      "accelerometer=()",
+      "ambient-light-sensor=()",
+      "battery=()",
+      "camera=()",
+      "display-capture=()",
+      "execution-while-not-rendered=()",
+      "execution-while-out-of-viewport=()",
+      "geolocation=()",
+      "gyroscope=()",
+      "magnetometer=()",
+      "microphone=()",
+      "payment=()",
+      "screen-wake-lock=()",
+      "usb=()",
+    ].join(", ")
   );
 
   // Content-Security-Policy: политика безопасности контента

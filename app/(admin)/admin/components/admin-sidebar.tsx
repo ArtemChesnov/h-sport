@@ -19,6 +19,7 @@ import {
   TicketPercent,
   Users,
   X,
+  FileText,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -82,6 +83,13 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     icon: Activity,
     iconColor: "text-cyan-600",
     hoverGradient: "hover:from-cyan-50/50 hover:to-sky-50/50",
+  },
+  {
+    href: "/admin/logs",
+    label: "Логи",
+    icon: FileText,
+    iconColor: "text-slate-600",
+    hoverGradient: "hover:from-slate-50/50 hover:to-zinc-50/50",
   },
 ];
 

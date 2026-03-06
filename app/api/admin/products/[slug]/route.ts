@@ -103,6 +103,13 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       revalidatePath(`/product/${result.slug}`, "page");
       if (slug !== result.slug) revalidatePath(`/product/${slug}`, "page");
 
+      const { invalidateProduct, invalidateCatalogList, invalidateProductBundles } =
+        await import("@/shared/lib/cache");
+      invalidateProduct(result.slug);
+      if (slug !== result.slug) invalidateProduct(slug);
+      invalidateCatalogList();
+      invalidateProductBundles();
+
       return NextResponse.json(result, { status: 200 });
     },
     request,
@@ -138,6 +145,12 @@ export async function DELETE(
       revalidatePath("/catalog", "page");
       revalidatePath("/admin/products", "page");
       revalidatePath(`/product/${slug}`, "page");
+
+      const { invalidateProduct, invalidateCatalogList, invalidateProductBundles } =
+        await import("@/shared/lib/cache");
+      invalidateProduct(slug);
+      invalidateCatalogList();
+      invalidateProductBundles();
 
       return NextResponse.json<{ success: true }>({ success: true }, { status: 200 });
     },

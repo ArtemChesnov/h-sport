@@ -8,9 +8,6 @@ const envSchema = z.object({
   // База данных — опционально в схеме, на сервере обязательно
   DATABASE_URL: z.string().optional(),
 
-  // Redis — опционально; без него rate-limit и кеш in-memory
-  REDIS_URL: z.string().optional(),
-
   // CDEK API
   CDEK_CLIENT_ID: z.string().optional(),
   CDEK_CLIENT_SECRET: z.string().optional(),
@@ -27,8 +24,8 @@ const envSchema = z.object({
   POSTCALC_FROM_CITY: z.string().optional(),
   POSTCALC_KEY: z.string().optional(),
 
-  // Авторизация
-  AUTH_SECRET: z.string().optional(),
+  // Авторизация (обязателен на сервере, min 32 символа для безопасности JWT)
+  AUTH_SECRET: z.string().min(32, "AUTH_SECRET должен содержать минимум 32 символа").optional(),
   AUTH_URL: z.string().url().optional(),
 
   // Email (модуль auth)
@@ -112,11 +109,18 @@ export const env = (() => {
   try {
     const parsed = envSchema.parse(process.env);
 
-    // На сервере (кроме тестов) проверяем, что DATABASE_URL установлен
+    // На сервере (кроме тестов) проверяем критичные переменные
     if (typeof window === "undefined" && parsed.NODE_ENV !== "test") {
+      const missing: string[] = [];
       if (!parsed.DATABASE_URL || parsed.DATABASE_URL.length === 0) {
+        missing.push("DATABASE_URL: DATABASE_URL обязателен");
+      }
+      if (!parsed.AUTH_SECRET || parsed.AUTH_SECRET.length < 32) {
+        missing.push("AUTH_SECRET: AUTH_SECRET обязателен и должен содержать минимум 32 символа");
+      }
+      if (missing.length > 0) {
         throw new Error(
-          "❌ Ошибка конфигурации окружения:\n  - DATABASE_URL: DATABASE_URL обязателен\n\nПроверьте файл .env"
+          `❌ Ошибка конфигурации окружения:\n${missing.map((m) => `  - ${m}`).join("\n")}\n\nПроверьте файл .env`
         );
       }
     }

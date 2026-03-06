@@ -26,6 +26,12 @@ async function handler(request: NextRequest) {
   const sessionUser = await getSessionUserAfterSignIn(email, password);
 
   if (!sessionUser) {
+    const { recordSecurityEvent } = await import("@/shared/lib/security-log");
+    recordSecurityEvent({
+      type: "FAILED_LOGIN",
+      request,
+      details: { endpoint: "/api/auth/signin" },
+    }).catch(() => {});
     return createErrorResponse("Неверный email или пароль", 401);
   }
 

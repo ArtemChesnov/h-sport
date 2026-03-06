@@ -10,7 +10,7 @@ app/                    # Next.js App Router
 shared/                 # Общий код
   components/          # UI-компоненты
   hooks/                # React-хуки
-  lib/                  # Утилиты: api, auth, cache, csrf, logger, redis, rate-limit, security
+  lib/                  # Утилиты: api, auth, cache, csrf, logger, rate-limit, security
   services/             # Сервисы (оркестрация)
   repositories/         # Доступ к данным (Prisma)
   dto/                  # Типы ответов/запросов API

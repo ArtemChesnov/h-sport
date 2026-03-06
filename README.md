@@ -6,7 +6,6 @@
 
 - **Next.js 15.1.6** (App Router, TypeScript)
 - **PostgreSQL** (Prisma ORM)
-- **Redis** (опционально, для кеширования и rate limiting)
 - **React Query** (TanStack Query) для управления состоянием
 - **Tailwind CSS** для стилизации
 
@@ -41,7 +40,7 @@ npm run prisma:seed
 # Development
 npm run dev
 
-# Production build (БД и Redis при сборке не требуются — главная и каталог отдаются по первому запросу)
+# Production build (БД при сборке не требуется — главная и каталог отдаются по первому запросу)
 npm run build
 npm start
 ```
@@ -64,7 +63,6 @@ npm start
 
 - `AUTH_SECRET` - секретный ключ для JWT токенов (минимум 32 символа)
 - `NEXT_PUBLIC_APP_URL` - публичный URL приложения
-- `REDIS_URL` - строка подключения к Redis (опционально, есть in-memory fallback)
 
 **Интеграции (опционально):**
 

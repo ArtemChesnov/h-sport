@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { seedProducts } from "./seed-products";
 import { seedUsers } from "./seed-users";
 import { seedOrders } from "./seed-orders";
@@ -9,8 +9,8 @@ export const prisma = new PrismaClient();
 /** Сбрасывает sequence для Category.id в 0, чтобы после createMany id были 1, 2, … 13. Только PostgreSQL. */
 async function resetCategorySequence(prismaInstance: PrismaClient) {
   try {
-    await prismaInstance.$executeRawUnsafe(
-      `SELECT setval(pg_get_serial_sequence('"Category"', 'id'), 0)`
+    await prismaInstance.$executeRaw(
+      Prisma.sql`SELECT setval(pg_get_serial_sequence('"Category"', 'id'), 0)`
     );
   } catch {
     // SQLite или другая БД — игнорируем
@@ -108,12 +108,20 @@ async function down() {
   await prisma.cartItem.deleteMany();
   await prisma.cart.deleteMany();
 
-  // Метрики (не зависят от пользователей/товаров, но лучше очистить)
+  // Метрики и логи
   await prisma.conversion.deleteMany();
   await prisma.favoriteAction.deleteMany();
   await prisma.cartAction.deleteMany();
   await prisma.productView.deleteMany();
   await prisma.apiMetric.deleteMany();
+  await prisma.webVitalsMetric.deleteMany();
+  await prisma.slowQuery.deleteMany();
+  await prisma.serverMetrics.deleteMany();
+  await prisma.securityEvent.deleteMany();
+  await prisma.webhookLog.deleteMany();
+  await prisma.clientErrorLog.deleteMany();
+  await prisma.incident.deleteMany();
+  await prisma.newsletterIssue.deleteMany();
 
   // Товары и категории
   await prisma.productItem.deleteMany();

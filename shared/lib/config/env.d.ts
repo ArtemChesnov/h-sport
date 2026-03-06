@@ -9,12 +9,12 @@ declare global {
       // Обязательные переменные
       DATABASE_URL: string;
       NEXT_PUBLIC_APP_URL: string;
-      REDIS_URL?: string;
 
       // Опциональные переменные
       ALLOWED_ORIGINS?: string;
       ALLOW_ANY_ORIGIN?: string;
       ANALYZE?: string;
+      ADMIN_EMAIL?: string;
       ALERT_EMAIL?: string;
       ALERT_WEBHOOK_URL?: string;
       AUTH_URL?: string;
@@ -42,8 +42,6 @@ declare global {
       ROBOKASSA_PASSWORD_2?: string;
       ROBOKASSA_IS_TEST?: string;
       ROBOKASSA_HASH_ALGORITHM?: string;
-      UPSTASH_REDIS_REST_TOKEN?: string;
-      UPSTASH_REDIS_REST_URL?: string;
 
       // Next.js переменные (автоматически добавляются)
       readonly NODE_ENV: "development" | "production" | "test";

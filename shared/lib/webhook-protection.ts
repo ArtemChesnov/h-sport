@@ -1,8 +1,6 @@
 /**
- * Защита от повторной обработки webhook (replay protection)
- *
- * В production рекомендуется использовать Redis.
- * Этот in-memory store работает для single-instance deployments.
+ * Защита от повторной обработки webhook (replay protection).
+ * In-memory store для single-instance deployments.
  */
 
 import { WEBHOOK_TTL_MS, WEBHOOK_CLEANUP_INTERVAL_MS } from "@/shared/constants";
@@ -11,19 +9,13 @@ interface ProcessedWebhook {
   processedAt: number;
 }
 
-// Используем globalThis для защиты от HMR дублирования
 const globalForWebhook = globalThis as typeof globalThis & {
   __webhookStore?: Map<string, ProcessedWebhook>;
   __webhookCleanupRegistered?: boolean;
 };
 
-/**
- * In-memory store для обработанных webhooks (защищён от HMR)
- * В production заменить на Redis
- */
 const processedWebhooks: Map<string, ProcessedWebhook> =
-  globalForWebhook.__webhookStore ||
-  (globalForWebhook.__webhookStore = new Map());
+  globalForWebhook.__webhookStore || (globalForWebhook.__webhookStore = new Map());
 
 /**
  * Очистка устаревших записей
@@ -114,51 +106,4 @@ export function tryProcessWebhook(key: string): boolean {
 
   markWebhookProcessed(key);
   return true;
-}
-
-/**
- * Интерфейс для Redis-совместимого store
- * Можно реализовать для production с Redis
- */
-export interface WebhookStore {
-  isProcessed(key: string): Promise<boolean>;
-  markProcessed(key: string, ttlSeconds?: number): Promise<void>;
-  tryProcess(key: string, ttlSeconds?: number): Promise<boolean>;
-}
-
-/**
- * Создаёт Redis-совместимый webhook store
- * Для использования с Upstash Redis или ioredis
- *
- * @example
- * const redis = new Redis(process.env.UPSTASH_REDIS_REST_URL);
- * const store = createRedisWebhookStore(redis);
- */
-export function createRedisWebhookStore(redis: {
-  get: (key: string) => Promise<string | null>;
-  set: (key: string, value: string, options?: { ex?: number }) => Promise<unknown>;
-}): WebhookStore {
-  const PREFIX = "webhook:processed:";
-  // TTL в секундах (24 часа) для Redis
-  const DEFAULT_TTL = Math.floor(WEBHOOK_TTL_MS / 1000);
-
-  return {
-    async isProcessed(key: string): Promise<boolean> {
-      const result = await redis.get(PREFIX + key);
-      return result !== null;
-    },
-
-    async markProcessed(key: string, ttlSeconds = DEFAULT_TTL): Promise<void> {
-      await redis.set(PREFIX + key, "1", { ex: ttlSeconds });
-    },
-
-    async tryProcess(key: string, ttlSeconds = DEFAULT_TTL): Promise<boolean> {
-      const exists = await redis.get(PREFIX + key);
-      if (exists) {
-        return false;
-      }
-      await redis.set(PREFIX + key, "1", { ex: ttlSeconds });
-      return true;
-    },
-  };
 }

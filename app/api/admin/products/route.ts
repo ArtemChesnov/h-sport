@@ -78,6 +78,11 @@ async function postHandler(request: NextRequest) {
   const { revalidatePath } = await import("next/cache");
   revalidatePath("/", "layout");
   revalidatePath("/catalog", "page");
+
+  const { invalidateCatalogList, invalidateProductBundles } = await import("@/shared/lib/cache");
+  invalidateCatalogList();
+  invalidateProductBundles();
+
   return NextResponse.json(result.product, { status: 201 });
 }
 

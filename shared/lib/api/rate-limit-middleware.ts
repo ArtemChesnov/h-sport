@@ -1,9 +1,14 @@
 /**
- * Rate limiting middleware для API endpoints
- * Использует единый конфиг из shared/lib/rate-limit.ts, автоматически переключается на Redis при наличии REDIS_URL
+ * Rate limiting middleware для API endpoints.
+ * Использует in-memory store из shared/lib/rate-limit.ts.
  */
 
-import { checkRateLimitAsync, getRateLimitKey, RATE_LIMIT_CONFIGS, type RateLimitOptions } from "@/shared/lib/rate-limit";
+import {
+  checkRateLimitAsync,
+  getRateLimitKey,
+  RATE_LIMIT_CONFIGS,
+  type RateLimitOptions,
+} from "@/shared/lib/rate-limit";
 import { NextRequest, NextResponse } from "next/server";
 
 export interface RateLimitConfig {
@@ -40,8 +45,10 @@ export const RATE_LIMIT_PRESETS = Object.fromEntries(
   (Object.keys(RATE_LIMIT_CONFIGS) as Array<keyof typeof RATE_LIMIT_CONFIGS>).map((key) => [
     key,
     { ...RATE_LIMIT_CONFIGS[key], message: PRESET_MESSAGES[key] },
-  ]),
-) as { [K in keyof typeof RATE_LIMIT_CONFIGS]: (typeof RATE_LIMIT_CONFIGS)[K] & { message: string } };
+  ])
+) as {
+  [K in keyof typeof RATE_LIMIT_CONFIGS]: (typeof RATE_LIMIT_CONFIGS)[K] & { message: string };
+};
 
 /** Тело ответа при превышении rate limit (совместимо с ErrorResponse) */
 export interface RateLimitErrorBody {
@@ -56,10 +63,13 @@ export interface RateLimitErrorBody {
  */
 export async function applyRateLimit(
   request: NextRequest,
-  config: keyof typeof RATE_LIMIT_PRESETS | RateLimitConfig,
+  config: keyof typeof RATE_LIMIT_PRESETS | RateLimitConfig
 ): Promise<NextResponse<RateLimitErrorBody> | null> {
   const resolvedConfig = typeof config === "string" ? RATE_LIMIT_PRESETS[config] : config;
-  const prefix = typeof config === "string" ? config : (resolvedConfig as RateLimitConfig).prefix ?? "rate-limit";
+  const prefix =
+    typeof config === "string"
+      ? config
+      : ((resolvedConfig as RateLimitConfig).prefix ?? "rate-limit");
   const key = getRateLimitKey(request, prefix);
   const options: RateLimitOptions = {
     maxRequests: resolvedConfig.maxRequests,
@@ -69,6 +79,17 @@ export async function applyRateLimit(
   const result = await checkRateLimitAsync(key, options);
 
   if (!result.allowed) {
+    // Логируем срабатывание rate limit (не блокируем ответ)
+    import("@/shared/lib/security-log")
+      .then(({ recordSecurityEvent }) =>
+        recordSecurityEvent({
+          type: "RATE_LIMIT",
+          request,
+          details: { prefix, endpoint: request.nextUrl?.pathname ?? request.url },
+        })
+      )
+      .catch(() => {});
+
     const message =
       ("message" in resolvedConfig && typeof resolvedConfig.message === "string"
         ? resolvedConfig.message
@@ -87,7 +108,7 @@ export async function applyRateLimit(
           "X-RateLimit-Remaining": result.remaining.toString(),
           "X-RateLimit-Reset": new Date(result.resetAt).toISOString(),
         },
-      },
+      }
     );
   }
 

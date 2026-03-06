@@ -1,17 +1,13 @@
 /**
- * Гибридное кэширование популярности товаров.
- * В production с Redis использует Redis, иначе in-memory кэш.
+ * Кэширование популярности товаров (in-memory).
  */
 
 import { POPULARITY_CACHE_TTL_MS } from "@/shared/constants";
-import { env } from "@/shared/lib/config/env";
 import type { PrismaClient } from "@prisma/client";
 import { Prisma, Size } from "@prisma/client";
 
 const popularityCache = new Map<string, { data: Record<number, number>; timestamp: number }>();
 const CACHE_TTL = POPULARITY_CACHE_TTL_MS;
-const CACHE_TTL_SECONDS = Math.ceil(CACHE_TTL / 1000);
-const REDIS_KEY_PREFIX = "popularity:";
 
 /**
  * Получает карту популярности продуктов на основе проданных единиц.
@@ -34,31 +30,13 @@ export async function getProductsPopularityMap(
   prismaOrTx: PrismaClient | Prisma.TransactionClient
 ): Promise<Record<number, number>> {
   const cacheKey = "popularity_map";
-  const redisKey = REDIS_KEY_PREFIX + cacheKey;
   const now = Date.now();
 
-  // Гибридная логика: сначала проверяем Redis (если доступен), затем in-memory
-  if (env.REDIS_URL) {
-    try {
-      const { redisGet } = await import("@/shared/lib/redis");
-      const redisCached = await redisGet<Record<number, number>>(redisKey);
-      if (redisCached) {
-        // Также сохраняем в in-memory для быстрого доступа
-        popularityCache.set(cacheKey, { data: redisCached, timestamp: now });
-        return redisCached;
-      }
-    } catch {
-      // При ошибке Redis продолжаем с in-memory
-    }
-  }
-
-  // Проверяем in-memory кэш
   const cached = popularityCache.get(cacheKey);
   if (cached && now - cached.timestamp < CACHE_TTL) {
     return cached.data;
   }
 
-  // Загружаем данные из БД
   const rows = await prismaOrTx.orderItem.groupBy({
     by: ["productId"],
     _sum: {
@@ -79,18 +57,7 @@ export async function getProductsPopularityMap(
     popularity[row.productId] = row._sum.qty ?? 0;
   }
 
-  // Сохраняем в кэш (и в Redis, и в in-memory)
   popularityCache.set(cacheKey, { data: popularity, timestamp: now });
-
-  // При наличии Redis также сохраняем в Redis
-  if (env.REDIS_URL) {
-    try {
-      const { redisSet } = await import("@/shared/lib/redis");
-      await redisSet(redisKey, popularity, CACHE_TTL_SECONDS);
-    } catch {
-      // Игнорируем ошибки записи в Redis
-    }
-  }
 
   return popularity;
 }

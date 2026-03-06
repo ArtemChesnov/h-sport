@@ -1,34 +1,25 @@
-/** Категории: список с кэшем (Redis/in-memory), маппинг в DTO. */
+/** Категории: список с in-memory кэшем, маппинг в DTO. */
 
 import { SEVEN_DAYS_MS } from "@/shared/constants";
-import { getAsync, set } from "@/shared/lib/cache";
+import { getOrSetAsync, getCategoriesCacheKey } from "@/shared/lib/cache";
 import {
   CategoriesRepository,
   type CategorySelectResult,
 } from "@/shared/repositories/categories.repository";
 import type * as DTO from "@/shared/services/dto";
 
-const CACHE_KEY = "categories_list";
-
 export class CategoriesService {
-  /** Список категорий (кэш 7 дней). */
+  /** Список категорий (кэш 7 дней, single-flight при промахе). */
   static async getAll(): Promise<DTO.CategoriesResponseDto> {
-    // Проверяем кеш (Redis приоритет, затем in-memory)
-    const cached = await getAsync<DTO.CategoriesResponseDto>(CACHE_KEY);
-    if (cached) {
-      return cached;
-    }
-
-    // Загружаем из БД через репозиторий
-    const categories = await CategoriesRepository.findAll();
-
-    // Маппим в DTO
-    const response = this.mapToResponse(categories);
-
-    // Сохраняем в кэш
-    set(CACHE_KEY, response, SEVEN_DAYS_MS);
-
-    return response;
+    const { value } = await getOrSetAsync(
+      getCategoriesCacheKey(),
+      async () => {
+        const categories = await CategoriesRepository.findAll();
+        return this.mapToResponse(categories);
+      },
+      SEVEN_DAYS_MS
+    );
+    return value;
   }
 
   private static mapToResponse(categories: CategorySelectResult[]): DTO.CategoriesResponseDto {

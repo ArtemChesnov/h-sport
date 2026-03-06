@@ -1,8 +1,14 @@
 /** Продукты для SSR: новинки, бестселлеры, каталог, деталка по slug. */
 
 import { prisma as defaultPrisma } from "@/prisma/prisma-client";
-import { POPULARITY_CACHE_TTL_MS } from "@/shared/constants";
-import { get, set } from "@/shared/lib/cache";
+import { POPULARITY_CACHE_TTL_MS, PRODUCT_SLUG_CACHE_TTL_MS } from "@/shared/constants";
+import {
+  getOrSetAsync,
+  getNewProductsCacheKey,
+  getPopularCacheKey,
+  getBestsellersCacheKey,
+  getProductCacheKey,
+} from "@/shared/lib/cache";
 import { logger } from "@/shared/lib/logger";
 import {
   buildProductsWhere,
@@ -41,91 +47,80 @@ const PRODUCT_LIST_SELECT = {
   },
 } as const;
 
-/** Новинки (limit штук), с in-memory кэшем и retry. */
+/** Новинки (limit штук), с in-memory кэшем и retry (single-flight при промахе). */
 export async function getNewProducts(limit: number = 3): Promise<DTO.ProductListItemDto[]> {
-  const cacheKey = `new-products:${limit}`;
-  const cached = get<DTO.ProductListItemDto[]>(cacheKey);
-  if (cached) {
-    return cached;
-  }
-
   try {
-    const where = buildProductsWhere({});
-
-    // Используем retry логику для обработки ошибок соединения
-    const products = await retryWithBackoff(
-      () =>
-        defaultPrisma.product.findMany({
-          where,
-          select: PRODUCT_LIST_SELECT,
-          orderBy: {
-            createdAt: "desc",
-          },
-          take: limit,
-        }),
-      {
-        maxRetries: 3,
-        initialDelay: 500,
-        shouldRetry: (error) => {
-          if (error && typeof error === "object" && "code" in error) {
-            const code = String(error.code);
-            return code.startsWith("P10");
+    const { value } = await getOrSetAsync(
+      getNewProductsCacheKey(limit),
+      async () => {
+        const where = buildProductsWhere({});
+        const products = await retryWithBackoff(
+          () =>
+            defaultPrisma.product.findMany({
+              where,
+              select: PRODUCT_LIST_SELECT,
+              orderBy: { createdAt: "desc" },
+              take: limit,
+            }),
+          {
+            maxRetries: 3,
+            initialDelay: 500,
+            shouldRetry: (error) => {
+              if (error && typeof error === "object" && "code" in error)
+                return String((error as { code?: string }).code).startsWith("P10");
+              if (error && typeof error === "object" && "message" in error) {
+                const msg = String((error as { message?: string }).message);
+                return (
+                  msg.includes("Server has closed the connection") ||
+                  msg.includes("connection closed")
+                );
+              }
+              return false;
+            },
           }
-          if (error && typeof error === "object" && "message" in error) {
-            const message = String(error.message);
-            return (
-              message.includes("Server has closed the connection") ||
-              message.includes("connection closed")
-            );
-          }
-          return false;
-        },
-      }
+        );
+        return mapProductsToListDto(products);
+      },
+      POPULARITY_CACHE_TTL_MS
     );
-
-    const result = mapProductsToListDto(products);
-    set(cacheKey, result, POPULARITY_CACHE_TTL_MS);
-    return result;
+    return value;
   } catch (error) {
     logger.error("Error fetching new products", error);
     return [];
   }
 }
 
-/** Популярные товары (limit штук) для блоков «Вам понравится» и др. Кэш по ключу popular:{limit}. */
+/** Популярные товары (limit штук) для блоков «Вам понравится» и др. Кэш по ключу popular:v1:{limit}. */
 export async function getPopularProducts(limit: number): Promise<DTO.ProductListItemDto[]> {
-  const cacheKey = `popular:${limit}`;
-  const cached = get<DTO.ProductListItemDto[]>(cacheKey);
-  if (cached) {
-    return cached;
-  }
-
   try {
-    const where = buildProductsWhere({});
-    const products = await retryWithBackoff(
-      () => getProductsSortedByPopularity(defaultPrisma, where, 0, limit),
-      {
-        maxRetries: 3,
-        initialDelay: 500,
-        shouldRetry: (error) => {
-          if (error && typeof error === "object" && "code" in error) {
-            const code = String(error.code);
-            return code.startsWith("P10");
+    const { value } = await getOrSetAsync(
+      getPopularCacheKey(limit),
+      async () => {
+        const where = buildProductsWhere({});
+        const products = await retryWithBackoff(
+          () => getProductsSortedByPopularity(defaultPrisma, where, 0, limit),
+          {
+            maxRetries: 3,
+            initialDelay: 500,
+            shouldRetry: (error) => {
+              if (error && typeof error === "object" && "code" in error)
+                return String((error as { code?: string }).code).startsWith("P10");
+              if (error && typeof error === "object" && "message" in error) {
+                const msg = String((error as { message?: string }).message);
+                return (
+                  msg.includes("Server has closed the connection") ||
+                  msg.includes("connection closed")
+                );
+              }
+              return false;
+            },
           }
-          if (error && typeof error === "object" && "message" in error) {
-            const message = String(error.message);
-            return (
-              message.includes("Server has closed the connection") ||
-              message.includes("connection closed")
-            );
-          }
-          return false;
-        },
-      }
+        );
+        return mapProductsToListDto(products);
+      },
+      POPULARITY_CACHE_TTL_MS
     );
-    const result = mapProductsToListDto(products);
-    set(cacheKey, result, POPULARITY_CACHE_TTL_MS);
-    return result;
+    return value;
   } catch (error) {
     logger.error("Error fetching popular products", error);
     return [];
@@ -147,38 +142,35 @@ export async function getBestSellers(
   limit: number = 4,
   _fetchLimit?: number
 ): Promise<DTO.ProductListItemDto[]> {
-  const cacheKey = `bestsellers:${limit}`;
-  const cached = get<DTO.ProductListItemDto[]>(cacheKey);
-  if (cached) {
-    return cached;
-  }
-
   try {
-    const where = buildProductsWhere({});
-    const products = await retryWithBackoff(
-      () => getProductsSortedByPopularity(defaultPrisma, where, 0, limit),
-      {
-        maxRetries: 3,
-        initialDelay: 500,
-        shouldRetry: (error) => {
-          if (error && typeof error === "object" && "code" in error) {
-            const code = String(error.code);
-            return code.startsWith("P10");
+    const { value } = await getOrSetAsync(
+      getBestsellersCacheKey(limit),
+      async () => {
+        const where = buildProductsWhere({});
+        const products = await retryWithBackoff(
+          () => getProductsSortedByPopularity(defaultPrisma, where, 0, limit),
+          {
+            maxRetries: 3,
+            initialDelay: 500,
+            shouldRetry: (error) => {
+              if (error && typeof error === "object" && "code" in error)
+                return String((error as { code?: string }).code).startsWith("P10");
+              if (error && typeof error === "object" && "message" in error) {
+                const msg = String((error as { message?: string }).message);
+                return (
+                  msg.includes("Server has closed the connection") ||
+                  msg.includes("connection closed")
+                );
+              }
+              return false;
+            },
           }
-          if (error && typeof error === "object" && "message" in error) {
-            const message = String(error.message);
-            return (
-              message.includes("Server has closed the connection") ||
-              message.includes("connection closed")
-            );
-          }
-          return false;
-        },
-      }
+        );
+        return mapProductsToListDto(products);
+      },
+      POPULARITY_CACHE_TTL_MS
     );
-    const result = mapProductsToListDto(products);
-    set(cacheKey, result, POPULARITY_CACHE_TTL_MS);
-    return result;
+    return value;
   } catch (error) {
     logger.error("Error fetching best sellers", error);
     return [];
@@ -253,45 +245,75 @@ export async function getInitialCatalogProducts(perPage: number = 24): Promise<{
   }
 }
 
-/** Деталка товара по slug или null. */
+/** Деталка товара по slug или null. Кэшируется на PRODUCT_SLUG_CACHE_TTL_MS. */
 export async function getProductBySlug(slug: string): Promise<DTO.ProductDetailDto | null> {
-  const product = await defaultPrisma.product.findUnique({
-    where: { slug },
-    select: {
-      id: true,
-      slug: true,
-      name: true,
-      description: true,
-      composition: true,
-      images: true,
-      tags: true,
-      categoryId: true,
-      category: {
-        select: {
-          id: true,
-          slug: true,
-          name: true,
-        },
-      },
-      items: {
-        select: {
-          id: true,
-          sku: true,
-          color: true,
-          size: true,
-          price: true,
-          isAvailable: true,
-          imageUrls: true,
-        },
-      },
-    },
-  });
+  try {
+    const cacheKey = getProductCacheKey(slug);
+    const { value } = await getOrSetAsync(
+      cacheKey,
+      async () => {
+        const product = await retryWithBackoff(
+          () =>
+            defaultPrisma.product.findUnique({
+              where: { slug },
+              select: {
+                id: true,
+                slug: true,
+                name: true,
+                description: true,
+                composition: true,
+                images: true,
+                tags: true,
+                categoryId: true,
+                category: {
+                  select: {
+                    id: true,
+                    slug: true,
+                    name: true,
+                  },
+                },
+                items: {
+                  select: {
+                    id: true,
+                    sku: true,
+                    color: true,
+                    size: true,
+                    price: true,
+                    isAvailable: true,
+                    imageUrls: true,
+                  },
+                },
+              },
+            }),
+          {
+            maxRetries: 3,
+            initialDelay: 500,
+            shouldRetry: (error) => {
+              if (error && typeof error === "object" && "code" in error)
+                return String((error as { code?: string }).code).startsWith("P10");
+              if (error && typeof error === "object" && "message" in error) {
+                const msg = String((error as { message?: string }).message);
+                return (
+                  msg.includes("Server has closed the connection") ||
+                  msg.includes("connection closed")
+                );
+              }
+              return false;
+            },
+          }
+        );
 
-  if (!product) {
+        if (!product) return null;
+        return mapProductToDetailDto(product as ProductDetailWithRelations);
+      },
+      PRODUCT_SLUG_CACHE_TTL_MS,
+      { cacheNull: true, nullTtlMs: 30000 }
+    );
+    return value;
+  } catch (error) {
+    logger.error("Error fetching product by slug", error);
     return null;
   }
-
-  return mapProductToDetailDto(product as ProductDetailWithRelations);
 }
 
 /**

@@ -80,9 +80,10 @@ export function createProductJsonLd(data: {
       "@type": "Offer",
       price: priceInRubles,
       priceCurrency: (data.currency || "RUB") as "RUB",
-      availability: data.availability !== false
-        ? "https://schema.org/InStock"
-        : "https://schema.org/OutOfStock",
+      availability:
+        data.availability !== false
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
       ...(data.url && { url: data.url }),
     },
     ...(data.brand && {
@@ -117,7 +118,9 @@ export function createOrganizationJsonLd(data: {
 /**
  * Создает JSON-LD для хлебных крошек
  */
-export function createBreadcrumbJsonLd(items: Array<{ name: string; url: string }>): BreadcrumbJsonLd {
+export function createBreadcrumbJsonLd(
+  items: Array<{ name: string; url: string }>
+): BreadcrumbJsonLd {
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -131,15 +134,13 @@ export function createBreadcrumbJsonLd(items: Array<{ name: string; url: string 
 }
 
 /**
- * Компонент для вставки JSON-LD в страницу
+ * Компонент для вставки JSON-LD в страницу.
+ * ВАЖНО: data должен содержать только серверно-генерируемые данные (каталог, товар).
+ * Не передавать сюда сырой пользовательский контент (риск XSS).
  */
 import React from "react";
 
 export function JsonLd({ data }: { data: object }) {
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
-    />
-  );
+  const json = JSON.stringify(data).replace(/<\//g, "<\\/");
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: json }} />;
 }

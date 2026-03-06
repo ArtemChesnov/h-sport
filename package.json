@@ -7,11 +7,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "dev": "concurrently -n \"REDIS,NEXT\" -c \"yellow,blue\" \"npm run redis:start\" \"npm run dev:next\"",
-    "dev:next": "next dev",
-    "dev:no-redis": "next dev",
-    "redis:start": "node scripts/start-redis.js",
-    "redis:stop": "node scripts/stop-redis.js",
+    "dev": "next dev",
     "clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\"",
     "build": "next build && node scripts/postbuild-standalone.js",
     "rebuild": "npm run clean && npm run build",
@@ -30,7 +26,15 @@
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "db:wait": "node scripts/wait-for-db.js",
-    "prepare": "husky"
+    "prepare": "husky",
+    "check:release": "npm run lint && npm run typecheck && npm run build",
+    "check:audit": "npm audit --omit=dev --audit-level=high",
+    "check:secrets": "gitleaks detect --redact --source .",
+    "check:security": "npm run check:audit && npm run check:release",
+    "check:security:full": "npm run check:audit && npm run check:release && npm run check:secrets && npm run check:sast",
+    "check:sast": "semgrep scan --config p/owasp-top-ten --config p/nextjs --config p/nodejs --config p/typescript --config p/react --error --exclude node_modules --exclude .next --exclude '*.lock' --exclude package-lock.json .",
+    "check:sast:report": "node -e \"require('fs').mkdirSync('reports',{recursive:true})\" && semgrep scan --config p/owasp-top-ten --config p/nextjs --config p/nodejs --config p/typescript --config p/react --exclude node_modules --exclude .next --exclude '*.lock' --exclude package-lock.json --json -o reports/semgrep.json . && semgrep scan --config p/owasp-top-ten --config p/nextjs --config p/nodejs --config p/typescript --config p/react --exclude node_modules --exclude .next --exclude '*.lock' --exclude package-lock.json --sarif -o reports/semgrep.sarif .",
+    "check:sast:maldeps": "semgrep scan --config p/nodejs --x-enable-mal-deps --error --exclude node_modules --exclude .next ."
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -70,13 +74,12 @@
     "lucide-react": "^0.552.0",
     "next": "15.5.12",
     "next-themes": "^0.4.6",
-    "nodemailer": "^6.10.1",
+    "nodemailer": "^8.0.1",
     "react": "18.3.1",
     "react-day-picker": "^9.11.1",
     "react-dom": "18.3.1",
     "react-hook-form": "^7.66.0",
     "recharts": "^3.6.0",
-    "redis": "^5.10.0",
     "sonner": "^2.0.7",
     "swagger-jsdoc": "^6.2.8",
     "tailwind-merge": "^3.3.1",
@@ -86,7 +89,6 @@
   "devDependencies": {
     "@babel/core": "^7.28.6",
     "@babel/preset-react": "^7.28.5",
-    "@lhci/cli": "^0.15.1",
     "@next/bundle-analyzer": "^16.1.1",
     "@playwright/test": "^1.57.0",
     "@tailwindcss/postcss": "^4",
@@ -113,7 +115,6 @@
     "ts-node": "^10.9.2",
     "tw-animate-css": "^1.4.0",
     "typescript": "^5",
-    "webpack-bundle-analyzer": "^5.2.0",
-    "xlsx": "^0.18.5"
+    "webpack-bundle-analyzer": "^5.2.0"
   }
 }

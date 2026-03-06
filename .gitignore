@@ -54,27 +54,10 @@ node_modules
 /prisma/seeds/
 
 # internal docs (not for public repo)
-/docs/DEPLOY_INSTRUCTIONS.md
-/docs/DEPLOY.md
-/docs/DEPLOY-VERCEL.md
-/docs/DEPLOY-QUICK-REF.md
-/docs/DEPLOYMENT.md
-/docs/DEVELOPMENT.md
-/docs/BACKUPS.md
-/docs/OPERATIONS.md
-/docs/MONITORING.md
-/docs/DEEP_ANALYSIS_REPORT.md
-/docs/PRE_DEPLOY_ANALYSIS_AND_ASSESSMENT.md
-/docs/REFACTORING_ANALYSIS_PRE_DEPLOY.md
-/docs/REPORT-*.md
-/PRE_PROD_CHECKLIST.md
-/PROJECT_ANALYSIS_AND_DEPLOY_REPORT.md
-/RISK_PATCH_PLAN.md
-/SQL_INJECTION_AUDIT.md
-/PERFORMANCE_*.md
-/REFACTORING_PLAN.md
-/SHOP_PERFORMANCE_ANALYSIS.md
-/DEPLOY_COMMANDS.md
+/docs/
+
+# Semgrep/SAST reports (генерируются локально, не коммитить)
+/reports/
 
 # IDE and editor
 .idea/

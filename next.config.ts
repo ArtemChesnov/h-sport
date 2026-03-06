@@ -62,7 +62,7 @@ const nextConfig: NextConfig = {
       config.plugins.push(copyServerChunksPlugin());
     }
 
-    // Исключаем Redis и Node.js модули из клиентского bundle (только серверные модули)
+    // Исключаем Node.js-специфичные модули из клиентского bundle
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -72,17 +72,6 @@ const nextConfig: NextConfig = {
         fs: false,
         child_process: false,
       };
-
-      // Исключаем redis пакет из клиентского bundle
-      config.externals = config.externals || [];
-      if (Array.isArray(config.externals)) {
-        config.externals.push({ redis: "commonjs redis" });
-      } else if (typeof config.externals === "object") {
-        config.externals = { ...config.externals, redis: "commonjs redis" };
-      } else {
-        const existingExternals = config.externals;
-        config.externals = [existingExternals, { redis: "commonjs redis" }];
-      }
     }
 
     if (!isServer) {

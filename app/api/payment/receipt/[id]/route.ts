@@ -1,15 +1,29 @@
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { createErrorResponse } from "@/shared/lib/api/error-response";
+import { applyRateLimit } from "@/shared/lib/api/rate-limit-middleware";
 import { getReceiptById } from "@/shared/services/server/payment/receipt.service";
 import { formatMoney } from "@/shared/lib/formatters";
 import type { RouteParams } from "@/shared/dto";
 import { NextRequest, NextResponse } from "next/server";
 
+function escapeHtml(str: string | null | undefined): string {
+  if (!str) return "";
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 type RouteContext = RouteParams<{ id: string }>;
 
 export async function GET(request: NextRequest, context: RouteContext) {
   return withErrorHandling(
-    async () => {
+    async (req) => {
+      const rateLimitResponse = await applyRateLimit(req, "public");
+      if (rateLimitResponse) return rateLimitResponse;
+
       const { id } = await context.params;
       const paymentId = parseInt(id, 10);
 
@@ -30,7 +44,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       <html>
         <head>
           <meta charset="utf-8">
-          <title>Чек об оплате заказа №${order.id}</title>
+          <title>Чек об оплате заказа №${escapeHtml(String(order.id))}</title>
           <style>
             body {
               font-family: Arial, sans-serif;
@@ -116,21 +130,21 @@ export async function GET(request: NextRequest, context: RouteContext) {
                 ? `
             <tr class="info-row">
               <td><span class="info-label">Внешний ID:</span></td>
-              <td>${payment.externalId}</td>
+              <td>${escapeHtml(payment.externalId)}</td>
             </tr>
             `
                 : ""
             }
             <tr class="info-row">
               <td><span class="info-label">Email:</span></td>
-              <td>${order.email}</td>
+              <td>${escapeHtml(order.email)}</td>
             </tr>
             ${
               order.fullName
                 ? `
             <tr class="info-row">
               <td><span class="info-label">Получатель:</span></td>
-              <td>${order.fullName}</td>
+              <td>${escapeHtml(order.fullName)}</td>
             </tr>
             `
                 : ""
@@ -154,9 +168,9 @@ export async function GET(request: NextRequest, context: RouteContext) {
                   (item) => `
                 <tr>
                   <td>
-                    ${item.productName}
-                    ${item.size ? `<br><small>Размер: ${item.size}</small>` : ""}
-                    ${item.color ? `<br><small>Цвет: ${item.color}</small>` : ""}
+                    ${escapeHtml(item.productName)}
+                    ${item.size ? `<br><small>Размер: ${escapeHtml(item.size)}</small>` : ""}
+                    ${item.color ? `<br><small>Цвет: ${escapeHtml(item.color)}</small>` : ""}
                   </td>
                   <td style="text-align: center;">${item.qty}</td>
                   <td style="text-align: right;">${formatMoney(item.price)}</td>
@@ -185,7 +199,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
               order.discount > 0
                 ? `
             <tr class="info-row">
-              <td><span class="info-label">Скидка${order.promoCodeCode ? ` (${order.promoCodeCode})` : ""}:</span></td>
+              <td><span class="info-label">Скидка${order.promoCodeCode ? ` (${escapeHtml(order.promoCodeCode)})` : ""}:</span></td>
               <td>-${formatMoney(order.discount)}</td>
             </tr>
             `

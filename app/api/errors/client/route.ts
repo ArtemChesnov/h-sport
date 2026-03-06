@@ -36,14 +36,20 @@ async function handler(request: NextRequest): Promise<NextResponse> {
 
   const { message, stack, componentStack } = parsed.data;
 
+  const userAgent = request.headers.get("user-agent") ?? undefined;
+  const url = request.headers.get("referer") ?? undefined;
+
+  const { recordClientError } = await import("@/shared/lib/security-log");
+  recordClientError({ message, stack, componentStack, userAgent, url }).catch(() => {});
+
   const errorData = {
     message: "Client-side error from ErrorBoundary",
     requestId: request.headers.get("x-request-id") ?? undefined,
     error: message,
     stack,
     componentStack,
-    userAgent: request.headers.get("user-agent"),
-    url: request.headers.get("referer"),
+    userAgent,
+    url,
     timestamp: new Date().toISOString(),
   };
 

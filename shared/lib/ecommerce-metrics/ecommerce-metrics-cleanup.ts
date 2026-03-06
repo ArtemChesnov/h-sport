@@ -44,7 +44,9 @@ export function clearOldEcommerceMetrics(olderThanMs: number = METRICS_MEMORY_RE
 /**
  * Очищает старые e-commerce метрики из БД
  */
-export async function clearOldEcommerceMetricsFromDb(olderThanDays: number = METRICS_DB_RETENTION_DAYS): Promise<void> {
+export async function clearOldEcommerceMetricsFromDb(
+  olderThanDays: number = METRICS_DB_RETENTION_DAYS
+): Promise<void> {
   try {
     const { prisma } = await import("@/prisma/prisma-client");
     const cutoff = new Date();
@@ -79,6 +81,35 @@ export async function clearOldEcommerceMetricsFromDb(olderThanDays: number = MET
           },
         },
       }),
+    ]);
+  } catch {
+    // Игнорируем ошибки БД
+  }
+}
+
+/**
+ * Очищает старые системные логи и метрики из БД.
+ * ApiMetric, WebVitalsMetric, SlowQuery, ServerMetrics — retention 30 дней.
+ * SecurityEvent, WebhookLog, ClientErrorLog — retention 90 дней.
+ */
+export async function clearOldSystemLogsFromDb(): Promise<void> {
+  try {
+    const { prisma } = await import("@/prisma/prisma-client");
+
+    const shortRetentionCutoff = new Date();
+    shortRetentionCutoff.setDate(shortRetentionCutoff.getDate() - 30);
+
+    const longRetentionCutoff = new Date();
+    longRetentionCutoff.setDate(longRetentionCutoff.getDate() - 90);
+
+    await Promise.all([
+      prisma.apiMetric.deleteMany({ where: { createdAt: { lt: shortRetentionCutoff } } }),
+      prisma.webVitalsMetric.deleteMany({ where: { createdAt: { lt: shortRetentionCutoff } } }),
+      prisma.slowQuery.deleteMany({ where: { createdAt: { lt: shortRetentionCutoff } } }),
+      prisma.serverMetrics.deleteMany({ where: { createdAt: { lt: shortRetentionCutoff } } }),
+      prisma.securityEvent.deleteMany({ where: { createdAt: { lt: longRetentionCutoff } } }),
+      prisma.webhookLog.deleteMany({ where: { createdAt: { lt: longRetentionCutoff } } }),
+      prisma.clientErrorLog.deleteMany({ where: { createdAt: { lt: longRetentionCutoff } } }),
     ]);
   } catch {
     // Игнорируем ошибки БД

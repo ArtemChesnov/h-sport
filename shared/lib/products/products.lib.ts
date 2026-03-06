@@ -2,10 +2,18 @@
  * Утилиты для работы с продуктами
  */
 
+import { createHash } from "crypto";
 import type * as DTO from "@/shared/services/dto";
 import type { Size as PrismaSize } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import type { ParsedProductsQuery } from "./validation.lib";
+
+/** Максимальная длина ключа кэша каталога; при превышении используется hash. */
+export const MAX_CATALOG_CACHE_KEY_LENGTH = 512;
+/** Максимальная длина поисковой строки (q) в ключе (защита от key explosion). */
+export const MAX_SEARCH_LENGTH_FOR_CACHE = 200;
+/** Префикс версии ключей каталога (при смене — инвалидация старого кэша). */
+export const CATALOG_CACHE_VERSION_PREFIX = "catalog:v1|";
 
 /**
  * Продукт с нужными связями:
@@ -48,25 +56,19 @@ export type ProductWithRelations = Prisma.ProductGetPayload<{
 export type { ParsedProductsQuery } from "./validation.lib";
 
 /**
- * Генерирует ключ кеша на основе query параметров
- * Используется для кеширования результатов запросов товаров
+ * Строит канонический ключ кэша каталога по query (стабильный порядок, лимиты, hash при длинном ключе).
+ * Используется для кеширования результатов запросов товаров; защита от key explosion и poisoning.
  */
-export function getProductsCacheKey(query: ParsedProductsQuery): string {
+export function buildCatalogCacheKey(query: ParsedProductsQuery): string {
   const parts: string[] = ["products"];
 
-  // Пагинация
   parts.push(`page:${query.page}`, `perPage:${query.perPage}`);
-
-  // Сортировка
   parts.push(`sort:${query.sort || "new"}`);
 
-  // Категории (сортируем для консистентности)
   if (query.categorySlug && query.categorySlug.length > 0) {
     const sorted = [...query.categorySlug].sort().join(",");
     parts.push(`cat:${sorted}`);
   }
-
-  // Цвета (сортируем для консистентности)
   if (query.color && query.color.length > 0) {
     const sorted = [...query.color]
       .map((c) => c.toLowerCase())
@@ -74,32 +76,32 @@ export function getProductsCacheKey(query: ParsedProductsQuery): string {
       .join(",");
     parts.push(`color:${sorted}`);
   }
-
-  // Размеры (сортируем для консистентности)
   if (query.size && query.size.length > 0) {
     const sorted = [...query.size].sort().join(",");
     parts.push(`size:${sorted}`);
   }
+  if (query.priceFrom !== undefined) parts.push(`priceFrom:${query.priceFrom}`);
+  if (query.priceTo !== undefined) parts.push(`priceTo:${query.priceTo}`);
+  if (query.sku) parts.push(`sku:${query.sku.toLowerCase().slice(0, 100)}`);
 
-  // Цена
-  if (query.priceFrom !== undefined) {
-    parts.push(`priceFrom:${query.priceFrom}`);
-  }
-  if (query.priceTo !== undefined) {
-    parts.push(`priceTo:${query.priceTo}`);
-  }
-
-  // SKU
-  if (query.sku) {
-    parts.push(`sku:${query.sku.toLowerCase()}`);
-  }
-
-  // Поиск
   if (query.q) {
-    parts.push(`q:${query.q.toLowerCase().trim()}`);
+    const q = query.q.toLowerCase().trim();
+    const truncated =
+      q.length > MAX_SEARCH_LENGTH_FOR_CACHE ? q.slice(0, MAX_SEARCH_LENGTH_FOR_CACHE) : q;
+    parts.push(`q:${truncated}`);
   }
 
-  return parts.join("|");
+  const raw = parts.join("|");
+  const prefix = CATALOG_CACHE_VERSION_PREFIX;
+  if (raw.length <= MAX_CATALOG_CACHE_KEY_LENGTH) return prefix + raw;
+  return prefix + "products:h:" + createHash("sha256").update(raw).digest("hex").slice(0, 32);
+}
+
+/**
+ * Генерирует ключ кеша на основе query параметров (делегирует в buildCatalogCacheKey).
+ */
+export function getProductsCacheKey(query: ParsedProductsQuery): string {
+  return buildCatalogCacheKey(query);
 }
 
 /**

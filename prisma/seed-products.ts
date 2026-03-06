@@ -1,4 +1,4 @@
-import { PrismaClient, Size } from "@prisma/client";
+import { Prisma, PrismaClient, Size } from "@prisma/client";
 import * as fs from "fs";
 import * as path from "path";
 import { generateSku } from "../shared/lib/generators";
@@ -247,8 +247,8 @@ export async function seedProducts(prisma: PrismaClient) {
 
   // Сбрасываем sequence для Product.id, чтобы следующий автоинкремент был корректен
   try {
-    await prisma.$executeRawUnsafe(
-      `SELECT setval(pg_get_serial_sequence('"Product"', 'id'), COALESCE((SELECT MAX(id) FROM "Product"), 1))`
+    await prisma.$executeRaw(
+      Prisma.sql`SELECT setval(pg_get_serial_sequence('"Product"', 'id'), COALESCE((SELECT MAX(id) FROM "Product"), 1))`
     );
   } catch {
     // SQLite или другая БД — игнорируем

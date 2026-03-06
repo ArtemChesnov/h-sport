@@ -2,7 +2,7 @@ import { PRODUCT_SLUG_CACHE_TTL_MS, CACHE_CONTROL_PRODUCT_SLUG } from "@/shared/
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { createErrorResponse } from "@/shared/lib/api/error-response";
 import { applyRateLimit } from "@/shared/lib/api/rate-limit-middleware";
-import { getAsync, set } from "@/shared/lib/cache";
+import { getOrSetAsync, getProductCacheKey } from "@/shared/lib/cache";
 import { getProductBySlug } from "@/shared/services/server/shop/product/products.service";
 import { DTO } from "@/shared/services";
 import type { ErrorResponse, RouteParams } from "@/shared/dto";
@@ -14,7 +14,7 @@ type ProductRouteContext = RouteParams<{ slug: string }>;
  * GET /api/shop/product/[slug]
  *
  * Возвращает детальную информацию о товаре для витрины.
- * Кэширование: Redis (приоритет) + in-memory, TTL 30 минут
+ * Кэширование: in-memory, TTL 30 минут
  * Rate limit: 120 req/min (product preset)
  */
 export const revalidate = 7200;
@@ -33,19 +33,24 @@ export async function GET(
         return createErrorResponse("Недопустимый slug товара", 400);
       }
 
-      const cacheKey = `product:${slug}`;
-      const cached = await getAsync<DTO.ProductDetailDto>(cacheKey);
-      if (cached) {
-        return NextResponse.json<DTO.ProductDetailDto>(cached, {
-          status: 200,
-          headers: { "Cache-Control": CACHE_CONTROL_PRODUCT_SLUG, "X-Cache": "HIT" },
-        });
+      const cacheKey = getProductCacheKey(slug);
+      let dto: DTO.ProductDetailDto;
+      let fromCache = false;
+      try {
+        const result = await getOrSetAsync(
+          cacheKey,
+          async () => {
+            const product = await getProductBySlug(slug);
+            if (!product) throw new Error("NOT_FOUND");
+            return product;
+          },
+          PRODUCT_SLUG_CACHE_TTL_MS
+        );
+        dto = result.value;
+        fromCache = result.fromCache;
+      } catch {
+        return createErrorResponse("Товар не найден", 404);
       }
-
-      const dto = await getProductBySlug(slug);
-      if (!dto) return createErrorResponse("Товар не найден", 404);
-
-      set(cacheKey, dto, PRODUCT_SLUG_CACHE_TTL_MS);
 
       try {
         const { getSessionUserFromRequest } = await import("@/shared/lib/auth/session");
@@ -58,7 +63,10 @@ export async function GET(
 
       return NextResponse.json<DTO.ProductDetailDto>(dto, {
         status: 200,
-        headers: { "Cache-Control": CACHE_CONTROL_PRODUCT_SLUG, "X-Cache": "MISS" },
+        headers: {
+          "Cache-Control": CACHE_CONTROL_PRODUCT_SLUG,
+          "X-Cache": fromCache ? "HIT" : "MISS",
+        },
       });
     },
     request,

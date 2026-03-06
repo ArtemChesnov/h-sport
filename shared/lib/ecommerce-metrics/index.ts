@@ -11,5 +11,6 @@ export {
   getEcommerceMetrics,
   clearOldEcommerceMetrics,
   clearOldEcommerceMetricsFromDb,
+  clearOldSystemLogsFromDb,
   getAggregatedEcommerceMetrics,
 } from "./ecommerce-metrics";

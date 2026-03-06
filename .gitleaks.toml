@@ -1,0 +1,24 @@
+# Gitleaks config for secret detection
+# https://github.com/gitleaks/gitleaks
+
+title = "h-sport gitleaks config"
+
+[extend]
+# use default rules
+useDefault = true
+
+[allowlist]
+description = "Allowlist for known safe patterns and paths"
+# path substrings (no regex specials like *)
+paths = [
+  ".env.example",
+  ".env.sample",
+  "docs/",
+  "package-lock.json",
+]
+regexes = [
+  "placeholder",
+  "your-.+-here",
+  "<secret>",
+  "example\\.com",
+]

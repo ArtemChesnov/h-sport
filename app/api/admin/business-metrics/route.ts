@@ -35,11 +35,9 @@ function parsePeriod(raw: string | null): DTO.AdminDashboardPeriodDto {
  * 3. Эффективность промокодов (ROI)
  * 4. Статистика по размерам/цветам товаров
  *
- * Использует кеширование (Redis + in-memory) на 5 минут для снижения нагрузки на БД
+ * Использует in-memory кеширование на 5 минут для снижения нагрузки на БД
  */
-async function getHandler(
-  req: NextRequest,
-): Promise<NextResponse<BusinessMetricsResponse>> {
+async function getHandler(req: NextRequest): Promise<NextResponse<BusinessMetricsResponse>> {
   const { requireAdmin } = await import("@/shared/lib/auth/middleware");
   const authError = await requireAdmin(req);
   if (authError) return authError as NextResponse<BusinessMetricsResponse>;
@@ -58,14 +56,15 @@ async function getHandler(
   }
 
   const now = new Date();
-  const [abandonedCartsAnalysis, ltvMetrics, promoCodesMetrics, productVariants] = await Promise.all([
-    getAbandonedCartsAnalysis(days),
-    getLTVMetrics(days),
-    getPromoEffectiveness(days),
-    getProductVariantsStats(days),
-  ]);
+  const [abandonedCartsAnalysis, ltvMetrics, promoCodesMetrics, productVariants] =
+    await Promise.all([
+      getAbandonedCartsAnalysis(days),
+      getLTVMetrics(days),
+      getPromoEffectiveness(days),
+      getProductVariantsStats(days),
+    ]);
 
-  const from = new Date();
+  const from = new Date(now);
   from.setDate(now.getDate() - (days - 1));
   from.setHours(0, 0, 0, 0);
 
@@ -94,7 +93,7 @@ async function getHandler(
 }
 
 export async function GET(
-  req: NextRequest,
+  req: NextRequest
 ): Promise<NextResponse<BusinessMetricsResponse | ErrorResponse>> {
   return withErrorHandling(getHandler, req, "GET /api/admin/business-metrics");
 }

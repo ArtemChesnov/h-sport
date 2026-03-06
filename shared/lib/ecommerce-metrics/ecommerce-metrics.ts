@@ -14,23 +14,27 @@
 
 import { createSafeInterval } from "../safe-interval";
 import {
-    aggregateCart,
-    aggregateConversions,
-    aggregateFavorites,
-    aggregateViews,
-    calculateEngagementRate,
+  aggregateCart,
+  aggregateConversions,
+  aggregateFavorites,
+  aggregateViews,
+  calculateEngagementRate,
 } from "./ecommerce-metrics-aggregation";
 import { loadMetricsFromDb, getAggregatedMetricsFromDb } from "./ecommerce-metrics-readers";
 
 // Реэкспорт функций записи
 export {
-    recordCartAction, recordConversion, recordFavoriteAction, recordProductView
+  recordCartAction,
+  recordConversion,
+  recordFavoriteAction,
+  recordProductView,
 } from "./ecommerce-metrics-writers";
 
 // Реэкспорт функций очистки
 export {
-    clearOldEcommerceMetrics,
-    clearOldEcommerceMetricsFromDb
+  clearOldEcommerceMetrics,
+  clearOldEcommerceMetricsFromDb,
+  clearOldSystemLogsFromDb,
 } from "./ecommerce-metrics-cleanup";
 
 // Реэкспорт функции агрегации из БД
@@ -68,8 +72,12 @@ export async function getEcommerceMetrics(timeWindowMs: number = 24 * 60 * 60 * 
   }
 
   // Для коротких периодов загружаем записи
-  const { views: recentViews, cartActions: recentCartActions, favorites: recentFavorites, conversions: recentConversions } =
-    await loadMetricsFromDb(cutoff, now);
+  const {
+    views: recentViews,
+    cartActions: recentCartActions,
+    favorites: recentFavorites,
+    conversions: recentConversions,
+  } = await loadMetricsFromDb(cutoff, now);
 
   // Агрегируем данные
   const viewsStats = aggregateViews(recentViews);
@@ -77,15 +85,27 @@ export async function getEcommerceMetrics(timeWindowMs: number = 24 * 60 * 60 * 
   const favoritesStats = aggregateFavorites(recentFavorites);
 
   const cartAdds = recentCartActions.filter((a) => a.action === "add");
-  const conversionsStats = aggregateConversions(recentConversions, viewsStats.total, cartAdds.length);
+  const conversionsStats = aggregateConversions(
+    recentConversions,
+    viewsStats.total,
+    cartAdds.length
+  );
 
   // Уникальные пользователи для engagement rate
-  const uniqueViewers = new Set(recentViews.map((v) => v.userId).filter((id): id is string => Boolean(id)));
-  const uniqueCartUsers = new Set(cartAdds.map((a) => a.userId).filter((id): id is string => Boolean(id)));
+  const uniqueViewers = new Set(
+    recentViews.map((v) => v.userId).filter((id): id is string => Boolean(id))
+  );
+  const uniqueCartUsers = new Set(
+    cartAdds.map((a) => a.userId).filter((id): id is string => Boolean(id))
+  );
   const favoriteAdds = recentFavorites.filter((f) => f.action === "add");
   const uniqueFavoriteUsers = new Set(favoriteAdds.map((f) => f.userId));
 
-  const engagementRate = calculateEngagementRate(uniqueViewers, uniqueCartUsers, uniqueFavoriteUsers);
+  const engagementRate = calculateEngagementRate(
+    uniqueViewers,
+    uniqueCartUsers,
+    uniqueFavoriteUsers
+  );
   const engagedUsers = new Set([...uniqueCartUsers, ...uniqueFavoriteUsers]);
 
   return {
@@ -119,16 +139,23 @@ export async function getEcommerceMetrics(timeWindowMs: number = 24 * 60 * 60 * 
 }
 
 // Инициализация периодической очистки метрик
-createSafeInterval(async () => {
-  const { clearOldEcommerceMetrics } = await import("./ecommerce-metrics-cleanup");
-  clearOldEcommerceMetrics();
-}, 24 * 60 * 60 * 1000, "ecommerce-metrics:cleanup");
+createSafeInterval(
+  async () => {
+    const { clearOldEcommerceMetrics } = await import("./ecommerce-metrics-cleanup");
+    clearOldEcommerceMetrics();
+  },
+  24 * 60 * 60 * 1000,
+  "ecommerce-metrics:cleanup"
+);
 
 // Периодическая очистка старых метрик из БД (раз в день)
-createSafeInterval(async () => {
-  const { clearOldEcommerceMetricsFromDb } = await import("./ecommerce-metrics-cleanup");
-  clearOldEcommerceMetricsFromDb(30).catch(() => {
-    // Игнорируем ошибки
-  });
-}, 24 * 60 * 60 * 1000, "ecommerce-metrics:db-cleanup");
-
+createSafeInterval(
+  async () => {
+    const { clearOldEcommerceMetricsFromDb } = await import("./ecommerce-metrics-cleanup");
+    clearOldEcommerceMetricsFromDb(30).catch(() => {
+      // Игнорируем ошибки
+    });
+  },
+  24 * 60 * 60 * 1000,
+  "ecommerce-metrics:db-cleanup"
+);

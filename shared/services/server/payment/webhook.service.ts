@@ -8,14 +8,8 @@ import {
 } from "@/modules/payment/lib/db";
 import { checkPaymentSignature } from "@/modules/payment/lib/robokassa";
 import { prisma } from "@/prisma/prisma-client";
-import { WEBHOOK_TTL_MS } from "@/shared/constants";
-import { getRedisClient } from "@/shared/lib/redis";
 import { logger } from "@/shared/lib/logger";
-import {
-  createRedisWebhookStore,
-  generateWebhookKey,
-  tryProcessWebhook,
-} from "@/shared/lib/webhook-protection";
+import { generateWebhookKey, tryProcessWebhook } from "@/shared/lib/webhook-protection";
 
 /** Данные webhook от Robokassa */
 export interface RobokassaWebhookData {
@@ -31,7 +25,7 @@ export interface RobokassaWebhookData {
 
 /** Результат обработки webhook */
 export type WebhookResult =
-  | { ok: true; invId: string }
+  | { ok: true; invId: string; replay?: true }
   | { ok: false; status: number; message: string };
 
 /**
@@ -80,15 +74,12 @@ export async function processRobokassaWebhook(
     return { ok: false, status: 400, message: "Неверный ID заказа" };
   }
 
-  // Replay protection: Redis при наличии REDIS_URL, иначе in-memory
+  // Replay protection: in-memory store (single instance)
   const webhookKey = generateWebhookKey("robokassa", InvId, SignatureValue);
-  const redis = await getRedisClient();
-  const canProcess = redis
-    ? await createRedisWebhookStore(redis).tryProcess(webhookKey, Math.floor(WEBHOOK_TTL_MS / 1000))
-    : tryProcessWebhook(webhookKey);
+  const canProcess = tryProcessWebhook(webhookKey);
   if (!canProcess) {
     logger.info("Webhook already processed (replay protection)", { InvId, webhookKey });
-    return { ok: true, invId: InvId }; // Уже обработан — OK
+    return { ok: true, invId: InvId, replay: true }; // Уже обработан — OK
   }
 
   // Проверка подписи
@@ -108,23 +99,41 @@ export async function processRobokassaWebhook(
     return { ok: false, status: 404, message: "Платеж не найден" };
   }
 
-  // Обновляем статус платежа
+  // Обновляем платёж, заказ и создаём событие в одной транзакции
   const receiptUrl = `${baseUrl}/api/payment/receipt/${payment.id}`;
-  await updatePaymentStatus(payment.id, "PAID", InvId, SignatureValue, receiptUrl);
+  await prisma.$transaction(async (tx) => {
+    await tx.payment.update({
+      where: { id: payment.id },
+      data: {
+        status: "PAID",
+        externalId: InvId,
+        signature: SignatureValue,
+        receiptUrl,
+        updatedAt: new Date(),
+      },
+    });
 
-  // Обновляем статус заказа
-  await updateOrderOnPayment(orderId, "PAID");
+    await tx.order.update({
+      where: { id: orderId },
+      data: { status: "PAID", updatedAt: new Date() },
+    });
 
-  // Отправляем email (асинхронно)
-  sendOrderEmailAsync(orderId).catch((err) => {
-    logger.error("Ошибка при отправке email о заказе", err);
+    await tx.orderEvent.create({
+      data: {
+        orderId,
+        type: "PAYMENT_PAID",
+        payload: {
+          paymentId: payment.id,
+          amount: OutSum,
+          timestamp: new Date().toISOString(),
+        },
+      },
+    });
   });
 
-  // Создаём событие
-  await createOrderEvent(orderId, "PAYMENT_PAID", {
-    paymentId: payment.id,
-    amount: OutSum,
-    timestamp: new Date().toISOString(),
+  // Отправляем email (асинхронно, вне транзакции)
+  sendOrderEmailAsync(orderId).catch((err) => {
+    logger.error("Ошибка при отправке email о заказе", err);
   });
 
   return { ok: true, invId: InvId };

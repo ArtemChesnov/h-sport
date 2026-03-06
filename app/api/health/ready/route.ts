@@ -1,7 +1,7 @@
 /**
  * GET /api/health/ready
  *
- * Readiness probe: 200 только когда БД (и в production Redis) доступны.
+ * Readiness probe: 200 только когда БД доступна.
  */
 
 import { withErrorHandling } from "@/shared/lib/api/error-handler";

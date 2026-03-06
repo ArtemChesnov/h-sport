@@ -1,9 +1,11 @@
-/** Каталог товаров API: фильтры, сортировка, пагинация, кэш (Redis + in-memory). */
+/** Каталог товаров API: фильтры, сортировка, пагинация, in-memory кэш. */
 
 import { prisma } from "@/prisma/prisma-client";
 import { PRODUCTS_LIST_CACHE_TTL_MS } from "@/shared/constants";
 import { buildPaginatedResponse, calculateSkip } from "@/shared/lib/pagination";
-import { getAsync, set } from "@/shared/lib/cache";
+import { getOrSetAsync } from "@/shared/lib/cache";
+import { logger } from "@/shared/lib/logger";
+import { retryWithBackoff } from "@/shared/lib/retry";
 import {
   buildProductsWhere,
   getProductsCacheKey,
@@ -14,24 +16,7 @@ import {
 } from "@/shared/lib/products";
 import type * as DTO from "@/shared/services/dto";
 
-// ─── Кэш каталога ──────────────────────────────────────────────────────────
-
-/**
- * Получает кешированный список товаров.
- */
-async function getCachedProducts(cacheKey: string): Promise<DTO.ProductsListResponseDto | null> {
-  return await getAsync<DTO.ProductsListResponseDto>(cacheKey);
-}
-
-/**
- * Сохраняет список товаров в кеш.
- */
-async function setProductsCache(
-  cacheKey: string,
-  data: DTO.ProductsListResponseDto
-): Promise<void> {
-  await set(cacheKey, data, PRODUCTS_LIST_CACHE_TTL_MS);
-}
+// ─── Кэш каталога (getOrSetAsync — single-flight при промахе) ─────────────────
 
 // ─── Константа select (общий набор полей для списка) ────────────────────────
 
@@ -65,7 +50,7 @@ const CATALOG_LIST_SELECT = {
 // ─── Сервис ─────────────────────────────────────────────────────────────────
 
 export class CatalogProductsService {
-  /** Список товаров по query (фильтры, сорт, пагинация), с кэшем. */
+  /** Список товаров по query (фильтры, сорт, пагинация), с кэшем и retry. */
   static async getProducts(query: {
     page: number;
     perPage: number;
@@ -78,30 +63,44 @@ export class CatalogProductsService {
     q?: string;
     sort: DTO.ProductsQueryDto["sort"];
   }): Promise<DTO.ProductsListResponseDto> {
-    // Проверяем кеш
-    const cacheKey = getProductsCacheKey(query);
-    const cached = await getCachedProducts(cacheKey);
-    if (cached) {
-      return cached;
+    try {
+      const cacheKey = getProductsCacheKey(query);
+      const { value } = await getOrSetAsync(
+        cacheKey,
+        async () => {
+          return retryWithBackoff(
+            async () => {
+              const products = await this.fetchProductsFromDb(query);
+              const listItems = mapProductsToListDto(products);
+              const where = buildProductsWhere(query);
+              const totalCount = await prisma.product.count({ where });
+              return buildPaginatedResponse(listItems, totalCount, query.page, query.perPage);
+            },
+            {
+              maxRetries: 3,
+              initialDelay: 500,
+              shouldRetry: (error) => {
+                if (error && typeof error === "object" && "code" in error)
+                  return String((error as { code?: string }).code).startsWith("P10");
+                if (error && typeof error === "object" && "message" in error) {
+                  const msg = String((error as { message?: string }).message);
+                  return (
+                    msg.includes("Server has closed the connection") ||
+                    msg.includes("connection closed")
+                  );
+                }
+                return false;
+              },
+            }
+          );
+        },
+        PRODUCTS_LIST_CACHE_TTL_MS
+      );
+      return value;
+    } catch (error) {
+      logger.error("Error fetching catalog products", error);
+      return buildPaginatedResponse([], 0, query.page, query.perPage);
     }
-
-    // Получаем данные из БД
-    const products = await this.fetchProductsFromDb(query);
-
-    // Маппим в DTO
-    const listItems = mapProductsToListDto(products);
-
-    // Получаем общее количество товаров для пагинации
-    const where = buildProductsWhere(query);
-    const totalCount = await prisma.product.count({ where });
-
-    // Строим пагинированный ответ
-    const responseBody = buildPaginatedResponse(listItems, totalCount, query.page, query.perPage);
-
-    // Сохраняем в кеш
-    await setProductsCache(cacheKey, responseBody);
-
-    return responseBody;
   }
 
   private static async fetchProductsFromDb(query: {

@@ -4,13 +4,26 @@
 
 // Типы и утилиты для работы со списком продуктов
 export {
-    buildProductsWhere, getProductsCacheKey, getProductsWithMaxPrice, getProductsWithMinPrice, mapProductsToListDto, paginateProducts, sortProducts, type ParsedProductsQuery, type ProductWithRelations
+  buildCatalogCacheKey,
+  buildProductsWhere,
+  getProductsCacheKey,
+  getProductsWithMaxPrice,
+  getProductsWithMinPrice,
+  mapProductsToListDto,
+  paginateProducts,
+  sortProducts,
+  MAX_CATALOG_CACHE_KEY_LENGTH,
+  MAX_SEARCH_LENGTH_FOR_CACHE,
+  CATALOG_CACHE_VERSION_PREFIX,
+  type ParsedProductsQuery,
+  type ProductWithRelations,
 } from "./products.lib";
 
 // Утилиты для популярности
 export {
-    getProductIdsSortedByPopularity, getProductsPopularityMap,
-    getProductsSortedByPopularity
+  getProductIdsSortedByPopularity,
+  getProductsPopularityMap,
+  getProductsSortedByPopularity,
 } from "./popularity.lib";
 
 // Маппинг для детальной страницы

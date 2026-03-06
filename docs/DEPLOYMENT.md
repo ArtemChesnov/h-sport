@@ -196,23 +196,29 @@ sudo -u postgres psql -c "CREATE DATABASE hsport OWNER hsport;"
 
 Если пароль уже использовался (пользователь уже есть), может появиться сообщение об ошибке «already exists». Тогда просто переходите к следующему шагу — база уже создана.
 
-### Шаг 3.6. Установить Redis
+### Шаг 3.6. Настройка файрвола (UFW)
 
-Redis нужен для кеша и ограничения запросов.
+Файрвол закрывает порты сервера от внешнего доступа. Это **обязательный** шаг для безопасности — без него порт 3000 (Next.js) и другие сервисы могут быть доступны напрямую из интернета.
 
 ```bash
-sudo apt install -y redis-server
-sudo systemctl enable redis-server
-sudo systemctl start redis-server
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow 22/tcp       # SSH (стандартный порт)
+sudo ufw allow 80/tcp       # HTTP
+sudo ufw allow 443/tcp      # HTTPS
+sudo ufw deny 3000/tcp      # Блокируем прямой доступ к Next.js
+sudo ufw enable
 ```
+
+Если используете нестандартный порт SSH (например, 2222), замените `22/tcp` на свой порт.
 
 Проверка:
 
 ```bash
-redis-cli ping
+sudo ufw status
 ```
 
-В ответ должно быть слово **PONG**. Если видите PONG — Redis работает.
+Должны быть видны правила: SSH (22), HTTP (80), HTTPS (443) — ALLOW. Порт 3000 — DENY. Весь остальной входящий трафик — по умолчанию заблокирован.
 
 ---
 
@@ -252,23 +258,69 @@ nano ~/h-sport/.env
 
 В проекте на GitHub есть файл **.env.example** — в нём перечислены все переменные. Вам нужно создать на сервере файл `.env` и заполнить в нём **реальные** значения.
 
-Минимальный набор переменных для первого запуска (скопируйте блок ниже в nano и замените значения на свои):
+Ниже — полный шаблон для production. Скопируйте блок в nano и замените значения на свои:
 
 ```env
-DATABASE_URL=postgresql://hsport:ВАШ_ПАРОЛЬ_ОТ_БАЗЫ@localhost:5432/hsport?schema=public
-AUTH_SECRET=замените_на_длинную_случайную_строку_минимум_32_символа
-REDIS_URL=redis://localhost:6379
-NODE_ENV=production
-NEXT_PUBLIC_APP_URL=https://h-brand.ru
+# ============================================
+# H-Sport — Production .env
+# ============================================
+
+# --- ОБЯЗАТЕЛЬНЫЕ ---
+DATABASE_URL="postgresql://hsport:ВАШ_ПАРОЛЬ_ОТ_БАЗЫ@localhost:5432/hsport?schema=public"
+NODE_ENV="production"
+AUTH_SECRET="ВСТАВЬТЕ_СЮДА_РЕЗУЛЬТАТ_openssl_rand_-base64_32"
+NEXT_PUBLIC_APP_URL="https://h-brand.ru"
+AUTH_URL="https://h-brand.ru"
+
+# --- АДМИНИСТРАТОР ---
+# Email, который автоматически получает роль ADMIN при входе
+ADMIN_EMAIL="jaksan37@gmail.com"
+
+# --- ПОЧТА (SMTP) ---
+# Без SMTP не будут работать: подтверждение email, сброс пароля, письмо о заказе
+SMTP_HOST="smtp.example.com"
+SMTP_PORT="465"
+SMTP_USER="ваш-smtp-логин"
+SMTP_PASSWORD="ваш-smtp-пароль"
+SMTP_FROM="H-Sport <noreply@h-brand.ru>"
+
+# --- CDEK API (доставка) ---
+CDEK_CLIENT_ID="ваш-cdek-client-id"
+CDEK_CLIENT_SECRET="ваш-cdek-client-secret"
+CDEK_IS_TEST="false"
+CDEK_FROM_CITY_CODE="137"
+
+# --- DaData API (подсказки адресов) ---
+DADATA_TOKEN="ваш-dadata-токен"
+
+# --- ROBOKASSA (оплата) ---
+ROBOKASSA_MERCHANT_LOGIN="ваш-логин"
+ROBOKASSA_PASSWORD_1="ваш-пароль-1"
+ROBOKASSA_PASSWORD_2="ваш-пароль-2"
+ROBOKASSA_IS_TEST="false"
+ROBOKASSA_HASH_ALGORITHM="sha256"
+
+# --- БЕЗОПАСНОСТЬ ---
+# Укажите реальный домен сайта. НЕ используйте ALLOW_ANY_ORIGIN в production!
+ALLOWED_ORIGINS="https://h-brand.ru"
+
+# --- ЛОГИРОВАНИЕ ---
+LOG_LEVEL="info"
+PRISMA_LOG_QUERIES="false"
+ENABLE_FILE_LOGGING=true
 ```
 
-Что заменить:
+**Что заменить:**
 
 - **ВАШ_ПАРОЛЬ_ОТ_БАЗЫ** — тот же пароль, что вы задали для пользователя `hsport` в шаге 3.5.
-- **AUTH_SECRET** — случайная строка не короче 32 символов. Сгенерировать можно на сервере командой:  
-  `openssl rand -base64 32`  
-  Скопируйте вывод и вставьте в `AUTH_SECRET=...`.
-- **NEXT_PUBLIC_APP_URL** — адрес сайта. Пока домена нет — укажите `http://62.113.44.100:3000`. После настройки домена и SSL — `https://h-brand.ru`.
+- **AUTH_SECRET** — случайная строка не короче 32 символов. **Без неё приложение не запустится.** Сгенерировать на сервере:  
+  ```bash
+  openssl rand -base64 32
+  ```  
+  Скопируйте вывод и вставьте в `AUTH_SECRET="..."`.
+- **NEXT_PUBLIC_APP_URL** и **AUTH_URL** — адрес сайта. Пока домена нет — укажите `http://ВАШ_IP:3000`. После настройки домена и SSL — `https://h-brand.ru`.
+- **SMTP_***, **CDEK_***, **DADATA_TOKEN**, **ROBOKASSA_*** — получите у соответствующих сервисов. Без них соответствующие функции (почта, доставка, подсказки, оплата) не будут работать, но сайт запустится.
+- **ADMIN_EMAIL** — email администратора (`jaksan37@gmail.com`). Этот пользователь автоматически получает права админа при входе.
 
 ### Шаг 5.3. Сохранить и выйти из nano
 

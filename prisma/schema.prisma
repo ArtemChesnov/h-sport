@@ -89,7 +89,7 @@ model User {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
-  @@index([email]) // для быстрого поиска по email
+  // @@index([email]) — redundant: уже покрыт @unique на email
   @@index([phone]) // для быстрого поиска по телефону
 }
 
@@ -171,8 +171,8 @@ model ProductItem {
   @@index([isAvailable]) // индекс для фильтрации доступных товаров
   @@index([productId, isAvailable]) // композитный индекс для частых выборок в каталоге
   @@index([productId, isAvailable, price]) // составной индекс для фильтрации по товару, наличию и цене (оптимизация сортировки по цене)
-  @@index([color, isAvailable]) // составной индекс для фильтрации по цвету и доступности
-  @@index([size, isAvailable]) // составной индекс для фильтрации по размеру и доступности
+  // @@index([color, isAvailable]) — redundant: покрыт [color, size, isAvailable]
+  // @@index([size, isAvailable]) — redundant: покрыт [color, size, isAvailable]
   @@index([color, size, isAvailable]) // составной индекс для комплексной фильтрации по цвету, размеру и доступности
 }
 
@@ -350,7 +350,7 @@ model Delivery {
   price        Int            @default(0)
 
   @@index([method]) // индекс по способу (отчёты/фильтры)
-  @@index([orderId])
+  // @@index([orderId]) — redundant: уже покрыт @unique на orderId
 }
 
 model Payment {
@@ -538,6 +538,58 @@ model ServerMetrics {
   totalmem  BigInt // bytes (общая память системы)
   uptime    Float // seconds
   createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+// События безопасности (неудачные логины, rate limit, неверная подпись и т.д.)
+enum SecurityEventType {
+  FAILED_LOGIN
+  RATE_LIMIT
+  INVALID_PAYMENT_SIGNATURE
+}
+
+model SecurityEvent {
+  id        Int              @id @default(autoincrement())
+  type      SecurityEventType
+  ip        String?          @db.VarChar(45)
+  userAgent String?          @db.VarChar(500)
+  details   Json?
+  createdAt DateTime         @default(now())
+
+  @@index([type])
+  @@index([createdAt])
+}
+
+// Лог входящих webhook-вызовов (платежи и т.д.)
+enum WebhookResultType {
+  SUCCESS
+  REPLAY
+  ERROR
+}
+
+model WebhookLog {
+  id        Int             @id @default(autoincrement())
+  source    String          @db.VarChar(50) // robokassa, ...
+  ip        String?         @db.VarChar(45)
+  invId     String?         @db.VarChar(50)
+  result    WebhookResultType
+  message   String?         @db.VarChar(500)
+  createdAt DateTime        @default(now())
+
+  @@index([source])
+  @@index([createdAt])
+}
+
+// Клиентские ошибки (ErrorBoundary)
+model ClientErrorLog {
+  id             Int      @id @default(autoincrement())
+  message        String   @db.Text
+  stack          String?  @db.Text
+  componentStack String?  @db.Text
+  userAgent      String?  @db.VarChar(500)
+  url            String?  @db.VarChar(2000)
+  createdAt      DateTime @default(now())
 
   @@index([createdAt])
 }

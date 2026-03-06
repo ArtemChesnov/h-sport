@@ -4,7 +4,6 @@
 
 - Node.js 20+
 - PostgreSQL
-- Redis (опционально: есть in-memory fallback для rate limit)
 
 ## Первый запуск
 
@@ -29,7 +28,6 @@
    ```bash
    npm run dev
    ```
-   С Redis в фоне: `npm run dev` (запускает Redis и Next). Без Redis: `npm run dev:no-redis`.
 
 Приложение: http://localhost:3000. Админка: http://localhost:3000/admin (нужен пользователь с ролью ADMIN).
 
@@ -37,8 +35,7 @@
 
 | Команда | Описание |
 |---------|----------|
-| `npm run dev` | Разработка (Redis + Next) |
-| `npm run dev:no-redis` | Разработка без Redis |
+| `npm run dev` | Разработка |
 | `npm run build` | Production-сборка |
 | `npm run start` | Запуск production-сборки |
 | `npm run lint` | ESLint |

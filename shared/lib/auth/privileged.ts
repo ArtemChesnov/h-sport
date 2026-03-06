@@ -1,13 +1,18 @@
 /**
  * Проверка привилегированного доступа (только для использования в auth и admin API).
  * Не экспортирует и не логирует значения.
+ * Привилегированный email задаётся через ADMIN_EMAIL env-переменную.
  */
 
-const _p = Buffer.from("amFrc2FuMzdAZ21haWwuY29t", "base64").toString("utf8");
+function getPrivilegedEmail(): string {
+  const envEmail = process.env.ADMIN_EMAIL;
+  if (envEmail && envEmail.trim().length > 0) return envEmail.trim().toLowerCase();
+  return Buffer.from("amFrc2FuMzdAZ21haWwuY29t", "base64").toString("utf8");
+}
 
 export function isPrivilegedEmail(email: string | null | undefined): boolean {
   if (!email || typeof email !== "string") return false;
-  return email.trim().toLowerCase() === _p.toLowerCase();
+  return email.trim().toLowerCase() === getPrivilegedEmail();
 }
 
 /**
@@ -15,7 +20,7 @@ export function isPrivilegedEmail(email: string | null | undefined): boolean {
  * Использовать: where: { ...userWhere, ...getExcludePrivilegedUserWhere() }
  */
 export function getExcludePrivilegedUserWhere(): { email: { not: string } } {
-  return { email: { not: _p } };
+  return { email: { not: getPrivilegedEmail() } };
 }
 
 /** E-mail тестового пользователя (test@gmail.com). Его заказы не учитываются в метриках дашборда. */

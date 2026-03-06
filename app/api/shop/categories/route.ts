@@ -14,7 +14,7 @@ import { NextRequest, NextResponse } from "next/server";
  *
  * Кэширование:
  * - ISR: 7 дней (revalidate)
- * - Redis (приоритет) + In-memory: 7 дней
+ * - In-memory: 7 дней
  * - HTTP: 7 дней + stale-while-revalidate 30 дней
  *
  * Rate limit: 100 req/min (catalog preset)
@@ -23,7 +23,7 @@ import { NextRequest, NextResponse } from "next/server";
 export const revalidate = 86400;
 
 async function getHandler(
-  request: NextRequest,
+  request: NextRequest
 ): Promise<NextResponse<DTO.CategoriesResponseDto> | NextResponse<ErrorResponse>> {
   const rateLimitResponse = await applyRateLimit(request, "catalog");
   if (rateLimitResponse) return rateLimitResponse;
@@ -36,7 +36,7 @@ async function getHandler(
 }
 
 export async function GET(
-  request: NextRequest,
+  request: NextRequest
 ): Promise<NextResponse<DTO.CategoriesResponseDto | ErrorResponse>> {
   return withErrorHandling(getHandler, request, "GET /api/shop/categories");
 }

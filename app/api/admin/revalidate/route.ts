@@ -1,5 +1,11 @@
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { requireAdmin } from "@/shared/lib/auth/middleware";
+import {
+  invalidateCatalogList,
+  invalidateCategories,
+  invalidateAllProducts,
+  invalidateProductBundles,
+} from "@/shared/lib/cache";
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -10,6 +16,12 @@ async function postHandler(request: NextRequest) {
   revalidatePath("/", "layout");
   revalidatePath("/catalog", "page");
   revalidatePath("/product/[slug]", "page");
+
+  invalidateCatalogList();
+  invalidateCategories();
+  invalidateAllProducts();
+  invalidateProductBundles();
+
   return NextResponse.json({ revalidated: true, now: Date.now() });
 }
 

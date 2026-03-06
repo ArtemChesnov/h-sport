@@ -8,11 +8,8 @@ import { getRussianPostPickupPoints } from "./providers/russianpost";
 import { env } from "@/shared/lib/config/env";
 import { PICKUP_POINTS_CACHE_TTL_MS } from "@/shared/constants";
 
-// Гибридный кеш: в production с Redis использует Redis, иначе in-memory
 const cache = new Map<string, { data: PickupPoint[]; expiresAt: number }>();
 const CACHE_TTL = PICKUP_POINTS_CACHE_TTL_MS;
-const CACHE_TTL_SECONDS = Math.ceil(CACHE_TTL / 1000);
-const REDIS_KEY_PREFIX = "pickupPoints:";
 
 const MAX_CACHE_SIZE = parseInt(env.PICKUP_POINTS_MAX_CACHE_SIZE || "200", 10);
 
@@ -78,22 +75,7 @@ function getCacheKey(query: PickupPointsQuery): string {
  */
 export async function getPickupPoints(query: PickupPointsQuery): Promise<PickupPoint[]> {
   const cacheKey = getCacheKey(query);
-  const redisKey = REDIS_KEY_PREFIX + cacheKey;
 
-  if (env.REDIS_URL) {
-    try {
-      const { redisGet } = await import("@/shared/lib/redis");
-      const redisCached = await redisGet<PickupPoint[]>(redisKey);
-      if (redisCached && redisCached.length > 0) {
-        cache.set(cacheKey, { data: redisCached, expiresAt: Date.now() + CACHE_TTL });
-        return redisCached;
-      }
-    } catch {
-      // При ошибке Redis продолжаем с in-memory
-    }
-  }
-
-  // Проверяем in-memory кеш (пустые массивы не считаем валидным кэшем)
   const cached = cache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now() && cached.data.length > 0) {
     return cached.data;
@@ -133,22 +115,12 @@ export async function getPickupPoints(query: PickupPointsQuery): Promise<PickupP
     points = [];
   }
 
-  // Кешируем только непустые результаты, чтобы не застревать на пустых ответах
   if (points.length > 0) {
     const expiresAt = Date.now() + CACHE_TTL;
     cache.set(cacheKey, {
       data: points,
       expiresAt,
     });
-
-    if (env.REDIS_URL) {
-      try {
-        const { redisSet } = await import("@/shared/lib/redis");
-        await redisSet(redisKey, points, CACHE_TTL_SECONDS);
-      } catch {
-        // Игнорируем ошибки записи в Redis
-      }
-    }
   }
 
   // Контролируем размер кеша

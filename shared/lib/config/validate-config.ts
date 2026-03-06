@@ -10,9 +10,6 @@ const requiredConfigSchema = z.object({
 
   // Next.js приложение
   NEXT_PUBLIC_APP_URL: z.string().url("NEXT_PUBLIC_APP_URL должен быть валидным URL"),
-
-  // Redis (обязателен для production, опционален для development)
-  REDIS_URL: z.string().url("REDIS_URL должен быть валидным URL").optional(),
 });
 
 /**
@@ -23,6 +20,24 @@ const optionalConfigSchema = z.object({
   // CORS
   ALLOWED_ORIGINS: z.string().optional(),
   ALLOW_ANY_ORIGIN: z.string().optional(),
+
+  // Cache (in-memory): таймаут loader'а в getOrSetAsync (мс). При указании — строго 1000..60000, иначе ошибка на старте.
+  CACHE_LOADER_TIMEOUT_MS: z
+    .string()
+    .optional()
+    .transform((s) => {
+      if (s === undefined || s === "") return undefined;
+      const n = parseInt(s, 10);
+      if (Number.isNaN(n)) {
+        throw new Error("CACHE_LOADER_TIMEOUT_MS должен быть числом (1000..60000)");
+      }
+      if (n < 1000 || n > 60000) {
+        throw new Error(
+          `CACHE_LOADER_TIMEOUT_MS должен быть в диапазоне 1000..60000 (получено: ${n})`
+        );
+      }
+      return n;
+    }),
 
   // Bundle analyzer
   ANALYZE: z.string().optional(),
@@ -47,12 +62,18 @@ const optionalConfigSchema = z.object({
   DB_POOL_TIMEOUT_MS: z.string().regex(/^\d+$/, "DB_POOL_TIMEOUT_MS должен быть числом").optional(),
 
   // Доставка
-  DELIVERY_FEE_KOPECKS: z.string().regex(/^\d+$/, "DELIVERY_FEE_KOPECKS должен быть числом").optional(),
+  DELIVERY_FEE_KOPECKS: z
+    .string()
+    .regex(/^\d+$/, "DELIVERY_FEE_KOPECKS должен быть числом")
+    .optional(),
 
   // Логирование
   PRISMA_LOG_QUERIES: z.string().optional(),
   SLOW_QUERY_LOGGING: z.string().optional(),
-  SLOW_QUERY_THRESHOLD_MS: z.string().regex(/^\d+$/, "SLOW_QUERY_THRESHOLD_MS должен быть числом").optional(),
+  SLOW_QUERY_THRESHOLD_MS: z
+    .string()
+    .regex(/^\d+$/, "SLOW_QUERY_THRESHOLD_MS должен быть числом")
+    .optional(),
 
   // SMTP
   SMTP_ALLOW_INSECURE_TLS: z.string().optional(),
@@ -61,10 +82,6 @@ const optionalConfigSchema = z.object({
   SMTP_PASSWORD: z.string().optional(),
   SMTP_PORT: z.string().regex(/^\d+$/, "SMTP_PORT должен быть числом").optional(),
   SMTP_USER: z.string().optional(),
-
-  // Upstash Redis
-  UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
-  UPSTASH_REDIS_REST_URL: z.string().url("UPSTASH_REDIS_REST_URL должен быть валидным URL").optional(),
 });
 
 /**
@@ -85,11 +102,10 @@ export function validateConfig(): Config {
   try {
     const config = configSchema.parse(process.env);
 
-    // Дополнительные проверки для production
-    if (process.env.NODE_ENV === "production") {
-      if (!config.REDIS_URL) {
-        throw new Error("REDIS_URL обязателен в production окружении");
-      }
+    // Нормализованное значение записать обратно в env для cache.ts (не ломаем запуск без переменной).
+    const timeoutMs = (config as { CACHE_LOADER_TIMEOUT_MS?: number }).CACHE_LOADER_TIMEOUT_MS;
+    if (timeoutMs != null && typeof process !== "undefined" && process.env) {
+      process.env.CACHE_LOADER_TIMEOUT_MS = String(timeoutMs);
     }
 
     return config;
@@ -100,7 +116,10 @@ export function validateConfig(): Config {
         console.error(`  - ${err.path.join(".")}: ${err.message}`);
       });
     } else {
-      console.error("❌ Ошибка конфигурации:", error instanceof Error ? error.message : String(error));
+      console.error(
+        "❌ Ошибка конфигурации:",
+        error instanceof Error ? error.message : String(error)
+      );
     }
 
     console.error("\n💡 Проверьте переменные окружения в .env файле");
