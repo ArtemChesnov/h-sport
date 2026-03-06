@@ -1,4 +1,5 @@
 import { createOrganizationJsonLd, JsonLd } from "@/shared/lib/seo/json-ld";
+import { CsrfMeta } from "@/shared/lib/csrf-meta";
 import { env } from "@/shared/lib/env.client";
 import type { Metadata, Viewport } from "next";
 import { inter, nunitoSans, oswald } from "./fonts";
@@ -11,7 +12,8 @@ const organizationJsonLd = createOrganizationJsonLd({
   name: "H-Sport",
   url: siteUrl,
   logo: defaultOgImage,
-  description: "Магазин спортивной одежды для активного образа жизни. Широкий выбор, быстрая доставка по России.",
+  description:
+    "Магазин спортивной одежды для активного образа жизни. Широкий выбор, быстрая доставка по России.",
 });
 
 export const metadata: Metadata = {
@@ -19,7 +21,8 @@ export const metadata: Metadata = {
     default: "H-Sport — Магазин спортивной одежды",
     template: "%s | H-Sport",
   },
-  description: "Качественная спортивная одежда для активного образа жизни. Широкий выбор, быстрая доставка по России.",
+  description:
+    "Качественная спортивная одежда для активного образа жизни. Широкий выбор, быстрая доставка по России.",
   keywords: ["спортивная одежда", "фитнес", "спорт", "одежда для тренировок", "H-Sport"],
   authors: [{ name: "H-Sport" }],
   creator: "H-Sport",
@@ -73,6 +76,7 @@ export default function RootLayout({
     >
       <head>
         <JsonLd data={organizationJsonLd} />
+        <CsrfMeta />
         <link data-rh="true" rel="icon" href="/logo-icon.png" />
         {/* Preconnect к API — только если API на внешнем домене */}
         {env.apiUrl.startsWith("http") && <link rel="preconnect" href={env.apiUrl} />}

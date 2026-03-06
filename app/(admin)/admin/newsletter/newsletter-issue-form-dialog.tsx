@@ -1,31 +1,32 @@
 "use client";
 
 import {
-    Button,
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    Label,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Label,
 } from "@/shared/components/ui";
 import { Input } from "@/shared/components/ui/input";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/shared/components/ui/select";
 import { Textarea } from "@/shared/components/ui/textarea";
 import {
-    buildNewsletterBodyHtml,
-    getNewsletterTemplateById,
-    NEWSLETTER_TEMPLATES,
-    plainTextToHtml,
-    type NewsletterTemplateId,
+  buildNewsletterBodyHtml,
+  getNewsletterTemplateById,
+  NEWSLETTER_TEMPLATES,
+  plainTextToHtml,
+  type NewsletterTemplateId,
 } from "@/shared/constants";
+import { getCsrfToken } from "@/shared/lib/csrf-client";
 import { ImagePlus, Loader2, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -39,23 +40,12 @@ type NewsletterIssueFormDialogProps = {
 
 const UPLOAD_FOLDER = "newsletter";
 
-/** Читает CSRF токен из cookie (клиентская сторона) */
-function getCsrfToken(): string | null {
-  if (typeof document === "undefined") return null;
-  const value = `; ${document.cookie}`;
-  const parts = value.split("; csrf_token=");
-  if (parts.length === 2) {
-    return parts.pop()?.split(";").shift() || null;
-  }
-  return null;
-}
-
 /** Собирает HTML контента: текст (как абзацы) + загруженные фото в конце */
 function buildContentHtml(plainText: string, imageUrls: string[]): string {
   const textHtml = plainTextToHtml(plainText.trim());
   const imgTags = imageUrls.map(
     (url) =>
-      `<img src="${url}" alt="" style="max-width:100%; height:auto; display:block; margin:12px 0;" />`,
+      `<img src="${url}" alt="" style="max-width:100%; height:auto; display:block; margin:12px 0;" />`
   );
   return [textHtml, ...imgTags].filter(Boolean).join("\n");
 }
@@ -64,9 +54,7 @@ function buildContentHtml(plainText: string, imageUrls: string[]): string {
  * HTML для предпросмотра: подставляем заглушку вместо ссылки отписки.
  */
 function previewHtml(fullHtml: string): string {
-  return fullHtml
-    .replace(/\{\{unsubscribe_link\}\}/g, "#")
-    .replace(/\{\{shop_url\}\}/g, "#");
+  return fullHtml.replace(/\{\{unsubscribe_link\}\}/g, "#").replace(/\{\{shop_url\}\}/g, "#");
 }
 
 /**
@@ -153,7 +141,8 @@ export function NewsletterIssueFormDialog(props: NewsletterIssueFormDialogProps)
         <DialogHeader>
           <DialogTitle>Создать рассылку</DialogTitle>
           <DialogDescription>
-            Выберите шаблон, укажите тему и текст письма обычным языком. Загруженные фото автоматически добавятся в конец письма. Ссылка отписки подставится при отправке.
+            Выберите шаблон, укажите тему и текст письма обычным языком. Загруженные фото
+            автоматически добавятся в конец письма. Ссылка отписки подставится при отправке.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
@@ -243,11 +232,7 @@ export function NewsletterIssueFormDialog(props: NewsletterIssueFormDialogProps)
                   <div key={url} className="relative group">
                     {/* Динамические URL загруженных превью; next/image не подходит для произвольных blob/data URL в форме */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={url}
-                      alt=""
-                      className="h-14 w-14 object-cover rounded-lg border"
-                    />
+                    <img src={url} alt="" className="h-14 w-14 object-cover rounded-lg border" />
                     <button
                       type="button"
                       onClick={() => setUploadedUrls((prev) => prev.filter((u) => u !== url))}

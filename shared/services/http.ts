@@ -1,25 +1,8 @@
 import { env } from "@/shared/lib/env.client";
+import { getCsrfToken } from "@/shared/lib/csrf-client";
 import axios from "axios";
 
-/**
- * Имя cookie с CSRF токеном
- */
-const CSRF_COOKIE_NAME = "csrf_token";
 const CSRF_HEADER_NAME = "X-CSRF-Token";
-
-/**
- * Получает значение cookie по имени (работает в браузере)
- */
-function getCookie(name: string): string | null {
-  if (typeof document === "undefined") return null;
-
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) {
-    return parts.pop()?.split(";").shift() || null;
-  }
-  return null;
-}
 
 /**
  * Базовый axios-инстанс.
@@ -45,7 +28,7 @@ axiosInstance.interceptors.request.use(
     const isMutating = method && ["POST", "PUT", "PATCH", "DELETE"].includes(method);
 
     if (isMutating) {
-      const csrfToken = getCookie(CSRF_COOKIE_NAME);
+      const csrfToken = getCsrfToken();
       if (csrfToken) {
         config.headers[CSRF_HEADER_NAME] = csrfToken;
       }

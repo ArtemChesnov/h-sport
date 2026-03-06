@@ -16,20 +16,11 @@ import {
   SHOP_MODAL_DESCRIPTION_CLASS,
   SHOP_MODAL_TITLE_CLASS,
 } from "@/shared/constants";
+import { getCsrfToken } from "@/shared/lib/csrf-client";
 import { cn } from "@/shared/lib/utils";
 import Link from "next/link";
 import React, { useState } from "react";
 import { toast } from "sonner";
-
-function getCsrfToken(): string | null {
-  if (typeof document === "undefined") return null;
-  const value = `; ${document.cookie}`;
-  const parts = value.split("; csrf_token=");
-  if (parts.length === 2) {
-    return parts.pop()?.split(";").shift() || null;
-  }
-  return null;
-}
 
 interface NewsletterSubscribeModalProps {
   open: boolean;

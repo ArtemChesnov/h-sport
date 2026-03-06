@@ -110,6 +110,7 @@
     "lint-staged": "^15.2.11",
     "prettier": "^3.4.2",
     "prisma": "^6.18.0",
+    "semgrep": "^0.0.1",
     "tailwindcss": "^4",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",

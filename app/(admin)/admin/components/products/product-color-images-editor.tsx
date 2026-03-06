@@ -15,19 +15,7 @@ import {
   Label,
   Badge,
 } from "@/shared/components/ui";
-
-/**
- * Получает CSRF токен из cookie
- */
-function getCsrfToken(): string | null {
-  if (typeof document === "undefined") return null;
-  const value = `; ${document.cookie}`;
-  const parts = value.split("; csrf_token=");
-  if (parts.length === 2) {
-    return parts.pop()?.split(";").shift() || null;
-  }
-  return null;
-}
+import { getCsrfToken } from "@/shared/lib/csrf-client";
 
 type ColorImagesEditorProps = {
   color: string;

@@ -16,6 +16,7 @@ const withBundleAnalyzer =
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  poweredByHeader: false,
 
   // Production: standalone для деплоя на VPS (один каталог с server.js и минимальным node_modules)
   ...(process.env.NODE_ENV === "production" && { output: "standalone" }),

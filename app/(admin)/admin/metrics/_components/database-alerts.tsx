@@ -5,11 +5,7 @@
  * Показывает предупреждения и рекомендации по решению проблем
  */
 
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/shared/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
 import { Button } from "@/shared/components/ui/button";
 import {
   Card,
@@ -82,20 +78,13 @@ function formatValue(value: number, type: "size" | "rows"): string {
   return value.toLocaleString();
 }
 
-/**
- * Получает CSRF токен из cookie
- */
-function getCsrfToken(): string | null {
-  if (typeof document === "undefined") return null;
-  const value = `; ${document.cookie}`;
-  const parts = value.split("; csrf_token=");
-  if (parts.length === 2) {
-    return parts.pop()?.split(";").shift() || null;
-  }
-  return null;
-}
+import { getCsrfToken } from "@/shared/lib/csrf-client";
 
-async function runAutoCleanup(): Promise<{ success: boolean; message: string; results: unknown[] }> {
+async function runAutoCleanup(): Promise<{
+  success: boolean;
+  message: string;
+  results: unknown[];
+}> {
   const csrfToken = getCsrfToken();
   const response = await fetch("/api/metrics/cleanup-auto", {
     method: "POST",
@@ -167,39 +156,41 @@ export function DatabaseAlerts() {
         <Tooltip>
           <TooltipTrigger asChild>
             <Card className="rounded-2xl border-emerald-200/60 bg-emerald-50/50 cursor-help">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                <CardTitle className="text-base font-semibold">Статус БД в норме</CardTitle>
-              </div>
-              <CardDescription className="text-xs">
-                Все таблицы метрик в пределах нормальных значений
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-4 text-sm">
+              <CardHeader>
                 <div className="flex items-center gap-2">
-                  <Database className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Общий размер:</span>
-                  <span className="font-semibold">{data.stats.totalSize}</span>
+                  <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                  <CardTitle className="text-base font-semibold">Статус БД в норме</CardTitle>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">Всего записей:</span>
-                  <span className="font-semibold">{data.stats.counts.total.toLocaleString()}</span>
+                <CardDescription className="text-xs">
+                  Все таблицы метрик в пределах нормальных значений
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Database className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">Общий размер:</span>
+                    <span className="font-semibold">{data.stats.totalSize}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">Всего записей:</span>
+                    <span className="font-semibold">
+                      {data.stats.counts.total.toLocaleString()}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TooltipTrigger>
-        <TooltipContent className="max-w-sm">
-          <p className="text-xs leading-relaxed font-medium mb-1">Статус БД в норме</p>
-          <p className="text-xs leading-relaxed">
-            Все таблицы метрик находятся в пределах нормальных значений. Лимиты для алертов:
-            предупреждение при 100 MB или 1M записей на таблицу, критическое при 500 MB или 5M записей.
-            Общий лимит для всех таблиц: 2 GB.
-          </p>
-        </TooltipContent>
-      </Tooltip>
+              </CardContent>
+            </Card>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-sm">
+            <p className="text-xs leading-relaxed font-medium mb-1">Статус БД в норме</p>
+            <p className="text-xs leading-relaxed">
+              Все таблицы метрик находятся в пределах нормальных значений. Лимиты для алертов:
+              предупреждение при 100 MB или 1M записей на таблицу, критическое при 500 MB или 5M
+              записей. Общий лимит для всех таблиц: 2 GB.
+            </p>
+          </TooltipContent>
+        </Tooltip>
       </TooltipProvider>
     );
   }
@@ -214,9 +205,7 @@ export function DatabaseAlerts() {
           <h3 className="text-lg font-semibold">Алерты размера таблиц</h3>
           <p className="text-xs text-muted-foreground mt-0.5">
             {data.criticalCount > 0 && (
-              <span className="text-destructive">
-                {data.criticalCount} критических,{" "}
-              </span>
+              <span className="text-destructive">{data.criticalCount} критических, </span>
             )}
             {data.warningCount} предупреждений
           </p>
@@ -224,7 +213,11 @@ export function DatabaseAlerts() {
         {data.hasAlerts && (
           <Button
             onClick={() => {
-              if (confirm("Выполнить автоматическую очистку старых данных? Данные старше 20 дней будут удалены.")) {
+              if (
+                confirm(
+                  "Выполнить автоматическую очистку старых данных? Данные старше 20 дней будут удалены."
+                )
+              ) {
                 cleanupMutation.mutate();
               }
             }}
@@ -254,11 +247,15 @@ export function DatabaseAlerts() {
           <AlertTitle className="text-base font-semibold">Очистка выполнена</AlertTitle>
           <AlertDescription className="mt-2 text-sm">
             {cleanupMutation.data.message}
-            {cleanupMutation.data && typeof cleanupMutation.data === "object" && "totalDeleted" in cleanupMutation.data && typeof cleanupMutation.data.totalDeleted === "number" && cleanupMutation.data.totalDeleted > 0 && (
-              <span className="block mt-1">
-                Удалено записей: {cleanupMutation.data.totalDeleted.toLocaleString()}
-              </span>
-            )}
+            {cleanupMutation.data &&
+              typeof cleanupMutation.data === "object" &&
+              "totalDeleted" in cleanupMutation.data &&
+              typeof cleanupMutation.data.totalDeleted === "number" &&
+              cleanupMutation.data.totalDeleted > 0 && (
+                <span className="block mt-1">
+                  Удалено записей: {cleanupMutation.data.totalDeleted.toLocaleString()}
+                </span>
+              )}
           </AlertDescription>
         </Alert>
       )}
@@ -290,8 +287,7 @@ export function DatabaseAlerts() {
                 <div className="text-sm">
                   <span className="font-medium">Текущее значение:</span>{" "}
                   {formatValue(alert.currentValue, alert.type)} |{" "}
-                  <span className="font-medium">Лимит:</span>{" "}
-                  {formatValue(alert.limit, alert.type)}
+                  <span className="font-medium">Лимит:</span> {formatValue(alert.limit, alert.type)}
                 </div>
                 <div className="mt-3">
                   <p className="text-sm font-medium mb-2 flex items-center gap-2">
@@ -314,18 +310,14 @@ export function DatabaseAlerts() {
       {warningAlerts.length > 0 && (
         <div className="space-y-4">
           {warningAlerts.map((alert, index) => (
-            <Alert
-              key={`warning-${index}`}
-              className="border-amber-200/60 bg-amber-50/50"
-            >
+            <Alert key={`warning-${index}`} className="border-amber-200/60 bg-amber-50/50">
               <AlertTriangle className="h-4 w-4 text-amber-600" />
               <AlertTitle className="text-base font-semibold">{alert.message}</AlertTitle>
               <AlertDescription className="mt-2 space-y-2">
                 <div className="text-sm">
                   <span className="font-medium">Текущее значение:</span>{" "}
                   {formatValue(alert.currentValue, alert.type)} |{" "}
-                  <span className="font-medium">Лимит:</span>{" "}
-                  {formatValue(alert.limit, alert.type)}
+                  <span className="font-medium">Лимит:</span> {formatValue(alert.limit, alert.type)}
                 </div>
                 <div className="mt-3">
                   <p className="text-sm font-medium mb-2 flex items-center gap-2">
@@ -369,9 +361,7 @@ export function DatabaseAlerts() {
                   </div>
                   <div className="text-right">
                     <div className="font-semibold text-sm">{stat.totalSize}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {stat.tableSize}
-                    </div>
+                    <div className="text-xs text-muted-foreground">{stat.tableSize}</div>
                   </div>
                 </div>
               );

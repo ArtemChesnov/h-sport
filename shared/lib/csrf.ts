@@ -1,12 +1,14 @@
 /**
- * CSRF защита для мутационных API
+ * CSRF защита для мутационных API (Double Submit Cookie + meta-тег)
  *
  * Механизм:
- * 1. Сервер генерирует токен и отправляет его в cookie (csrf_token)
- * 2. Клиент читает токен из cookie и отправляет в заголовке X-CSRF-Token
- * 3. Сервер проверяет, что токен в cookie совпадает с токеном в заголовке
+ * 1. Сервер генерирует токен и отправляет его в httpOnly cookie (csrf_token)
+ * 2. CsrfMeta (Server Component) рендерит токен в <meta name="csrf-token">
+ * 3. Клиент читает токен из meta-тега и отправляет в заголовке X-CSRF-Token
+ * 4. Сервер проверяет, что токен в cookie совпадает с токеном в заголовке
  *
- * Защита от CSRF: сторонний сайт не может прочитать cookie с другого домена (Same-Origin Policy)
+ * Cookie httpOnly — недоступен из JS, XSS не может его прочитать.
+ * Meta-тег обновляется при каждом полном рендере страницы сервером.
  */
 
 import { cookies } from "next/headers";
@@ -44,7 +46,7 @@ export async function setCsrfCookie(): Promise<string> {
   if (!token) {
     token = generateCsrfToken();
     cookieStore.set(CSRF_COOKIE_NAME, token, {
-      httpOnly: false,
+      httpOnly: true,
       secure: isSecureCookies(),
       sameSite: "strict",
       path: "/",
@@ -101,7 +103,7 @@ export function setCsrfCookieInResponse(response: NextResponse, token?: string):
   const csrfToken = token || generateCsrfToken();
 
   response.cookies.set(CSRF_COOKIE_NAME, csrfToken, {
-    httpOnly: false,
+    httpOnly: true,
     secure: isSecureCookies(),
     sameSite: "strict",
     path: "/",

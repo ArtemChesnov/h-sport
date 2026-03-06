@@ -130,7 +130,7 @@ function handlePageRoute(
   const existingCsrfToken = request.cookies.get(CSRF_COOKIE_NAME)?.value;
   if (!existingCsrfToken) {
     response.cookies.set(CSRF_COOKIE_NAME, generateCsrfToken(), {
-      httpOnly: false,
+      httpOnly: true,
       secure: isSecureCookies(),
       sameSite: "strict",
       path: "/",
@@ -189,7 +189,7 @@ export function middleware(request: NextRequest) {
   const existingCsrfToken = request.cookies.get(CSRF_COOKIE_NAME)?.value;
   if (!existingCsrfToken) {
     response.cookies.set(CSRF_COOKIE_NAME, generateCsrfToken(), {
-      httpOnly: false,
+      httpOnly: true,
       secure: isSecureCookies(),
       sameSite: "strict",
       path: "/",
