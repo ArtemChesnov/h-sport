@@ -1,17 +1,11 @@
 "use client";
 
 import { TooltipProvider } from "@/shared/components/ui";
-import {
-  MetricCard,
-  MetricsSection,
-  EmptyState,
-  MetricsErrorBoundary,
-} from "@/shared/components/admin";
+import { EmptyState, MetricsErrorBoundary } from "@/shared/components/admin";
 import { formatMoney } from "@/shared/lib/formatters";
 import { useProductPerformance } from "./hooks/use-product-performance";
 import type { BaseMetricsCardProps } from "@/shared/services/dto";
 import { Skeleton } from "@/shared/components/ui/skeleton";
-import { Package, Eye, ShoppingCart, TrendingUp } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -35,11 +29,7 @@ export function ProductPerformanceCard({ period }: ProductPerformanceCardProps) 
           <Skeleton className="h-5 w-52 mb-1" />
           <Skeleton className="h-3 w-68" />
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-[90px] rounded-2xl" />
-          ))}
-        </div>
+        <Skeleton className="h-[200px] rounded-2xl" />
       </div>
     );
   }
@@ -53,7 +43,6 @@ export function ProductPerformanceCard({ period }: ProductPerformanceCardProps) 
     );
   }
 
-  const totals = data.totals ?? {};
   const products = data.products ?? [];
 
   return (
@@ -69,47 +58,6 @@ export function ProductPerformanceCard({ period }: ProductPerformanceCardProps) 
               По каждому товару: просмотры, корзина, заказы, выручка и конверсии
             </p>
           </div>
-
-          <MetricsSection title="Сводка">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <MetricCard
-                icon={Eye}
-                title="Просмотры"
-                value={Number(totals.totalViews ?? 0).toLocaleString()}
-                description="Всего"
-                tooltipTitle="Total views"
-                tooltipContent="Суммарное количество просмотров товаров за период."
-                color="slate"
-              />
-              <MetricCard
-                icon={ShoppingCart}
-                title="Добавления в корзину"
-                value={Number(totals.totalCartAdds ?? 0).toLocaleString()}
-                description="Всего"
-                tooltipTitle="Cart adds"
-                tooltipContent="Суммарное количество добавлений в корзину."
-                color="blue"
-              />
-              <MetricCard
-                icon={Package}
-                title="Заказы / Выручка"
-                value={`${Number(totals.totalOrders ?? 0).toLocaleString()} / ${formatMoney(Number(totals.totalRevenue ?? 0))}`}
-                description="За период"
-                tooltipTitle="Orders and revenue"
-                tooltipContent="Общее количество заказов и выручка по товарам."
-                color="emerald"
-              />
-              <MetricCard
-                icon={TrendingUp}
-                title="Средние конверсии"
-                value={`View→Cart: ${Number(totals.avgViewToCartRate ?? 0).toFixed(1)}% · Cart→Order: ${Number(totals.avgCartToOrderRate ?? 0).toFixed(1)}%`}
-                description="По товарам"
-                tooltipTitle="Average conversion rates"
-                tooltipContent="Средний процент просмотр→корзина и корзина→заказ."
-                color="indigo"
-              />
-            </div>
-          </MetricsSection>
 
           {products.length > 0 && (
             <Card className="rounded-2xl border shadow-sm">
