@@ -42,6 +42,14 @@ export async function getConversionFunnel(days: number): Promise<ConversionFunne
   from.setDate(now.getDate() - (days - 1));
   from.setHours(0, 0, 0, 0);
 
+  const excludedStatuses = [OrderStatus.CANCELED];
+  const paidStatuses = [
+    OrderStatus.PAID,
+    OrderStatus.PROCESSING,
+    OrderStatus.SHIPPED,
+    OrderStatus.DELIVERED,
+  ];
+
   // Выполняем все запросы параллельно для оптимизации
   const [
     // 1. Уникальные посетители (по userId в ProductView)
@@ -86,13 +94,13 @@ export async function getConversionFunnel(days: number): Promise<ConversionFunne
       WHERE "createdAt" >= ${from} AND "createdAt" <= ${now}
       AND "userId" IS NOT NULL
     `,
-    // Оформили заказ (уникальные пользователи)
+    // Оформили заказ (уникальные пользователи), исключаем отменённые
     prisma.$queryRaw<[CountResult]>`
       SELECT COUNT(DISTINCT "userId")::bigint AS count
       FROM "Order"
       WHERE "createdAt" >= ${from} AND "createdAt" <= ${now}
       AND "userId" IS NOT NULL
-      AND status NOT IN ('${OrderStatus.CANCELED}')
+      AND NOT (status = ANY(${excludedStatuses}))
     `,
     // Оплаченные заказы (уникальные пользователи)
     prisma.$queryRaw<[CountResult]>`
@@ -100,7 +108,7 @@ export async function getConversionFunnel(days: number): Promise<ConversionFunne
       FROM "Order"
       WHERE "createdAt" >= ${from} AND "createdAt" <= ${now}
       AND "userId" IS NOT NULL
-      AND status IN ('${OrderStatus.PAID}', '${OrderStatus.PROCESSING}', '${OrderStatus.SHIPPED}', '${OrderStatus.DELIVERED}')
+      AND status = ANY(${paidStatuses})
     `,
   ]);
 
