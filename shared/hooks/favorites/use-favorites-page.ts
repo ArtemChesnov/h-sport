@@ -16,22 +16,16 @@ export function useFavoritesPage(options?: UseFavoritesPageOptions) {
   const favorites = data?.items ?? [];
   const [hiddenIds, setHiddenIds] = React.useState<number[]>([]);
 
-  const handleToggleFavorite = React.useCallback(
-    (productId: number, nextIsFavorite: boolean) => {
-      if (!nextIsFavorite) {
-        setHiddenIds((prev) =>
-          prev.includes(productId) ? prev : [...prev, productId]
-        );
-      }
-    },
-    []
-  );
+  const handleToggleFavorite = React.useCallback((productId: number, nextIsFavorite: boolean) => {
+    if (!nextIsFavorite) {
+      setHiddenIds((prev) => (prev.includes(productId) ? prev : [...prev, productId]));
+    }
+  }, []);
 
-  const visibleFavorites = favorites.filter(
-    (fav) => !hiddenIds.includes(fav.productId)
-  );
+  const visibleFavorites = favorites.filter((fav) => !hiddenIds.includes(fav.productId));
 
   return {
+    data,
     favorites,
     visibleFavorites,
     isLoading,

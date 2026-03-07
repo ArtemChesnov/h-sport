@@ -3,11 +3,9 @@
  * Соответствует структуре: хлебные крошки, заголовок, список товаров + саммари.
  * Layout: flex-col до 1080px (саммари под списком), с 1081px — два столбца.
  * Карточка товара: до 460px — колонка (фото сверху), с 461px — строка (фото слева).
+ * @param omitHeader — когда true, не рендерить скелетон крошек/заголовка (уже есть реальные ShopBreadcrumbs снаружи)
  */
-import {
-    PageSkeletonBreadcrumb,
-    PageSkeletonTitle,
-} from "@/shared/components/common/skeleton";
+import { PageSkeletonBreadcrumb, PageSkeletonTitle } from "@/shared/components/common/skeleton";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 
 function CartItemCardSkeleton() {
@@ -36,11 +34,15 @@ function CartItemCardSkeleton() {
   );
 }
 
-export function CartPageSkeleton() {
+export function CartPageSkeleton({ omitHeader = false }: { omitHeader?: boolean }) {
   return (
-    <section className="mt-15">
-      <PageSkeletonBreadcrumb />
-      <PageSkeletonTitle />
+    <>
+      {!omitHeader && (
+        <section className="mt-15">
+          <PageSkeletonBreadcrumb />
+          <PageSkeletonTitle />
+        </section>
+      )}
       <section className="flex flex-col min-[1081px]:flex-row justify-between mt-10 gap-10">
         {/* Список товаров — те же классы, что и CartItemList */}
         <div className="w-235 max-[1080px]:w-full flex flex-col pr-2 space-y-0">
@@ -86,6 +88,6 @@ export function CartPageSkeleton() {
           </div>
         </div>
       </section>
-    </section>
+    </>
   );
 }

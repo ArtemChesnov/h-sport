@@ -1,5 +1,8 @@
-import { YouMightLikeSkeleton } from "@/shared/components/common/you-might-like/you-might-like-skeleton";
-import { getPopularProducts, getProductBySlug, getProductSlugsForPreRender } from "@/shared/services/server";
+import {
+  getPopularProducts,
+  getProductBySlug,
+  getProductSlugsForPreRender,
+} from "@/shared/services/server";
 import dynamic from "next/dynamic";
 import { ProductSkeleton } from "./_components/product-skeleton";
 import { generateMetadata } from "./generate-metadata";
@@ -9,16 +12,7 @@ const ProductSlugClient = dynamic(
     import("./_components/product-slug-client").then((m) => ({
       default: m.ProductSlugClient,
     })),
-  {
-    loading: () => (
-      <>
-        <ProductSkeleton />
-        <div className="mx-auto max-w-[1860px] px-4 lg:px-6 pb-20">
-          <YouMightLikeSkeleton />
-        </div>
-      </>
-    ),
-  },
+  { loading: () => <ProductSkeleton /> }
 );
 
 export { generateMetadata };

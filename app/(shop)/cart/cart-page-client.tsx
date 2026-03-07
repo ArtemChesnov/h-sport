@@ -28,7 +28,7 @@ export default function CartPageClient() {
 
         <div className="mt-15">
           {showSkeleton ? (
-            <CartPageSkeleton />
+            <CartPageSkeleton omitHeader />
           ) : items.length === 0 ? (
             <div className="mt-15">
               <StoreEmptyBlock
@@ -41,7 +41,9 @@ export default function CartPageClient() {
             </div>
           ) : (
             <>
-              <h1 className="text-[40px] max-[768px]:text-[28px] mt-15 font-medium">{CART_LABELS.title}</h1>
+              <h1 className="text-[40px] max-[768px]:text-[28px] mt-15 font-medium">
+                {CART_LABELS.title}
+              </h1>
               <section className="flex flex-col min-[1081px]:flex-row justify-between mt-10 gap-10">
                 {/* Левая колонка — товары */}
                 <CartItemList items={items} />

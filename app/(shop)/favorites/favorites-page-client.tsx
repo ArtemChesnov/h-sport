@@ -10,6 +10,7 @@ export default function FavoritesPageClient() {
   const router = useRouter();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuthCheck();
   const {
+    data: favoritesData,
     visibleFavorites,
     isLoading,
     isError,
@@ -29,7 +30,17 @@ export default function FavoritesPageClient() {
     return (
       <Container className="">
         <ShopBreadcrumbs />
-        <FavoritesPageSkeleton />
+        <FavoritesPageSkeleton variant="full" />
+      </Container>
+    );
+  }
+
+  // Пока нет первого ответа — показываем скелетон, чтобы не мелькал пустой блок «Избранное пусто»
+  if (isLoading || favoritesData === undefined) {
+    return (
+      <Container className="">
+        <ShopBreadcrumbs />
+        <FavoritesPageSkeleton variant="full" />
       </Container>
     );
   }
@@ -39,7 +50,7 @@ export default function FavoritesPageClient() {
       <ShopBreadcrumbs />
       <FavoritesLayout
         visibleFavorites={visibleFavorites}
-        isLoading={isLoading}
+        isLoading={false}
         isError={isError}
         onErrorRetry={() => refetch()}
         onToggleFavorite={handleToggleFavorite}

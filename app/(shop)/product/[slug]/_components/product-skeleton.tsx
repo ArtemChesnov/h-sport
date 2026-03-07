@@ -1,14 +1,16 @@
 "use client";
 
+import { Container } from "@/shared/components/common/layout/container";
+import { YouMightLikeSkeleton } from "@/shared/components/common/you-might-like/you-might-like-skeleton";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 
 /**
  * Скелетон для страницы товара.
- * Соответствует новой вёрстке ProductSlugClient.
+ * Соответствует вёрстке ProductSlugClient (Container, крошки, контент, «Вам понравится»).
  */
 export function ProductSkeleton() {
   return (
-    <div className="mx-auto max-w-[1860px] px-4 lg:px-6 pb-20">
+    <Container className="pb-20">
       {/* Скелетон хлебных крошек */}
       <div className="flex items-center gap-2">
         <Skeleton className="h-4 w-16" />
@@ -94,6 +96,8 @@ export function ProductSkeleton() {
           </div>
         </div>
       </div>
-    </div>
+
+      <YouMightLikeSkeleton />
+    </Container>
   );
 }

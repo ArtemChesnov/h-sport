@@ -9,8 +9,8 @@ export default function CartLoading() {
     <main className="pb-20">
       <Container>
         <ShopBreadcrumbs />
-        <div className="mt-[60px]">
-          <CartPageSkeleton />
+        <div className="mt-15">
+          <CartPageSkeleton omitHeader />
         </div>
       </Container>
     </main>

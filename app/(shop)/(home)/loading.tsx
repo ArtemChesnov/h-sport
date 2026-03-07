@@ -6,14 +6,14 @@ import { Container } from "@/shared/components/common";
 import { FirstScreenSkeleton } from "@/shared/components/common/skeleton";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 
-/** Секция карусели видов спорта: 1 карточка ≤576px, 2 карточки >576px */
+/** Секция карусели видов спорта: высоты как у SportTypesCarousel */
 function SportTypesSkeletonSection() {
   return (
     <div className="mx-auto w-full max-w-[1920px]">
       <div className="flex overflow-hidden">
         {[1, 2].map((i) => (
           <div key={i} className="relative flex-shrink-0 basis-full min-[577px]:basis-1/2">
-            <Skeleton className="h-[650px] min-[577px]:h-[520px] min-[769px]:h-[800px] min-[1440px]:h-[1080px] w-full rounded-md" />
+            <Skeleton className="h-[650px] min-[577px]:h-[520px] min-[769px]:h-[765px] min-[1025px]:h-[820px] min-[1281px]:h-[800px] min-[1441px]:h-[920px] min-[1601px]:h-[1080px] w-full rounded-md" />
           </div>
         ))}
       </div>
