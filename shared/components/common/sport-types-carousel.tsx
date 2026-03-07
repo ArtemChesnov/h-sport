@@ -53,7 +53,7 @@ export const SportTypesCarousel: React.FC<Props> = ({ className }) => {
                     loading={index === 0 ? undefined : "lazy"}
                   />
 
-                  <div className="absolute bottom-4 left-1/2 flex max-w-132 -translate-x-1/2 flex-col items-center gap-1.5 rounded-[10px] bg-white/50 backdrop-blur-xl px-4 py-2.5 min-[768px]:px-5 min-[768px]:py-3 min-[1280px]:px-10 min-[1280px]:py-5">
+                  <div className="absolute bottom-4 left-1/2 flex max-w-132 -translate-x-1/2 flex-col items-center gap-1.5 rounded-[10px] bg-[color-mix(in_oklab,oklch(1_0_0)_60%,transparent)] backdrop-blur-xl px-4 py-2.5 min-[768px]:px-5 min-[768px]:py-3 min-[1280px]:px-10 min-[1280px]:py-5">
                     <h1 className="text-center text-[22px] font-semibold uppercase leading-[120%] text-foreground sm:text-[28px] lg:text-[40px] min-[1280px]:text-[56px] mb-1 min-[768px]:mb-2">
                       {item.type}
                     </h1>

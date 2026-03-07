@@ -1,11 +1,10 @@
 "use client";
 
 import { ContactsBlock } from "@/shared/components/common/ui";
-import { DesignButton } from "@/shared/components/ui";
+import { PromoButton } from "@/shared/components/ui";
 import { CART_LABELS } from "@/shared/constants";
 import { useNewsletterModal } from "@/shared/contexts/newsletter-modal-context";
 import { cn } from "@/shared/lib/utils";
-import { Mail } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -44,7 +43,7 @@ export const Footer: React.FC<Props> = ({ className }) => {
         {/* Фоновое изображение */}
         <div className="relative w-full h-80   min-[576px]:h-130 min-[768px]:h-170 min-[1024px]:h-215 min-[1280px]:h-270 min-[1920px]:h-270 overflow-hidden">
           <Image
-            src="/assets/images/footer-img.webp"
+            src="/assets/images/footer-img.png"
             alt="H-Sport — подпишитесь на новости"
             fill
             sizes="100vw"
@@ -52,14 +51,27 @@ export const Footer: React.FC<Props> = ({ className }) => {
             className="object-cover"
           />
 
-          <h5
+          <div
             className={
-              "min-[1920px]:text-[48px] font-bold uppercase min-[1920px]:max-w-225 absolute left-7.5 bottom-10 min-[390px]:left-6 min-[390px]:bottom-8  min-[1600px]:text-[36px] min-[1600px]:max-w-160 min-[1440px]:text-[36px] min-[1440px]:max-w-160 min-[1280px]:text-[32px] min-[1280px]:max-w-150 min-[1024px]:text-[24px] min-[1024px]:max-w-110  min-[768px]:text-[18px] min-[768px]:max-w-84  min-[576px]:text-[18px] min-[576px]:max-w-84 min-[390px]:text-[12px] min-[390px]:max-w-56"
+              "footer-newsletter-block absolute left-[12px] bottom-10 flex max-[500px]:flex-col max-[500px]:items-start min-[501px]:flex-row min-[501px]:items-end gap-4 min-[576px]:gap-6 min-[768px]:gap-8 min-[1024px]:gap-10"
             }
           >
-            Открой мир спорта — подписывайся на рассылку и получай уникальные предложения и тренды
-            первым!
-          </h5>
+            <h5
+              className={
+                "footer-newsletter-heading min-[1920px]:text-[48px] font-bold uppercase min-[1920px]:max-w-225 min-[1600px]:text-[36px] min-[1600px]:max-w-160 min-[1440px]:text-[36px] min-[1440px]:max-w-160 min-[1280px]:text-[32px] min-[1280px]:max-w-150 min-[1024px]:text-[24px] min-[1024px]:max-w-110 min-[768px]:text-[18px] min-[768px]:max-w-84 min-[576px]:text-[18px] min-[576px]:max-w-84 max-[500px]:text-[18px] max-[500px]:max-w-[224px] min-[390px]:text-[12px]"
+              }
+            >
+              Открой мир спорта — подписывайся на рассылку и получай уникальные предложения и тренды
+              первым!
+            </h5>
+            <PromoButton
+              _variant="outline"
+              text="Подписаться на новости"
+              onClick={openNewsletterModal}
+              className="rounded-[10px] w-fit bg-white max-[768px]:h-10 max-[768px]:px-4 max-[768px]:py-2 max-[768px]:text-[13px] min-[769px]:text-[16px] min-[769px]:h-14 min-[769px]:px-8"
+              size="lg"
+            />
+          </div>
         </div>
 
         {/* Контент футера */}
@@ -157,35 +169,7 @@ export const Footer: React.FC<Props> = ({ className }) => {
                 </li>
               </ul>
             </nav>
-            <div
-              className={
-                "flex gap-20  max-[1440px]:gap-12 max-[1280px]:gap-10 max-[1024px]:flex-col max-[768px]:items-start max-[768px]:text-left"
-              }
-            >
-              <div className="flex flex-col  gap-4 md:items-start max-[1024px]:gap-3">
-                <h3 className="text-[26px] font-light leading-[120%] uppercase max-[1280px]:text-[24px]">
-                  Будьте в курсе новинок
-                </h3>
-                <p className="max-w-85  text-[14px] font-light leading-[150%] text-text-primary md:text-left max-[1280px]:text-[12px] max-[1280px]:max-w-68">
-                  Подпишитесь на нашу рассылку и узнавайте первыми о новых коллекциях, акциях и
-                  скидках.
-                </p>
-                <DesignButton
-                  variant="outline"
-                  onClick={openNewsletterModal}
-                  className="group  flex  gap-2.5 rounded-[10px]"
-                  size={"lg"}
-                >
-                  <span className="text-[16px] leading-[100%]">Подписаться на новости</span>
-                  <Mail
-                    className="h-6 w-6 stroke-[#1F1E1E] transition-colors group-hover:stroke-white"
-                    aria-hidden="true"
-                  />
-                </DesignButton>
-              </div>
-
-              <ContactsBlock />
-            </div>
+            <ContactsBlock />
           </div>
 
           {/* Копирайт */}

@@ -77,7 +77,7 @@ export function AboutPageClient() {
           aria-label="Видео о бренде"
         >
           <video
-            src="/video/about.mp4"
+            src="/video/about.mov"
             className="h-full w-full object-cover"
             playsInline
             muted

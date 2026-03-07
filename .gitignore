@@ -59,6 +59,8 @@ node_modules
 # Semgrep/SAST reports (генерируются локально, не коммитить)
 /reports/
 
+/DEPLOY_COMMANDS.md
+
 # IDE and editor
 .idea/
 *.swp

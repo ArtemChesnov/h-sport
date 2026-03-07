@@ -56,15 +56,15 @@ export const FirstScreen: React.FC<Props> = ({ className }) => {
           quality={85}
         />
       </div>
-      <Container>
+      <Container className="relative">
         <div
           ref={boxRef}
-          className="absolute bottom-10 flex flex-col min-[1920px]:gap-8 min-[1440px]:gap-6 min-[1024px]:gap-6 gap-4 items-start min-[1024px]:p-10 p-6 bg-white/50 backdrop-blur-xl rounded-[10px] w-fit"
+          className="absolute bottom-10 left-[12px] min-[1025px]:left-[30px] flex flex-col min-[1920px]:gap-8 min-[1440px]:gap-6 min-[1024px]:gap-6 gap-4 items-start min-[1024px]:p-10 p-6 bg-[color-mix(in_oklab,oklch(1_0_0)_50%,transparent)] backdrop-blur-xl rounded-[10px] w-fit max-md:w-auto max-md:left-1/2 max-md:-translate-x-1/2"
         >
           <div className="flex flex-col gap-2">
             <h2
               ref={titleRef}
-              className="text-primary! leading-[100%] tracking-[-0.06em] min-[1920px]:text-[76px] font-semibold uppercase motion-reduce:opacity-100 min-[1440px]:text-[52px] min-[1024px]:text-[42px] min-[768px]:text-[32px] min-[576px]:text-[22px]  text-[18px] "
+              className="text-primary! leading-[100%] tracking-[-0.12em] min-[576px]:tracking-[-0.06em] min-[1920px]:text-[76px] font-semibold uppercase motion-reduce:opacity-100 min-[1440px]:text-[52px] min-[1024px]:text-[42px] min-[768px]:text-[32px] text-[22px]"
             >
               Будь сильной. Будь яркой. Будь собой.
             </h2>
@@ -78,7 +78,7 @@ export const FirstScreen: React.FC<Props> = ({ className }) => {
           </div>
           <div ref={ctaRef} className="motion-reduce:opacity-100">
             <PromoButton
-              className="min-[1440px]:text-[16px] rounded-[10px]  min-[1920px]:text-[24px]!"
+              className="min-[1440px]:text-[16px] rounded-[10px] min-[1920px]:text-[24px]!"
               _variant="outline"
               text="Промокод на первый заказ"
               onClick={() => setPromoModalOpen(true)}

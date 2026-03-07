@@ -81,9 +81,33 @@ summary {
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
 
+  --color-white: oklch(1 0 0);
+
   /* Цвета текста магазина (определены в .shop) */
   --color-text-primary: var(--text-primary, #030306);
   --color-text-secondary: var(--text-secondary, #878787);
+}
+
+/* Футер: блок текста и кнопки рассылки только 390px–767px */
+@media (min-width: 390px) and (max-width: 767px) {
+  .footer-newsletter-block {
+    left: 12px;
+    bottom: calc(var(--spacing) * 4);
+  }
+}
+
+/* Футер: max-width заголовка рассылки только 390px–575px */
+@media (min-width: 390px) and (max-width: 575px) {
+  .footer-newsletter-heading {
+    max-width: calc(var(--spacing) * 74);
+  }
+}
+
+/* Футер: размер шрифта заголовка рассылки только 768px–1023px (Tailwind arbitrary даёт 16px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .footer-newsletter-heading {
+    font-size: 18px;
+  }
 }
 
 /* --- БАЗА: только радиус и шрифты --- */

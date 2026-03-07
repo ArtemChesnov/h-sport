@@ -98,15 +98,29 @@ export const Header: React.FC<Props> = ({ className }) => {
           className
         )}
       >
-        <Container className="grid grid-cols-[1fr_auto_1fr] items-start pt-10">
-          <div className="flex justify-start">
-            <BurgerButton />
+        <Container className="flex md:grid md:grid-cols-[1fr_auto_1fr] justify-between md:justify-stretch items-start pt-10 gap-4">
+          {/* Мобилка: логотип слева. Десктоп: бургер слева */}
+          <div className="flex justify-start order-1">
+            <Link href="/" onClick={handleLogoClick} className="cursor-pointer shrink-0 md:hidden">
+              <Image
+                alt="H Sport"
+                src="/assets/logos/logo-big.png"
+                width={55}
+                height={104}
+                priority
+                className="h-auto w-10 sm:w-12 max-h-[80px] sm:max-h-[90px] object-contain"
+              />
+            </Link>
+            <div className="hidden md:block">
+              <BurgerButton />
+            </div>
           </div>
 
+          {/* Десктоп: логотип по центру */}
           <Link
             href="/"
             onClick={handleLogoClick}
-            className="cursor-pointer shrink-0 justify-self-center"
+            className="hidden md:flex cursor-pointer shrink-0 justify-self-center order-2"
           >
             <Image
               alt="H Sport"
@@ -118,90 +132,96 @@ export const Header: React.FC<Props> = ({ className }) => {
             />
           </Link>
 
-          <div className="flex items-center justify-end gap-2 md:gap-3 ">
-            {/* Избранное: outline (розовый) по умолчанию, filled (primary) при hover. Спиннер синхронно с корзиной. */}
-            <Link
-              href="/favorites"
-              onClick={handleFavoritesClick}
-              className="group relative inline-flex h-10 w-10 min-w-10 items-center justify-center transition-colors md:h-[42px] md:w-[42px] md:min-w-[42px]"
-              aria-label="Избранное"
-            >
-              {isLoading ? (
-                <span className="flex h-6 w-6 items-center justify-center md:h-8 md:w-8">
-                  <CountLoader />
-                </span>
-              ) : (
-                <>
-                  <FavoritesIcon
-                    className={cn(
-                      "absolute transition-opacity group-hover:opacity-0",
-                      ICON_PINK,
-                      ICON_CLASS
-                    )}
-                  />
-                  <FavoritesFilledIcon
-                    className={cn(
-                      "absolute opacity-0 transition-opacity group-hover:opacity-100 group-hover:text-primary",
-                      ICON_CLASS
-                    )}
-                  />
-                  <IconBadge count={favorites ?? 0} aria-label={`В избранном: ${favorites}`} />
-                </>
-              )}
-            </Link>
-
-            {/* Корзина: outline (розовый) по умолчанию, filled (primary) при hover. Спиннер синхронно с избранным. */}
-            <Link
-              href="/cart"
-              onClick={handleCartClick}
-              className="group relative inline-flex h-10 w-10 min-w-10 items-center justify-center transition-colors md:h-[42px] md:w-[42px] md:min-w-[42px]"
-              aria-label={CART_LABELS.title}
-            >
-              {isLoading ? (
-                <span className="flex h-6 w-6 items-center justify-center md:h-8 md:w-8">
-                  <CountLoader />
-                </span>
-              ) : (
-                <>
-                  <CartIcon
-                    className={cn(
-                      "absolute transition-opacity group-hover:opacity-0",
-                      ICON_PINK,
-                      ICON_CLASS
-                    )}
-                  />
-                  <CartIconFilled
-                    className={cn(
-                      "absolute opacity-0 transition-opacity group-hover:opacity-100 group-hover:text-primary",
-                      ICON_CLASS
-                    )}
-                  />
-                  <IconBadge count={cartCount ?? 0} aria-label={`В корзине: ${cartCount}`} />
-                </>
-              )}
-            </Link>
-
-            {/* Аккаунт: outline (розовый) по умолчанию, filled (primary) при hover */}
-            <Link
-              href="/account"
-              onClick={handleAccountClick}
-              className="group relative inline-flex h-10 w-10 min-w-10 items-center justify-center transition-colors md:h-[42px] md:w-[42px] md:min-w-[42px]"
-              aria-label="Личный кабинет"
-            >
-              <UserIcon
-                className={cn(
-                  "absolute transition-opacity group-hover:opacity-0",
-                  ICON_PINK,
-                  ICON_CLASS
+          {/* Мобилка: бургер справа. Десктоп: иконки корзины, избранного, ЛК */}
+          <div className="flex items-center justify-end gap-2 md:gap-3 order-3">
+            <div className="md:hidden">
+              <BurgerButton />
+            </div>
+            <div className="hidden md:flex items-center gap-2 md:gap-3">
+              {/* Избранное: outline (розовый) по умолчанию, filled (primary) при hover. Спиннер синхронно с корзиной. */}
+              <Link
+                href="/favorites"
+                onClick={handleFavoritesClick}
+                className="group relative inline-flex h-10 w-10 min-w-10 items-center justify-center transition-colors md:h-[42px] md:w-[42px] md:min-w-[42px]"
+                aria-label="Избранное"
+              >
+                {isLoading ? (
+                  <span className="flex h-6 w-6 items-center justify-center md:h-8 md:w-8">
+                    <CountLoader />
+                  </span>
+                ) : (
+                  <>
+                    <FavoritesIcon
+                      className={cn(
+                        "absolute transition-opacity group-hover:opacity-0",
+                        ICON_PINK,
+                        ICON_CLASS
+                      )}
+                    />
+                    <FavoritesFilledIcon
+                      className={cn(
+                        "absolute opacity-0 transition-opacity group-hover:opacity-100 group-hover:text-primary",
+                        ICON_CLASS
+                      )}
+                    />
+                    <IconBadge count={favorites ?? 0} aria-label={`В избранном: ${favorites}`} />
+                  </>
                 )}
-              />
-              <UserIconFilled
-                className={cn(
-                  "absolute opacity-0 transition-opacity group-hover:opacity-100 group-hover:text-primary",
-                  ICON_CLASS
+              </Link>
+
+              {/* Корзина: outline (розовый) по умолчанию, filled (primary) при hover. Спиннер синхронно с избранным. */}
+              <Link
+                href="/cart"
+                onClick={handleCartClick}
+                className="group relative inline-flex h-10 w-10 min-w-10 items-center justify-center transition-colors md:h-[42px] md:w-[42px] md:min-w-[42px]"
+                aria-label={CART_LABELS.title}
+              >
+                {isLoading ? (
+                  <span className="flex h-6 w-6 items-center justify-center md:h-8 md:w-8">
+                    <CountLoader />
+                  </span>
+                ) : (
+                  <>
+                    <CartIcon
+                      className={cn(
+                        "absolute transition-opacity group-hover:opacity-0",
+                        ICON_PINK,
+                        ICON_CLASS
+                      )}
+                    />
+                    <CartIconFilled
+                      className={cn(
+                        "absolute opacity-0 transition-opacity group-hover:opacity-100 group-hover:text-primary",
+                        ICON_CLASS
+                      )}
+                    />
+                    <IconBadge count={cartCount ?? 0} aria-label={`В корзине: ${cartCount}`} />
+                  </>
                 )}
-              />
-            </Link>
+              </Link>
+
+              {/* Аккаунт: outline (розовый) по умолчанию, filled (primary) при hover */}
+              <Link
+                href="/account"
+                onClick={handleAccountClick}
+                className="group relative inline-flex h-10 w-10 min-w-10 items-center justify-center transition-colors md:h-[42px] md:w-[42px] md:min-w-[42px]"
+                aria-label="Личный кабинет"
+              >
+                <UserIcon
+                  className={cn(
+                    "absolute transition-opacity group-hover:opacity-0",
+                    ICON_PINK,
+                    ICON_CLASS
+                  )}
+                />
+                <UserIconFilled
+                  className={cn(
+                    "absolute opacity-0 transition-opacity group-hover:opacity-100 group-hover:text-primary",
+                    ICON_CLASS
+                  )}
+                />
+              </Link>
+            </div>
           </div>
         </Container>
       </header>
