@@ -87,8 +87,8 @@ export const MenuDrawer: React.FC<React.PropsWithChildren<Props>> = ({ className
               ))}
             </nav>
 
-            {/* Избранное, Корзина, Вход — отдельный блок, без подчёркивания, просто текст 20px */}
-            <div className="flex flex-col gap-4 mt-6 menu-drawer-user">
+            {/* Избранное, Корзина, Вход — только на мобилках (когда в хедере иконки скрыты) */}
+            <div className="flex flex-col gap-4 mt-6 menu-drawer-user md:hidden">
               <Link
                 href="/favorites"
                 onClick={(e) => {
