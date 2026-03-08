@@ -50,51 +50,45 @@ export async function getConversionFunnel(days: number): Promise<ConversionFunne
     OrderStatus.DELIVERED,
   ];
 
-  // Выполняем все запросы параллельно для оптимизации
+  // Выполняем все запросы параллельно для оптимизации.
+  // ProductView/CartAction могут быть анонимными (userId IS NULL),
+  // поэтому считаем общее число записей, а не только авторизованных.
   const [
-    // 1. Уникальные посетители (по userId в ProductView)
     uniqueVisitorsResult,
-    // 2. Просмотры товаров (уникальные пользователи, которые смотрели товары)
     viewedProductsResult,
-    // 3. Добавили в корзину (уникальные пользователи)
     addedToCartResult,
-    // 4. Начали оформление (корзины с заполненными данными или заказы pending)
     startedCheckoutResult,
-    // 5. Оформили заказ (любой статус)
     completedOrderResult,
-    // 6. Оплаченные заказы
     paidOrdersResult,
   ] = await Promise.all([
-    // Уникальные посетители
+    // Уникальные авторизованные посетители (для details)
     prisma.$queryRaw<[CountResult]>`
       SELECT COUNT(DISTINCT "userId")::bigint AS count
       FROM "ProductView"
       WHERE "createdAt" >= ${from} AND "createdAt" <= ${now}
       AND "userId" IS NOT NULL
     `,
-    // Просмотры товаров (уникальные пользователи)
+    // Просмотры товаров — все (включая анонимных)
     prisma.$queryRaw<[CountResult]>`
-      SELECT COUNT(DISTINCT "userId")::bigint AS count
+      SELECT COUNT(DISTINCT COALESCE("userId", 'anon-' || id::text))::bigint AS count
       FROM "ProductView"
       WHERE "createdAt" >= ${from} AND "createdAt" <= ${now}
-      AND "userId" IS NOT NULL
     `,
-    // Добавили в корзину
+    // Добавили в корзину — все (включая анонимных, по userId или cartId)
     prisma.$queryRaw<[CountResult]>`
-      SELECT COUNT(DISTINCT "userId")::bigint AS count
+      SELECT COUNT(DISTINCT COALESCE("userId", "cartId", 'anon-' || id::text))::bigint AS count
       FROM "CartAction"
       WHERE "createdAt" >= ${from} AND "createdAt" <= ${now}
       AND action = 'add'
-      AND "userId" IS NOT NULL
     `,
-    // Начали оформление (корзины, которые перешли в заказы)
+    // Начали оформление (все заказы — userId всегда есть)
     prisma.$queryRaw<[CountResult]>`
       SELECT COUNT(DISTINCT "userId")::bigint AS count
       FROM "Order"
       WHERE "createdAt" >= ${from} AND "createdAt" <= ${now}
       AND "userId" IS NOT NULL
     `,
-    // Оформили заказ (уникальные пользователи), исключаем отменённые
+    // Оформили заказ, исключаем отменённые
     prisma.$queryRaw<[CountResult]>`
       SELECT COUNT(DISTINCT "userId")::bigint AS count
       FROM "Order"
@@ -102,7 +96,7 @@ export async function getConversionFunnel(days: number): Promise<ConversionFunne
       AND "userId" IS NOT NULL
       AND NOT (status = ANY(${excludedStatuses}))
     `,
-    // Оплаченные заказы (уникальные пользователи)
+    // Оплаченные заказы
     prisma.$queryRaw<[CountResult]>`
       SELECT COUNT(DISTINCT "userId")::bigint AS count
       FROM "Order"

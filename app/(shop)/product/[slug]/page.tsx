@@ -57,6 +57,17 @@ export default async function ProductSlugPage({ params }: ProductSlugPageProps) 
     notFound();
   }
 
+  if (initialProduct != null) {
+    try {
+      const { getSessionUser } = await import("@/shared/lib/auth/session");
+      const { recordProductView } = await import("@/shared/lib/ecommerce-metrics");
+      const user = await getSessionUser();
+      void recordProductView(initialProduct.id, user?.id);
+    } catch {
+      // не блокируем рендер при ошибке метрик
+    }
+  }
+
   const youMightLike =
     initialProduct != null
       ? popularList.filter((p) => p.id !== initialProduct!.id).slice(0, YOU_MIGHT_LIKE_DISPLAY)
