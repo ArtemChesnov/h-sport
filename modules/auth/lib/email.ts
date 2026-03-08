@@ -21,7 +21,6 @@ let transporter: nodemailer.Transporter | null = null;
  * Инициализирует транспортер для отправки email
  */
 export function initEmailTransporter(config: EmailConfig): void {
-  // Проверяем env-флаг для разрешения небезопасного TLS (только для тестовых серверов)
   const allowInsecureTls = process.env.SMTP_ALLOW_INSECURE_TLS === "true";
 
   transporter = nodemailer.createTransport({
@@ -32,11 +31,15 @@ export function initEmailTransporter(config: EmailConfig): void {
       user: config.user,
       pass: config.password,
     },
-    // Для порта 587 (STARTTLS) устанавливаем rejectUnauthorized только если явно разрешено
+    // Многие VPS не имеют IPv6 — принудительно используем IPv4
+    family: 4,
+    connectionTimeout: 15_000,
+    greetingTimeout: 15_000,
+    socketTimeout: 30_000,
     ...(config.port === 587 && !config.secure && allowInsecureTls
       ? {
           tls: {
-            rejectUnauthorized: false, // Только если SMTP_ALLOW_INSECURE_TLS=true
+            rejectUnauthorized: false,
           },
         }
       : {}),
