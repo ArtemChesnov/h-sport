@@ -12,7 +12,7 @@ import { PaymentProvider, PaymentMethod } from "@prisma/client";
 export async function createPayment(
   orderId: number,
   amount: number,
-  method: PaymentMethod = "AUTO",
+  method: PaymentMethod = "AUTO"
 ): Promise<number> {
   const { retryWithBackoff } = await import("@/shared/lib/retry");
 
@@ -35,7 +35,7 @@ export async function createPayment(
       maxRetries: 3,
       initialDelay: 500,
       maxDelay: 5000,
-    },
+    }
   );
 }
 
@@ -47,7 +47,7 @@ export async function updatePaymentStatus(
   status: PaymentStatusDto,
   externalId?: string,
   signature?: string,
-  receiptUrl?: string,
+  receiptUrl?: string
 ): Promise<void> {
   await prisma.payment.update({
     where: { id: paymentId },
@@ -58,6 +58,15 @@ export async function updatePaymentStatus(
       receiptUrl,
       updatedAt: new Date(),
     },
+  });
+}
+
+/**
+ * Находит платёж по ID
+ */
+export async function findPaymentById(paymentId: number) {
+  return prisma.payment.findUnique({
+    where: { id: paymentId },
   });
 }
 
@@ -76,7 +85,7 @@ export async function findPaymentByOrderId(orderId: number) {
  */
 export async function updateOrderOnPayment(
   orderId: number,
-  status: "PAID" | "PENDING_PAYMENT",
+  status: "PAID" | "PENDING_PAYMENT"
 ): Promise<void> {
   await prisma.order.update({
     where: { id: orderId },
@@ -93,7 +102,7 @@ export async function updateOrderOnPayment(
 export async function createOrderEvent(
   orderId: number,
   type: string,
-  payload?: Record<string, unknown>,
+  payload?: Record<string, unknown>
 ): Promise<void> {
   await prisma.orderEvent.create({
     data: {

@@ -100,7 +100,11 @@ export function useCheckoutPayment() {
           throw new Error(errorData.message || "Ошибка при создании платежа");
         }
 
-        const { url } = await paymentResponse.json();
+        const data = await paymentResponse.json();
+        const url = data?.url;
+        if (typeof url !== "string" || !url.startsWith("http")) {
+          throw new Error("Не получен корректный URL для оплаты");
+        }
 
         if (typeof window !== "undefined") {
           window.sessionStorage.removeItem(CHECKOUT_ADDRESS_STORAGE_KEY);

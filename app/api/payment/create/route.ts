@@ -10,6 +10,7 @@ import type { PaymentRequest } from "@/modules/payment/types";
 import { OrderForPaymentService } from "@/shared/services/server";
 import { validateRequestSize, withErrorHandling } from "@/shared/lib/api/error-handler";
 import { createErrorResponse } from "@/shared/lib/api/error-response";
+import { getSessionUserOrError } from "@/shared/lib/auth/middleware";
 import { getAppUrl } from "@/shared/lib/config/env";
 import { applyRateLimit } from "@/shared/lib/api/rate-limit-middleware";
 import { NextRequest, NextResponse } from "next/server";
@@ -19,6 +20,9 @@ async function handler(
 ): Promise<NextResponse<{ success: boolean; message?: string; url?: string; paymentId?: number }>> {
   const rateLimitResponse = await applyRateLimit(request, "payment");
   if (rateLimitResponse) return rateLimitResponse;
+
+  const session = await getSessionUserOrError(request);
+  if ("error" in session) return session.error;
 
   const sizeCheck = validateRequestSize(request, 10 * 1024);
   if (!sizeCheck.valid) {
@@ -41,6 +45,10 @@ async function handler(
 
   if (!order) {
     return createErrorResponse("Заказ не найден", 404);
+  }
+
+  if (order.userId == null || order.userId !== session.user.id) {
+    return createErrorResponse("Доступ запрещён", 403);
   }
 
   if (amount !== order.total) {

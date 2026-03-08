@@ -1,5 +1,6 @@
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { createErrorResponse } from "@/shared/lib/api/error-response";
+import { getSessionUserOrError } from "@/shared/lib/auth/middleware";
 import { applyRateLimit } from "@/shared/lib/api/rate-limit-middleware";
 import { getReceiptById } from "@/shared/services/server/payment/receipt.service";
 import { formatMoney } from "@/shared/lib/formatters";
@@ -31,6 +32,9 @@ export async function GET(request: NextRequest, context: RouteContext) {
         return createErrorResponse("Неверный ID платежа", 400);
       }
 
+      const session = await getSessionUserOrError(req);
+      if ("error" in session) return session.error;
+
       const data = await getReceiptById(paymentId);
 
       if (!data) {
@@ -38,6 +42,9 @@ export async function GET(request: NextRequest, context: RouteContext) {
       }
 
       const { payment, order } = data;
+      if (order.userId == null || order.userId !== session.user.id) {
+        return createErrorResponse("Доступ запрещён", 403);
+      }
 
       const receiptHtml = `
       <!DOCTYPE html>

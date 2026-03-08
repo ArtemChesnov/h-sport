@@ -2,6 +2,7 @@
 
 import {
   createOrderEvent,
+  findPaymentById,
   findPaymentByOrderId,
   updateOrderOnPayment,
   updatePaymentStatus,
@@ -93,8 +94,16 @@ export async function processRobokassaWebhook(
     return { ok: false, status: 400, message: "Неверная подпись" };
   }
 
-  // Находим платеж
-  const payment = await findPaymentByOrderId(orderId);
+  // Находим платёж: по Shp_payment_id если передан (точное совпадение с заказом), иначе по orderId
+  const shpPaymentId = userParams["Shp_payment_id"];
+  const paymentById =
+    shpPaymentId != null && shpPaymentId !== ""
+      ? await findPaymentById(parseInt(shpPaymentId, 10))
+      : null;
+  const payment =
+    paymentById && paymentById.orderId === orderId
+      ? paymentById
+      : await findPaymentByOrderId(orderId);
   if (!payment) {
     return { ok: false, status: 404, message: "Платеж не найден" };
   }

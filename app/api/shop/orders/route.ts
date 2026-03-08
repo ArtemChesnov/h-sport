@@ -58,8 +58,13 @@ export async function POST(request: NextRequest) {
 
       const idempotencyKey = req.headers.get("X-Idempotency-Key");
       if (idempotencyKey) {
-        const existingOrder = await OrdersService.findByIdempotencyKey(idempotencyKey);
-        if (existingOrder) return NextResponse.json<DTO.OrderCreateResponseDto>(existingOrder);
+        const existingOrder = await OrdersService.findByIdempotencyKeyForOwner(
+          idempotencyKey,
+          session.user.id
+        );
+        if (existingOrder) {
+          return NextResponse.json<DTO.OrderCreateResponseDto>(existingOrder);
+        }
       }
 
       const bodyResult = await validateRequestBody(req, orderCreateSchema);

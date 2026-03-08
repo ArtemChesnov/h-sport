@@ -1,8 +1,8 @@
 "use client";
 
-import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {DTO, PROMO_CLIENT} from "@/shared/services";
-import {CART_QUERY_KEY} from "@/shared/hooks/cart/cart.hooks";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { DTO, PROMO_CLIENT } from "@/shared/services";
+import { CART_QUERY_KEY, withSortedItems } from "@/shared/hooks/cart/cart.hooks";
 
 /**
  * Мутация для применения промокода к текущей корзине.
@@ -17,8 +17,7 @@ export function useApplyPromoCodeMutation() {
     mutationFn: (payload) => PROMO_CLIENT.applyPromoCode(payload),
 
     onSuccess: (cart) => {
-      // синхронизируем кэш корзины
-      queryClient.setQueryData(CART_QUERY_KEY, cart);
+      queryClient.setQueryData(CART_QUERY_KEY, withSortedItems(cart));
     },
   });
 }
@@ -36,7 +35,7 @@ export function useClearPromoCodeMutation() {
     mutationFn: () => PROMO_CLIENT.clearPromoCode(),
 
     onSuccess: (cart) => {
-      queryClient.setQueryData(CART_QUERY_KEY, cart);
+      queryClient.setQueryData(CART_QUERY_KEY, withSortedItems(cart));
     },
   });
 }

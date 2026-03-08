@@ -15,6 +15,7 @@ export type ReceiptOrderItem = {
 
 export type ReceiptOrder = {
   id: number;
+  userId: string | null;
   email: string;
   fullName: string | null;
   subtotal: number | null;
@@ -60,6 +61,7 @@ export async function getReceiptById(paymentId: number): Promise<ReceiptData | n
     },
     order: {
       id: payment.order.id,
+      userId: payment.order.userId,
       email: payment.order.email,
       fullName: payment.order.fullName,
       subtotal: payment.order.subtotal,

@@ -188,6 +188,7 @@ export class OrdersRepository {
   static async findByIdempotencyKey(idempotencyKey: string): Promise<{
     id: number;
     uid: string;
+    userId: string | null;
     status: OrderStatus;
     total: number;
     totalItems: number;
@@ -198,6 +199,7 @@ export class OrdersRepository {
       select: {
         id: true,
         uid: true,
+        userId: true,
         status: true,
         total: true,
         totalItems: true,
@@ -265,6 +267,7 @@ export class OrdersRepository {
    */
   static async findForPaymentCreate(orderId: number): Promise<{
     id: number;
+    userId: string | null;
     status: OrderStatus;
     total: number;
     deliveryFee: number;
@@ -274,6 +277,7 @@ export class OrdersRepository {
       where: { id: orderId },
       select: {
         id: true,
+        userId: true,
         status: true,
         total: true,
         deliveryFee: true,

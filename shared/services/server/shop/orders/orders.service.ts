@@ -45,6 +45,24 @@ export class OrdersService {
     };
   }
 
+  /** Заказ по idempotency key только если владелец совпадает. */
+  static async findByIdempotencyKeyForOwner(
+    idempotencyKey: string,
+    userId: string
+  ): Promise<DTO.OrderCreateResponseDto | null> {
+    const order = await OrdersRepository.findByIdempotencyKey(idempotencyKey);
+    if (!order || order.userId == null || order.userId !== userId) return null;
+
+    return {
+      id: order.id,
+      uid: order.uid,
+      status: order.status as DTO.OrderStatusDto,
+      total: order.total,
+      totalItems: order.totalItems,
+      createdAt: order.createdAt.toISOString(),
+    };
+  }
+
   /** Отмена заказа пользователем. Возвращает DTO или объект с ошибкой. */
   static async cancelOrder(
     uid: string,

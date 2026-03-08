@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import type { ErrorResponse } from "@/shared/dto";
 import { logger } from "@/shared/lib/logger";
@@ -15,13 +14,18 @@ import { createErrorResponse } from "./error-response";
  * Handler может возвращать успешный ответ (NextResponse<T>) или любой ответ с ошибкой (например от requireAdmin или rate limit).
  */
 export async function withErrorHandling<T>(
-  handler: (request: NextRequest) => Promise<NextResponse<T> | NextResponse<ErrorResponse> | NextResponse<unknown>>,
+  handler: (
+    request: NextRequest
+  ) => Promise<NextResponse<T> | NextResponse<ErrorResponse> | NextResponse<unknown>>,
   request: NextRequest,
-  routeName: string,
+  routeName: string
 ): Promise<NextResponse<T | ErrorResponse>> {
   try {
     return (await handler(request)) as NextResponse<T | ErrorResponse>;
   } catch (error) {
+    if (error instanceof Response) {
+      return error as NextResponse<ErrorResponse>;
+    }
     // Обрабатываем Zod ошибки отдельно
     if (error instanceof ZodError) {
       const fieldErrors: FieldError[] = error.issues.map((issue) => ({
@@ -31,19 +35,23 @@ export async function withErrorHandling<T>(
       const firstIssue = error.issues[0];
       const validationError = new ValidationError(
         firstIssue?.message || "Ошибка валидации данных",
-        fieldErrors,
+        fieldErrors
       );
 
-      logger.warn(`[${routeName}] Ошибка валидации: ${validationError.message}`, {
-        code: validationError.code,
-        statusCode: validationError.statusCode,
-        fieldErrors: fieldErrors.length,
-      }, {
-        requestId: request.headers.get("x-request-id") ?? undefined,
-        route: routeName,
-        method: request.method,
-        url: request.url,
-      });
+      logger.warn(
+        `[${routeName}] Ошибка валидации: ${validationError.message}`,
+        {
+          code: validationError.code,
+          statusCode: validationError.statusCode,
+          fieldErrors: fieldErrors.length,
+        },
+        {
+          requestId: request.headers.get("x-request-id") ?? undefined,
+          route: routeName,
+          method: request.method,
+          url: request.url,
+        }
+      );
 
       return NextResponse.json<ErrorResponse>(
         {
@@ -51,7 +59,7 @@ export async function withErrorHandling<T>(
           message: validationError.message,
           errors: fieldErrors,
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -79,7 +87,7 @@ export async function withErrorHandling<T>(
           statusCode: appError.statusCode,
           ...appError.context,
         },
-        requestContext,
+        requestContext
       );
     } else if (appError.isOperational) {
       logger.warn(
@@ -89,7 +97,7 @@ export async function withErrorHandling<T>(
           statusCode: appError.statusCode,
           ...appError.context,
         },
-        requestContext,
+        requestContext
       );
     } else {
       logger.error(
@@ -100,7 +108,7 @@ export async function withErrorHandling<T>(
           statusCode: appError.statusCode,
           ...appError.context,
         },
-        requestContext,
+        requestContext
       );
     }
 
@@ -138,7 +146,7 @@ export async function withErrorHandling<T>(
         message: userMessage,
         ...(isAppError(error) && error.code && { code: error.code }),
       },
-      { status: appError.statusCode },
+      { status: appError.statusCode }
     );
   }
 }
@@ -150,7 +158,7 @@ export async function withErrorHandling<T>(
  */
 export function validateRequestSize(
   request: NextRequest,
-  maxSizeBytes: number = 1024 * 1024, // 1MB
+  maxSizeBytes: number = 1024 * 1024 // 1MB
 ): { valid: true } | { valid: false; response: NextResponse<ErrorResponse> } {
   const contentLength = request.headers.get("content-length");
 
@@ -162,7 +170,7 @@ export function validateRequestSize(
         valid: false,
         response: createErrorResponse(
           `Размер запроса превышает максимально допустимый (${Math.round(maxSizeBytes / 1024)}KB)`,
-          413,
+          413
         ),
       };
     }

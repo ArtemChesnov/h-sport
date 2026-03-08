@@ -25,7 +25,7 @@ function sortCartItems(items: DTO.CartItemDto[]): DTO.CartItemDto[] {
 /**
  * Применяет сортировку к данным корзины.
  */
-function withSortedItems(cart: DTO.CartDto): DTO.CartDto {
+export function withSortedItems(cart: DTO.CartDto): DTO.CartDto {
   return {
     ...cart,
     items: sortCartItems(cart.items),
@@ -36,7 +36,7 @@ function withSortedItems(cart: DTO.CartDto): DTO.CartDto {
  * Хук для получения текущей корзины.
  */
 export function useCartQuery<TData = DTO.CartDto>(
-  options?: Omit<UseQueryOptions<DTO.CartDto, Error, TData>, "queryKey" | "queryFn">,
+  options?: Omit<UseQueryOptions<DTO.CartDto, Error, TData>, "queryKey" | "queryFn">
 ) {
   return useQuery<DTO.CartDto, Error, TData>({
     queryKey: CART_QUERY_KEY,
