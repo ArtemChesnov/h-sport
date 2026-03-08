@@ -1,5 +1,6 @@
 import { Container, ShopBreadcrumbs } from "@/shared/components/common";
 import { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Оплата и доставка",
@@ -141,7 +142,11 @@ export default function PaymentDeliveryPage() {
               в зависимости от условий транспортных компаний.
             </p>
             <p className={paragraph}>
-              Все условия оплаты и доставки являются неотъемлемой частью Публичной оферты.
+              Все условия оплаты и доставки являются неотъемлемой частью{" "}
+              <Link href="/sales-rules" className="link-underline text-primary hover:underline">
+                Публичной оферты
+              </Link>
+              .
             </p>
             <p className={paragraph}>
               Подробную информацию о возврате товара вы можете найти в разделе «Обмен и возврат».
