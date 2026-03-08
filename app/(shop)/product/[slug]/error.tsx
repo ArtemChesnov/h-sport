@@ -41,7 +41,7 @@ export default function ProductSlugError({
           description="Не удалось загрузить страницу товара. Попробуйте обновить страницу или перейти в каталог."
           onRetry={reset}
           secondaryAction={{ href: "/catalog", label: CTA.GO_TO_CATALOG }}
-          minHeight="50vh"
+          minHeight="60vh"
           error={error}
         />
       </Container>

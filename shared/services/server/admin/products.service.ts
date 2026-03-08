@@ -123,7 +123,15 @@ export async function createProduct(payload: DTO.ProductCreateDto): Promise<Crea
     return { ok: false, status: result.status, message: result.message };
   }
 
-  return { ok: true, product: mapProductToDetailDto(result.product) };
+  const dto = mapProductToDetailDto(result.product);
+  if (!dto) {
+    return {
+      ok: false,
+      status: 500,
+      message: "Не удалось преобразовать товар (нет вариантов или категории)",
+    };
+  }
+  return { ok: true, product: dto };
 }
 
 /** Select для полных данных товара */

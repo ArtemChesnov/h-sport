@@ -1,14 +1,10 @@
-import {
-  getPopularProducts,
-  getProductBySlug,
-  getProductSlugsForPreRender,
-} from "@/shared/services/server";
-import dynamic from "next/dynamic";
+import { getPopularProducts, getProductBySlug } from "@/shared/services/server";
+import nextDynamic from "next/dynamic";
 import { notFound } from "next/navigation";
 import { ProductSkeleton } from "./_components/product-skeleton";
 import { generateMetadata } from "./generate-metadata";
 
-const ProductSlugClient = dynamic(
+const ProductSlugClient = nextDynamic(
   () =>
     import("./_components/product-slug-client").then((m) => ({
       default: m.ProductSlugClient,
@@ -19,55 +15,18 @@ const ProductSlugClient = dynamic(
 export { generateMetadata };
 
 /**
- * ISR fallback: 2 ч (public). Основная ревалидация — on-demand при сохранении товара в админке.
- */
-export const revalidate = 7200;
-
-/**
- * Генерирует статические параметры для топ-товаров
- * Остальные товары будут генерироваться по требованию (on-demand)
+ * Динамический рендеринг (без ISR).
  *
- * ВАЖНО: Pre-render включается ТОЛЬКО при явном ENABLE_PRODUCT_PRE_RENDER=true
- * По умолчанию все страницы товаров генерируются динамически (ISR on-demand)
- * Это гарантирует успешную сборку в CI/CD без доступа к БД
+ * ISR (revalidate) несовместим с cookies() в корневом layout (CsrfMeta),
+ * что вызывает DYNAMIC_SERVER_USAGE в Next.js 15.
+ * Данные кэшируются in-memory через getOrSetAsync (TTL 30 мин для товара,
+ * TTL 10 мин для популярных), поэтому производительность не страдает.
  */
-export async function generateStaticParams() {
-  // Pre-render только при явном включении (для production с доступом к БД)
-  // По умолчанию возвращаем пустой массив - страницы генерируются по требованию
-  if (process.env.ENABLE_PRODUCT_PRE_RENDER !== "true") {
-    return [];
-  }
-
-  // Проверяем наличие DATABASE_URL
-  if (!process.env.DATABASE_URL) {
-    return [];
-  }
-
-  try {
-    // Получаем топ-100 товаров для pre-render через server-сервис
-    const topProducts = await getProductSlugsForPreRender(100);
-    return topProducts;
-  } catch (error) {
-    // В случае ошибки возвращаем пустой массив - товары будут генерироваться по требованию
-    const { logger } = await import("@/shared/lib/logger");
-    logger.error("Error generating static params for products:", error);
-    return [];
-  }
-}
+export const dynamic = "force-dynamic";
 
 type ProductSlugPageProps = {
   params: Promise<{ slug: string }>;
 };
-
-/**
- * Серверный page-обёртка с ISR.
- *
- * Стратегия:
- * - Pre-render топ-100 товаров при сборке (ENABLE_PRODUCT_PRE_RENDER=true)
- * - Остальные товары генерируются по требованию
- * - On-demand ревалидация при создании/обновлении/удалении товара в админке
- * - Fallback revalidate = 2 ч
- */
 const YOU_MIGHT_LIKE_FETCH = 12;
 const YOU_MIGHT_LIKE_DISPLAY = 4;
 
