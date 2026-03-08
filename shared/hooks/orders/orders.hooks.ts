@@ -1,6 +1,7 @@
 "use client";
 
 import { DTO, ORDER_CANCEL_CLIENT, ORDER_CLIENT } from "@/shared/services";
+import { getCsrfToken } from "@/shared/lib/csrf-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CART_QUERY_KEY } from "../cart/cart.hooks";
 
@@ -24,10 +25,7 @@ export const orderDetailQueryKey = (uid: string | number) => ["orders", "detail"
  * Использование:
  *   const { data, isLoading, isError } = useOrdersListQuery({ page: 1, perPage: 10 });
  */
-export function useOrdersListQuery(params?: {
-  page?: number;
-  perPage?: number;
-}) {
+export function useOrdersListQuery(params?: { page?: number; perPage?: number }) {
   const page = params?.page ?? 1;
   const perPage = params?.perPage ?? 10;
 
@@ -94,7 +92,6 @@ export function useCreateOrderMutation() {
   });
 }
 
-
 /**
  * Мутация инициации оплаты заказа.
  * Вызывает POST /api/shop/orders/[uid]/pay и редиректит на URL оплаты.
@@ -103,9 +100,15 @@ export function usePayOrderMutation() {
   return useMutation<string, Error, string>({
     mutationKey: ["orders", "pay"],
     mutationFn: async (uid) => {
+      const csrfToken = getCsrfToken();
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (csrfToken) {
+        headers["X-CSRF-Token"] = csrfToken;
+      }
+
       const res = await fetch(`/api/shop/orders/${uid}/pay?returnTo=order`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         credentials: "include",
       });
       const json = await res.json();
@@ -142,4 +145,3 @@ export function useCancelOrderMutation() {
     },
   });
 }
-
