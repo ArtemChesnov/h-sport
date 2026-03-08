@@ -12,7 +12,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/shared/components/ui";
-import { MetricsSection } from "@/shared/components/admin";
+import { MetricsSection, EmptyState } from "@/shared/components/admin";
 import { formatMoney } from "@/shared/lib/formatters";
 import { Truck, CreditCard, Info } from "lucide-react";
 
@@ -49,29 +49,39 @@ export function DeliveryPaymentSection({
                 <CardDescription className="text-xs">Распределение по способам</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {delivery.distribution.map(({ method, count, percentage }) => (
-                    <div key={method} className="space-y-1.5">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium">
-                          {deliveryMethodLabels[method] || method}
-                        </span>
-                        <span className="text-muted-foreground">
-                          {count} ({percentage.toFixed(1)}%)
-                        </span>
-                      </div>
-                      <div className="w-full bg-muted rounded-full h-2">
-                        <div
-                          className="bg-primary h-2 rounded-full transition-all"
-                          style={{ width: `${percentage}%` }}
-                        />
-                      </div>
+                {!delivery.distribution || delivery.distribution.length === 0 ? (
+                  <EmptyState
+                    title="Нет данных"
+                    description="За выбранный период нет данных о продажах"
+                    icon={Truck}
+                  />
+                ) : (
+                  <>
+                    <div className="space-y-3">
+                      {delivery.distribution.map(({ method, count, percentage }) => (
+                        <div key={method} className="space-y-1.5">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="font-medium">
+                              {deliveryMethodLabels[method] || method}
+                            </span>
+                            <span className="text-muted-foreground">
+                              {count} ({percentage.toFixed(1)}%)
+                            </span>
+                          </div>
+                          <div className="w-full bg-muted rounded-full h-2">
+                            <div
+                              className="bg-primary h-2 rounded-full transition-all"
+                              style={{ width: `${percentage}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-                <p className="text-xs text-muted-foreground mt-4 pt-4 border-t">
-                  Средняя стоимость доставки: {formatMoney(delivery.averageDeliveryFee)}
-                </p>
+                    <p className="text-xs text-muted-foreground mt-4 pt-4 border-t">
+                      Средняя стоимость доставки: {formatMoney(delivery.averageDeliveryFee)}
+                    </p>
+                  </>
+                )}
               </CardContent>
             </Card>
           </TooltipTrigger>
@@ -96,24 +106,34 @@ export function DeliveryPaymentSection({
                 <CardDescription className="text-xs">Распределение по способам</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {payment.distribution.map(({ method, count, percentage }) => (
-                    <div key={method} className="space-y-1.5">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium">{paymentMethodLabels[method] || method}</span>
-                        <span className="text-muted-foreground">
-                          {count} ({percentage.toFixed(1)}%)
-                        </span>
+                {!payment.distribution || payment.distribution.length === 0 ? (
+                  <EmptyState
+                    title="Нет данных"
+                    description="За выбранный период нет данных о продажах"
+                    icon={CreditCard}
+                  />
+                ) : (
+                  <div className="space-y-3">
+                    {payment.distribution.map(({ method, count, percentage }) => (
+                      <div key={method} className="space-y-1.5">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-medium">
+                            {paymentMethodLabels[method] || method}
+                          </span>
+                          <span className="text-muted-foreground">
+                            {count} ({percentage.toFixed(1)}%)
+                          </span>
+                        </div>
+                        <div className="w-full bg-muted rounded-full h-2">
+                          <div
+                            className="bg-primary h-2 rounded-full transition-all"
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
                       </div>
-                      <div className="w-full bg-muted rounded-full h-2">
-                        <div
-                          className="bg-primary h-2 rounded-full transition-all"
-                          style={{ width: `${percentage}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TooltipTrigger>

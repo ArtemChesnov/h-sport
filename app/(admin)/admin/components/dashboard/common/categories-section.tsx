@@ -12,7 +12,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/shared/components/ui";
-import { MetricsSection } from "@/shared/components/admin";
+import { MetricsSection, EmptyState } from "@/shared/components/admin";
 import { formatMoney } from "@/shared/lib/formatters";
 import { METRICS_CONSTANTS } from "@/shared/constants";
 import { BarChart3, Info } from "lucide-react";
@@ -29,10 +29,6 @@ type CategoriesSectionProps = {
 };
 
 export function CategoriesSection({ categories }: CategoriesSectionProps) {
-  if (categories.length === 0) {
-    return null;
-  }
-
   return (
     <MetricsSection title="Категории" description="По выручке">
       <Tooltip>
@@ -47,33 +43,41 @@ export function CategoriesSection({ categories }: CategoriesSectionProps) {
               <CardDescription className="text-xs">По выручке</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {categories.slice(0, METRICS_CONSTANTS.TOP_ITEMS_COUNT).map((category, index) => (
-                  <div
-                    key={category.name}
-                    className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-                  >
-                    <div className="flex items-center gap-3 flex-1">
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-white text-xs font-bold shadow-sm">
-                        {index + 1}
-                      </span>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">{category.name}</p>
+              {!categories || categories.length === 0 ? (
+                <EmptyState
+                  title="Нет данных"
+                  description="За выбранный период нет данных о продажах"
+                  icon={BarChart3}
+                />
+              ) : (
+                <div className="space-y-3">
+                  {categories.slice(0, METRICS_CONSTANTS.TOP_ITEMS_COUNT).map((category, index) => (
+                    <div
+                      key={category.name}
+                      className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                    >
+                      <div className="flex items-center gap-3 flex-1">
+                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-white text-xs font-bold shadow-sm">
+                          {index + 1}
+                        </span>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">{category.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {category.views} просмотров · {category.orders} заказов ·{" "}
+                            {category.items} товаров
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-semibold">{formatMoney(category.revenue)}</p>
                         <p className="text-xs text-muted-foreground">
-                          {category.views} просмотров · {category.orders} заказов · {category.items}{" "}
-                          товаров
+                          {formatMoney(category.averageOrderValue)} средний чек
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm font-semibold">{formatMoney(category.revenue)}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatMoney(category.averageOrderValue)} средний чек
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TooltipTrigger>
