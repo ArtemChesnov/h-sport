@@ -79,16 +79,33 @@ export function OrderPaymentsCard({ order }: OrderPaymentsCardProps) {
               {payment.receiptUrl && (
                 <>
                   <Separator className="my-2" />
-                  <Button
-                    asChild
-                    variant="outline"
-                    size="sm"
-                    className="w-full cursor-pointer hover:bg-violet-50 hover:border-violet-200 hover:text-violet-700 transition-all"
-                  >
-                    <a href={payment.receiptUrl} target="_blank" rel="noopener noreferrer">
-                      Открыть чек об оплате
-                    </a>
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 cursor-pointer hover:bg-violet-50 hover:border-violet-200 hover:text-violet-700 transition-all"
+                    >
+                      <a href={payment.receiptUrl} target="_blank" rel="noopener noreferrer">
+                        Открыть чек
+                      </a>
+                    </Button>
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 cursor-pointer hover:bg-violet-50 hover:border-violet-200 hover:text-violet-700 transition-all"
+                    >
+                      <a
+                        href={`${payment.receiptUrl}${payment.receiptUrl.includes("?") ? "&" : "?"}format=pdf`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        download
+                      >
+                        Скачать PDF
+                      </a>
+                    </Button>
+                  </div>
                 </>
               )}
             </div>

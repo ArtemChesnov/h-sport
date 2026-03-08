@@ -2,6 +2,7 @@ import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { createErrorResponse } from "@/shared/lib/api/error-response";
 import { getSessionUserOrError } from "@/shared/lib/auth/middleware";
 import { applyRateLimit } from "@/shared/lib/api/rate-limit-middleware";
+import { buildReceiptPdf } from "@/shared/services/server/payment/receipt-pdf.service";
 import { getReceiptById } from "@/shared/services/server/payment/receipt.service";
 import { formatMoney } from "@/shared/lib/formatters";
 import type { RouteParams } from "@/shared/dto";
@@ -44,6 +45,18 @@ export async function GET(request: NextRequest, context: RouteContext) {
       const { payment, order } = data;
       if (order.userId == null || order.userId !== session.user.id) {
         return createErrorResponse("Доступ запрещён", 403);
+      }
+
+      const format = req.nextUrl.searchParams.get("format");
+      if (format === "pdf") {
+        const pdfBuffer = await buildReceiptPdf(data);
+        const filename = `receipt-order-${order.id}.pdf`;
+        return new NextResponse(new Uint8Array(pdfBuffer), {
+          headers: {
+            "Content-Type": "application/pdf",
+            "Content-Disposition": `attachment; filename="${filename}"`,
+          },
+        });
       }
 
       const receiptHtml = `
