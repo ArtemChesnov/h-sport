@@ -166,11 +166,11 @@ export const MenuDrawer: React.FC<React.PropsWithChildren<Props>> = ({ className
               </div>
             </nav>
 
-            {/* Свяжитесь с нами: иконки 24×24, уменьшенный отступ от заголовка */}
+            {/* Свяжитесь с нами: на мобилках иконки 24×24, на md+ — 40×40 */}
             <div className="flex flex-col">
               <ContactsBlock
-                className="menu-drawer-contacts-block [&_h3]:text-[20px] [&>div]:h-9 md:[&>div]:h-6 gap-2 [&_svg]:w-9 [&_svg]:h-9 [&_svg]:min-w-9 [&_svg]:min-h-9 md:[&_svg]:!w-6 md:[&_svg]:!h-6 md:[&_svg]:!min-w-6 md:[&_svg]:!min-h-6"
-                iconSize={36}
+                className="menu-drawer-contacts-block [&_h3]:text-[20px] min-[577px]:[&_h3]:text-[26px] [&_h3]:font-light [&_h3]:leading-[120%] [&>div]:h-9 md:[&>div]:h-10 gap-2 [&_svg]:w-6 [&_svg]:h-6 [&_svg]:min-w-6 [&_svg]:min-h-6 md:[&_svg]:!w-10 md:[&_svg]:!h-10 md:[&_svg]:!min-w-10 md:[&_svg]:!min-h-10"
+                iconSize={40}
                 iconsOnly
               />
             </div>

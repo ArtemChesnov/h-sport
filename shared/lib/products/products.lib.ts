@@ -226,7 +226,10 @@ export function mapProductsToListDto(products: ProductWithRelations[]): DTO.Prod
       const productItems = product.items;
 
       if (productItems.length === 0) {
-        // Товар без вариантов — пропускаем.
+        return null;
+      }
+
+      if (!product.category) {
         return null;
       }
 
@@ -259,7 +262,7 @@ export function mapProductsToListDto(products: ProductWithRelations[]): DTO.Prod
       }
 
       // Комплект (топ + леггинсы)?
-      const isSet = product.category.slug === "top-leggings-sets";
+      const isSet = product.category?.slug === "top-leggings-sets";
 
       const dtoProduct: DTO.ProductListItemDto = {
         id: product.id,

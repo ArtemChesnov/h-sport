@@ -4,6 +4,7 @@ import {
   getProductSlugsForPreRender,
 } from "@/shared/services/server";
 import dynamic from "next/dynamic";
+import { notFound } from "next/navigation";
 import { ProductSkeleton } from "./_components/product-skeleton";
 import { generateMetadata } from "./generate-metadata";
 
@@ -71,16 +72,35 @@ const YOU_MIGHT_LIKE_FETCH = 12;
 const YOU_MIGHT_LIKE_DISPLAY = 4;
 
 export default async function ProductSlugPage({ params }: ProductSlugPageProps) {
-  const { slug } = await params;
+  let slug: string;
+  try {
+    const resolved = await params;
+    slug = resolved?.slug;
+    if (!slug || typeof slug !== "string") {
+      notFound();
+    }
+  } catch {
+    notFound();
+  }
 
-  const [initialProduct, popularList] = await Promise.all([
-    getProductBySlug(slug),
-    getPopularProducts(YOU_MIGHT_LIKE_FETCH),
-  ]);
+  let initialProduct: Awaited<ReturnType<typeof getProductBySlug>> = null;
+  let popularList: Awaited<ReturnType<typeof getPopularProducts>> = [];
+
+  try {
+    const [product, popular] = await Promise.all([
+      getProductBySlug(slug),
+      getPopularProducts(YOU_MIGHT_LIKE_FETCH),
+    ]);
+    initialProduct = product;
+    popularList = Array.isArray(popular) ? popular : [];
+  } catch {
+    // Ошибка БД, кэша и т.д. — показываем «не найден», а не 500
+    notFound();
+  }
 
   const youMightLike =
     initialProduct != null
-      ? popularList.filter((p) => p.id !== initialProduct.id).slice(0, YOU_MIGHT_LIKE_DISPLAY)
+      ? popularList.filter((p) => p.id !== initialProduct!.id).slice(0, YOU_MIGHT_LIKE_DISPLAY)
       : [];
 
   return (

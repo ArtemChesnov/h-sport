@@ -304,7 +304,8 @@ export async function getProductBySlug(slug: string): Promise<DTO.ProductDetailD
         );
 
         if (!product) return null;
-        return mapProductToDetailDto(product as ProductDetailWithRelations);
+        const dto = mapProductToDetailDto(product as ProductDetailWithRelations);
+        return dto ?? null;
       },
       PRODUCT_SLUG_CACHE_TTL_MS,
       { cacheNull: true, nullTtlMs: 30000 }

@@ -46,6 +46,7 @@ export type ProductDetailWithRelations = Prisma.ProductGetPayload<{
 
 /**
  * Маппинг Product (Prisma) → ProductDetailDto (фронт).
+ * Возвращает null, если у товара нет вариантов или нет категории (защита от 500 на странице).
  *
  * Здесь:
  * - выбираем базовый набор вариантов (доступные, иначе все);
@@ -55,12 +56,17 @@ export type ProductDetailWithRelations = Prisma.ProductGetPayload<{
  * - определяем, является ли товар комплектом;
  * - формируем список вариантов.
  */
-export function mapProductToDetailDto(product: ProductDetailWithRelations): DTO.ProductDetailDto {
+export function mapProductToDetailDto(
+  product: ProductDetailWithRelations
+): DTO.ProductDetailDto | null {
   const items = product.items;
 
   if (!items || items.length === 0) {
-    // Защита от кривых данных: товар без вариантов.
-    throw new Error(`Product(id=${product.id}, slug=${product.slug}) has no items`);
+    return null;
+  }
+
+  if (!product.category) {
+    return null;
   }
 
   // --- 1. Базовый набор вариантов для расчётов ---
@@ -93,7 +99,7 @@ export function mapProductToDetailDto(product: ProductDetailWithRelations): DTO.
 
   // --- 5. Комплект или нет ---
 
-  const isSet = product.category.slug === "top-leggings-sets";
+  const isSet = product.category?.slug === "top-leggings-sets";
 
   // --- 6. Варианты товара ---
 
