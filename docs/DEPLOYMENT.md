@@ -380,6 +380,8 @@ cp -r .next/static .next/standalone/.next/
 cp -r public .next/standalone/
 ```
 
+**Фото товаров:** загруженные в админке изображения сохраняются в `public/assets/images/products/` и отдаются через API (запросы к `/assets/images/products/*` перенаправляются на него). Важно запускать приложение из **корня проекта** (как в ecosystem.config.cjs: `cwd` — корень), чтобы загрузки и раздача шли из одной и той же папки `public/`.
+
 ### Шаг 6.5. Создать каталог для логов
 
 ```bash

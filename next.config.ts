@@ -21,6 +21,16 @@ const nextConfig: NextConfig = {
   // Production: standalone для деплоя на VPS (один каталог с server.js и минимальным node_modules)
   ...(process.env.NODE_ENV === "production" && { output: "standalone" }),
 
+  // Фото товаров: раздаём через API из process.cwd()/public/, чтобы в standalone загрузки не терялись (статика там из .next/standalone/public/)
+  async rewrites() {
+    return [
+      {
+        source: "/assets/images/products/:path*",
+        destination: "/api/assets/products/:path*",
+      },
+    ];
+  },
+
   // Компрессия ответов (Next.js делает это автоматически, но можно настроить)
   compress: true,
 
