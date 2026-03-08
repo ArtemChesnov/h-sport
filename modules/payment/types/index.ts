@@ -17,7 +17,7 @@ export interface ReceiptItem {
   sum: number; // в рублях за всё количество
   payment_method: "full_payment";
   payment_object: "commodity" | "service";
-  tax: "none" | "vat0" | "vat10" | "vat20" | "vat5" | "vat7";
+  tax: "none" | "vat0" | "vat10" | "vat20" | "vat110" | "vat120";
 }
 
 export interface PaymentRequest {
