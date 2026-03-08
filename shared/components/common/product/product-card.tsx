@@ -63,6 +63,7 @@ function ProductCardComponent({
               className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
               loading={priority ? "eager" : "lazy"}
               priority={priority}
+              unoptimized={previewImage?.includes("/assets/images/products/") ?? false}
             />
             <FavoriteToggleButton
               className="absolute right-4 top-4"
@@ -100,6 +101,7 @@ function ProductCardComponent({
             className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
             loading={priority ? "eager" : "lazy"}
             priority={priority}
+            unoptimized={previewImage?.includes("/assets/images/products/") ?? false}
           />
 
           <FavoriteToggleButton className="absolute right-5 top-5" productId={id} />

@@ -133,6 +133,7 @@ export function ProductsTable(props: ProductsTableProps) {
                           fill
                           className="object-cover"
                           sizes="48px"
+                          unoptimized
                         />
                       </div>
                     </TableCell>

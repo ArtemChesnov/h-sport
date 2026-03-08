@@ -22,6 +22,9 @@ const THUMBNAIL_GAP = 20;
 const THUMBNAIL_GAP_MOBILE = 12;
 const MAX_VISIBLE_THUMBNAILS = 3;
 
+/** Загруженные фото товара не прогоняем через sharp, чтобы избежать ошибки "isn't a valid image" для части WebP. */
+const isUploadedProductImage = (src: string) => src.includes("/assets/images/products/");
+
 /**
  * Новая галерея изображений товара
  * Миниатюры слева с кнопками скролла, главное изображение справа с навигацией
@@ -225,6 +228,7 @@ export function ProductGalleryNew({
                     fill
                     className="object-cover"
                     sizes="(max-width: 1280px) 25vw, 290px"
+                    unoptimized={isUploadedProductImage(image)}
                   />
                 </button>
               ))}
@@ -273,6 +277,7 @@ export function ProductGalleryNew({
               sizes="880px"
               onLoad={() => handleImageLoad(currentImage)}
               onLoadStart={() => handleImageLoadStart(currentImage)}
+              unoptimized={isUploadedProductImage(currentImage)}
             />
           </div>
 
@@ -346,6 +351,7 @@ export function ProductGalleryNew({
               sizes="(max-width: 1024px) 96vw, 0"
               onLoad={() => handleImageLoad(currentImage)}
               onLoadStart={() => handleImageLoadStart(currentImage)}
+              unoptimized={isUploadedProductImage(currentImage)}
             />
           </div>
 
@@ -435,6 +441,7 @@ export function ProductGalleryNew({
                     fill
                     className="object-cover"
                     sizes="80px"
+                    unoptimized={isUploadedProductImage(image)}
                   />
                 </button>
               ))}
@@ -485,6 +492,7 @@ export function ProductGalleryNew({
                 className="object-contain"
                 sizes="90vw"
                 onClick={(e) => e.stopPropagation()}
+                unoptimized={isUploadedProductImage(currentImage)}
               />
             </div>
 

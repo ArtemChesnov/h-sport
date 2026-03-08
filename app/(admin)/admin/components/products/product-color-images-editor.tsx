@@ -205,6 +205,7 @@ export function ColorImagesEditor({
                         className="object-cover pointer-events-none select-none"
                         sizes={isCover ? "160px" : "128px"}
                         draggable={false}
+                        unoptimized
                       />
 
                       {isCover && (
