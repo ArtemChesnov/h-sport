@@ -15,10 +15,12 @@ import {
   STATUS_LABELS,
 } from "./order-validation";
 
+const PRE_PAYMENT_STATUSES: string[] = ["NEW", "PENDING_PAYMENT"];
+
 export async function syncOrderStatusIfPaid(
   order: OrderWithRelations
 ): Promise<OrderWithRelations> {
-  if (hasPaidPayment(order.payments) && order.status !== "PAID") {
+  if (hasPaidPayment(order.payments) && PRE_PAYMENT_STATUSES.includes(order.status)) {
     const previousStatus = order.status;
     const updatedOrder = await prisma.order.update({
       where: { id: order.id },
