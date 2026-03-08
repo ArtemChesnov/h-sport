@@ -68,18 +68,28 @@ export async function getConversionFunnel(days: number): Promise<ConversionFunne
       WHERE "createdAt" >= ${from} AND "createdAt" <= ${now}
       AND "userId" IS NOT NULL
     `,
-    // Просмотры товаров — все (включая анонимных)
+    // Просмотры товаров: авторизованные уники + число анонимных записей
     prisma.$queryRaw<[CountResult]>`
-      SELECT COUNT(DISTINCT COALESCE("userId", 'anon-' || id::text))::bigint AS count
-      FROM "ProductView"
-      WHERE "createdAt" >= ${from} AND "createdAt" <= ${now}
+      SELECT (
+        (SELECT COUNT(DISTINCT "userId") FROM "ProductView"
+         WHERE "createdAt" >= ${from} AND "createdAt" <= ${now} AND "userId" IS NOT NULL)
+        +
+        (SELECT COUNT(*) FROM "ProductView"
+         WHERE "createdAt" >= ${from} AND "createdAt" <= ${now} AND "userId" IS NULL)
+      )::bigint AS count
     `,
-    // Добавили в корзину — все (включая анонимных, по userId или cartId)
+    // Добавили в корзину: авторизованные уники + анонимные по cartId + полностью анонимные
     prisma.$queryRaw<[CountResult]>`
-      SELECT COUNT(DISTINCT COALESCE("userId", "cartId", 'anon-' || id::text))::bigint AS count
-      FROM "CartAction"
-      WHERE "createdAt" >= ${from} AND "createdAt" <= ${now}
-      AND action = 'add'
+      SELECT (
+        (SELECT COUNT(DISTINCT "userId") FROM "CartAction"
+         WHERE "createdAt" >= ${from} AND "createdAt" <= ${now} AND action = 'add' AND "userId" IS NOT NULL)
+        +
+        (SELECT COUNT(DISTINCT "cartId") FROM "CartAction"
+         WHERE "createdAt" >= ${from} AND "createdAt" <= ${now} AND action = 'add' AND "userId" IS NULL AND "cartId" IS NOT NULL)
+        +
+        (SELECT COUNT(*) FROM "CartAction"
+         WHERE "createdAt" >= ${from} AND "createdAt" <= ${now} AND action = 'add' AND "userId" IS NULL AND "cartId" IS NULL)
+      )::bigint AS count
     `,
     // Начали оформление (все заказы — userId всегда есть)
     prisma.$queryRaw<[CountResult]>`

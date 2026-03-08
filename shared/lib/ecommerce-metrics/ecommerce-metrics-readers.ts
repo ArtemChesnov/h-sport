@@ -115,11 +115,9 @@ export interface AggregatedMetricsResult {
     topProducts: Array<{ productId: number; count: number }>;
   };
   conversions: {
-    viewToCart: number;
-    cartToOrder: number;
-    viewToOrder: number;
-    viewToCartRate: number;
-    cartToOrderRate: number;
+    viewToCart: { count: number; rate: number };
+    cartToOrder: { count: number; rate: number };
+    viewToOrder: { count: number };
   };
   engagement: {
     rate: number;
@@ -305,11 +303,9 @@ export async function getAggregatedMetricsFromDb(
         })),
       },
       conversions: {
-        viewToCart,
-        cartToOrder,
-        viewToOrder,
-        viewToCartRate,
-        cartToOrderRate,
+        viewToCart: { count: viewToCart, rate: viewToCartRate },
+        cartToOrder: { count: cartToOrder, rate: cartToOrderRate },
+        viewToOrder: { count: viewToOrder },
       },
       engagement: {
         rate: engagementRate,
@@ -324,11 +320,9 @@ export async function getAggregatedMetricsFromDb(
       cart: { totalAdds: 0, uniqueUsers: 0, topProducts: [] },
       favorites: { totalAdds: 0, uniqueUsers: 0, topProducts: [] },
       conversions: {
-        viewToCart: 0,
-        cartToOrder: 0,
-        viewToOrder: 0,
-        viewToCartRate: 0,
-        cartToOrderRate: 0,
+        viewToCart: { count: 0, rate: 0 },
+        cartToOrder: { count: 0, rate: 0 },
+        viewToOrder: { count: 0 },
       },
       engagement: { rate: 0, engagedUsers: 0, totalViewers: 0 },
     };

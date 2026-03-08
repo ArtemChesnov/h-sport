@@ -292,6 +292,15 @@ export async function createOrderFromCart(
     },
   };
 
+  try {
+    const { recordConversion } = await import("@/shared/lib/ecommerce-metrics");
+    for (const cartItem of cart.items) {
+      void recordConversion("cart_to_order", cartItem.productItem.productId, order.id, userId);
+    }
+  } catch {
+    // не блокируем оформление заказа при ошибке метрик
+  }
+
   return {
     id: order.id,
     uid: order.uid,
