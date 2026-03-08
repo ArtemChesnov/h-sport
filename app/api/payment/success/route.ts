@@ -8,8 +8,13 @@
 import { checkSuccessSignature } from "@/modules/payment/lib/robokassa";
 import { OrderForPaymentService } from "@/shared/services/server";
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
+import { getAppUrl } from "@/shared/lib/config/env";
 import { logger } from "@/shared/lib/logger";
 import { NextRequest, NextResponse } from "next/server";
+
+function appRedirect(path: string): NextResponse {
+  return NextResponse.redirect(new URL(path, getAppUrl()));
+}
 
 async function handler(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -19,7 +24,7 @@ async function handler(request: NextRequest) {
   const SignatureValue = searchParams.get("SignatureValue");
 
   if (!InvId || !OutSum) {
-    return NextResponse.redirect(new URL("/checkout?error=payment_failed", request.url));
+    return appRedirect("/checkout?error=payment_failed");
   }
 
   if (SignatureValue && SignatureValue !== "mock") {
@@ -34,7 +39,7 @@ async function handler(request: NextRequest) {
 
     if (!isValid) {
       logger.warn("GET /api/payment/success: Неверная подпись", { InvId, OutSum });
-      return NextResponse.redirect(new URL("/checkout?error=invalid_signature", request.url));
+      return appRedirect("/checkout?error=invalid_signature");
     }
   } else if (SignatureValue === "mock") {
     logger.info("GET /api/payment/success: Используется mock режим для тестирования", {
@@ -45,7 +50,7 @@ async function handler(request: NextRequest) {
 
   const orderId = parseInt(InvId, 10);
   if (isNaN(orderId)) {
-    return NextResponse.redirect(new URL("/checkout?error=invalid_order", request.url));
+    return appRedirect("/checkout?error=invalid_order");
   }
 
   const order = await OrderForPaymentService.getOrderForSuccessEmail(orderId);
@@ -81,18 +86,18 @@ async function handler(request: NextRequest) {
       searchParams.get("returnTo") === "order" ||
       request.cookies.get("payment_return_to")?.value === "order";
 
-    const redirectUrl = returnToOrder
+    const redirectPath = returnToOrder
       ? `/account/orders/${order.uid}`
       : `/checkout/success?uid=${order.uid}&paid=1`;
 
-    const redirect = NextResponse.redirect(new URL(redirectUrl, request.url));
+    const redirect = appRedirect(redirectPath);
     if (returnToOrder) {
       redirect.cookies.delete("payment_return_to");
     }
     return redirect;
   }
 
-  return NextResponse.redirect(new URL("/checkout?error=payment_error", request.url));
+  return appRedirect("/checkout?error=payment_error");
 }
 
 export async function GET(request: NextRequest) {
@@ -100,6 +105,6 @@ export async function GET(request: NextRequest) {
     return await withErrorHandling(handler, request, "GET /api/payment/success");
   } catch (error) {
     logger.error("GET /api/payment/success: Ошибка при обработке успешной оплаты", error);
-    return NextResponse.redirect(new URL("/checkout?error=payment_error", request.url));
+    return appRedirect("/checkout?error=payment_error");
   }
 }

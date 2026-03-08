@@ -5,7 +5,7 @@
  */
 
 import { createPayment } from "@/modules/payment/lib/db";
-import { generatePaymentUrl } from "@/modules/payment/lib/robokassa";
+import { buildReceiptItems, generatePaymentUrl } from "@/modules/payment/lib/robokassa";
 import type { PaymentRequest } from "@/modules/payment/types";
 import { OrderForPaymentService } from "@/shared/services/server";
 import { validateRequestSize, withErrorHandling } from "@/shared/lib/api/error-handler";
@@ -53,11 +53,14 @@ async function handler(
   try {
     paymentId = await createPayment(orderId, amount);
 
+    const receiptItems = buildReceiptItems(order.items, order.deliveryFee);
+
     const paymentUrl = await generatePaymentUrl({
       orderId,
       amount,
       description,
       email,
+      receiptItems,
       userParameters: {
         ...userParameters,
         Shp_payment_id: paymentId.toString(),

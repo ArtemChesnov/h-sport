@@ -6,7 +6,7 @@
  */
 
 import { createPayment } from "@/modules/payment/lib/db";
-import { generatePaymentUrl } from "@/modules/payment/lib/robokassa";
+import { buildReceiptItems, generatePaymentUrl } from "@/modules/payment/lib/robokassa";
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
 import { createErrorResponse } from "@/shared/lib/api/error-response";
 import { getSessionUserOrError } from "@/shared/lib/auth/middleware";
@@ -37,16 +37,18 @@ export async function POST(
       const result = await OrdersService.getPayableOrder(uid, session.user.id);
       if (!result.ok) return createErrorResponse(result.message, result.status);
 
-      const { id: orderId, total, email } = result.data;
+      const { id: orderId, total, email, items, deliveryFee } = result.data;
 
       let url: string;
       try {
         const paymentId = await createPayment(orderId, total);
+        const receiptItems = buildReceiptItems(items, deliveryFee);
         const paymentUrl = await generatePaymentUrl({
           orderId,
           amount: total,
           description: `Заказ №${orderId}`,
           email,
+          receiptItems,
           userParameters: { Shp_payment_method: "CARD", Shp_payment_id: paymentId.toString() },
         });
         url = paymentUrl.url;

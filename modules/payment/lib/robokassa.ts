@@ -5,7 +5,7 @@
 import { createHash } from "crypto";
 import { env } from "@/shared/lib/config/env";
 import { Robokassa } from "@dev-aces/robokassa";
-import type { PaymentConfig, PaymentRequest, PaymentUrlResponse } from "../types";
+import type { PaymentConfig, PaymentRequest, PaymentUrlResponse, ReceiptItem } from "../types";
 
 let robokassaInstance: Robokassa | null = null;
 
@@ -68,10 +68,22 @@ export function getRobokassa(): Robokassa {
 export async function generatePaymentUrl(request: PaymentRequest): Promise<PaymentUrlResponse> {
   const robokassa = getRobokassa();
 
-  // Конвертируем сумму из копеек в рубли
   const outSum = (request.amount / 100).toFixed(2);
-
   const outSumNumber = request.amount / 100;
+
+  const receiptItems: ReceiptItem[] =
+    request.receiptItems && request.receiptItems.length > 0
+      ? request.receiptItems
+      : [
+          {
+            sum: outSumNumber,
+            name: request.description.slice(0, 128),
+            quantity: 1,
+            payment_method: "full_payment",
+            payment_object: "commodity",
+            tax: "none",
+          },
+        ];
 
   const url = robokassa.generatePaymentUrl({
     outSum,
@@ -79,20 +91,42 @@ export async function generatePaymentUrl(request: PaymentRequest): Promise<Payme
     invId: typeof request.orderId === "number" ? request.orderId : Number(request.orderId),
     userParameters: request.userParameters,
     receipt: {
-      items: [
-        {
-          sum: outSumNumber,
-          name: request.description,
-          quantity: 1,
-          payment_method: "full_payment",
-          payment_object: "commodity",
-          tax: "none",
-        },
-      ],
+      items: receiptItems,
     },
   });
 
   return { url };
+}
+
+/**
+ * Формирует массив позиций фискального чека из данных заказа.
+ * Цены в БД хранятся в копейках — конвертируем в рубли.
+ */
+export function buildReceiptItems(
+  items: { productName: string; qty: number; price: number }[],
+  deliveryFee: number
+): ReceiptItem[] {
+  const receiptItems: ReceiptItem[] = items.map((item) => ({
+    name: item.productName.slice(0, 128),
+    quantity: item.qty,
+    sum: (item.price * item.qty) / 100,
+    payment_method: "full_payment" as const,
+    payment_object: "commodity" as const,
+    tax: "none" as const,
+  }));
+
+  if (deliveryFee > 0) {
+    receiptItems.push({
+      name: "Доставка",
+      quantity: 1,
+      sum: deliveryFee / 100,
+      payment_method: "full_payment",
+      payment_object: "service",
+      tax: "none",
+    });
+  }
+
+  return receiptItems;
 }
 
 /**

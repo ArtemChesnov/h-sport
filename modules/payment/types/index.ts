@@ -11,11 +11,21 @@ export interface PaymentConfig {
   url?: string;
 }
 
+export interface ReceiptItem {
+  name: string;
+  quantity: number;
+  sum: number; // в рублях за всё количество
+  payment_method: "full_payment";
+  payment_object: "commodity" | "service";
+  tax: "none" | "vat0" | "vat10" | "vat20" | "vat5" | "vat7";
+}
+
 export interface PaymentRequest {
   orderId: number;
   amount: number; // в копейках
   description: string;
   email?: string;
+  receiptItems?: ReceiptItem[];
   userParameters?: Record<string, string>;
 }
 

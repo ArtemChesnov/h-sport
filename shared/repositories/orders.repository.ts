@@ -89,7 +89,7 @@ export class OrdersRepository {
   static async findByUserId(
     userId: string,
     page: number = 1,
-    perPage: number = 10,
+    perPage: number = 10
   ): Promise<{ orders: OrderShortSelectResult[]; total: number }> {
     const skip = Math.max(0, (page - 1) * perPage);
 
@@ -125,7 +125,7 @@ export class OrdersRepository {
           },
         }),
         prisma.order.count({ where: { userId } }),
-      ]),
+      ])
     );
 
     return { orders, total };
@@ -209,7 +209,10 @@ export class OrdersRepository {
   /**
    * Находит заказ пользователя с минимальным набором полей для отмены.
    */
-  static async findForCancel(uid: string, userId: string): Promise<{
+  static async findForCancel(
+    uid: string,
+    userId: string
+  ): Promise<{
     id: number;
     uid: string;
     status: OrderStatus;
@@ -221,17 +224,29 @@ export class OrdersRepository {
   }
 
   /**
-   * Находит заказ пользователя с полями для создания платежа.
+   * Находит заказ пользователя с позициями для создания платежа и фискального чека.
    */
-  static async findForPayment(uid: string, userId: string): Promise<{
+  static async findForPayment(
+    uid: string,
+    userId: string
+  ): Promise<{
     id: number;
     status: OrderStatus;
     total: number;
     email: string;
+    deliveryFee: number;
+    items: { productName: string; qty: number; price: number }[];
   } | null> {
     return prisma.order.findFirst({
       where: { uid, userId },
-      select: { id: true, status: true, total: true, email: true },
+      select: {
+        id: true,
+        status: true,
+        total: true,
+        email: true,
+        deliveryFee: true,
+        items: { select: { productName: true, qty: true, price: true } },
+      },
     });
   }
 
@@ -246,16 +261,24 @@ export class OrdersRepository {
   }
 
   /**
-   * Находит заказ по ID с минимальным набором полей для создания платежа.
+   * Находит заказ по ID с позициями для создания платежа и фискального чека.
    */
   static async findForPaymentCreate(orderId: number): Promise<{
     id: number;
     status: OrderStatus;
     total: number;
+    deliveryFee: number;
+    items: { productName: string; qty: number; price: number }[];
   } | null> {
     return prisma.order.findUnique({
       where: { id: orderId },
-      select: { id: true, status: true, total: true },
+      select: {
+        id: true,
+        status: true,
+        total: true,
+        deliveryFee: true,
+        items: { select: { productName: true, qty: true, price: true } },
+      },
     });
   }
 

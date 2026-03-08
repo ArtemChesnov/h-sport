@@ -12,8 +12,13 @@ import {
 } from "@/modules/payment/lib/db";
 import { OrderForPaymentService } from "@/shared/services/server";
 import { withErrorHandling } from "@/shared/lib/api/error-handler";
+import { getAppUrl } from "@/shared/lib/config/env";
 import { logger } from "@/shared/lib/logger";
 import { NextRequest, NextResponse } from "next/server";
+
+function appRedirect(path: string): NextResponse {
+  return NextResponse.redirect(new URL(path, getAppUrl()));
+}
 
 async function handler(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -33,14 +38,12 @@ async function handler(request: NextRequest) {
 
       const order = await OrderForPaymentService.getOrderForSuccessEmail(orderId);
       if (order) {
-        return NextResponse.redirect(
-          new URL(`/checkout/success?uid=${order.uid}&paid=0`, request.url)
-        );
+        return appRedirect(`/checkout/success?uid=${order.uid}&paid=0`);
       }
     }
   }
 
-  return NextResponse.redirect(new URL("/checkout?error=payment_canceled", request.url));
+  return appRedirect("/checkout?error=payment_canceled");
 }
 
 export async function GET(request: NextRequest) {
@@ -48,6 +51,6 @@ export async function GET(request: NextRequest) {
     return await withErrorHandling(handler, request, "GET /api/payment/fail");
   } catch (error) {
     logger.error("GET /api/payment/fail: Ошибка при обработке неуспешной оплаты", error);
-    return NextResponse.redirect(new URL("/checkout?error=payment_error", request.url));
+    return appRedirect("/checkout?error=payment_error");
   }
 }

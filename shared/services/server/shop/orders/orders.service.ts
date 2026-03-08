@@ -75,7 +75,16 @@ export class OrdersService {
     uid: string,
     userId: string
   ): Promise<
-    | { ok: true; data: { id: number; total: number; email: string } }
+    | {
+        ok: true;
+        data: {
+          id: number;
+          total: number;
+          email: string;
+          deliveryFee: number;
+          items: { productName: string; qty: number; price: number }[];
+        };
+      }
     | { ok: false; status: number; message: string }
   > {
     const order = await OrdersRepository.findForPayment(uid, userId);
@@ -85,7 +94,16 @@ export class OrdersService {
       return { ok: false, status: 400, message: "Заказ уже оплачен или отменён" };
     }
 
-    return { ok: true, data: { id: order.id, total: order.total, email: order.email } };
+    return {
+      ok: true,
+      data: {
+        id: order.id,
+        total: order.total,
+        email: order.email,
+        deliveryFee: order.deliveryFee,
+        items: order.items,
+      },
+    };
   }
 
   private static mapToListResponse(
