@@ -2,14 +2,10 @@
  * Утилиты для отправки email
  */
 
-import dns from "node:dns";
 import { getAppUrl } from "@/shared/lib/config/env";
 import { formatMoneyHtml as formatMoney } from "@/shared/lib/formatters/format-money";
 import nodemailer from "nodemailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
-
-// Многие VPS не имеют IPv6 — принудительно резолвим в IPv4
-dns.setDefaultResultOrder("ipv4first");
 
 interface EmailConfig {
   host: string;
@@ -26,6 +22,11 @@ let transporter: nodemailer.Transporter | null = null;
  * Инициализирует транспортер для отправки email
  */
 export function initEmailTransporter(config: EmailConfig): void {
+  // Многие VPS не имеют IPv6 — принудительно резолвим в IPv4
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const dns = require("dns") as typeof import("dns");
+  dns.setDefaultResultOrder("ipv4first");
+
   const allowInsecureTls = process.env.SMTP_ALLOW_INSECURE_TLS === "true";
 
   const opts: SMTPTransport.Options = {
