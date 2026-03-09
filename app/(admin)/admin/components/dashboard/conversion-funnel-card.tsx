@@ -73,7 +73,7 @@ export function ConversionFunnelCard({ period }: ConversionFunnelCardProps) {
               <MetricCard
                 icon={TrendingUp}
                 title="Просмотр → Заказ"
-                value={`${Number(data.overallConversionRate).toFixed(2)}%`}
+                value={`${Number(data.overallConversionRate).toFixed(1)}%`}
                 description="Общая конверсия"
                 tooltipTitle="Overall conversion"
                 tooltipContent="Процент пользователей, дошедших от просмотра товара до оформления заказа."

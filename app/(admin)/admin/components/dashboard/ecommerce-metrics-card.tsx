@@ -5,12 +5,7 @@
  * Единый стиль с основными показателями
  */
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  Skeleton,
-} from "@/shared/components/ui";
+import { Card, CardContent, CardHeader, Skeleton } from "@/shared/components/ui";
 import {
   MetricCard,
   MetricsSection,
@@ -65,7 +60,9 @@ interface EcommerceMetricsData {
   };
 }
 
-async function fetchEcommerceMetrics(period: DTO.AdminDashboardPeriodDto): Promise<EcommerceMetricsData> {
+async function fetchEcommerceMetrics(
+  period: DTO.AdminDashboardPeriodDto
+): Promise<EcommerceMetricsData> {
   const windowHours = periodToHours(period);
   const response = await fetch(`/api/metrics/ecommerce?window=${windowHours}`);
   if (!response.ok) {
@@ -79,7 +76,11 @@ import type { BaseMetricsCardProps } from "@/shared/services/dto";
 type EcommerceMetricsCardProps = BaseMetricsCardProps;
 
 export function EcommerceMetricsCard({ period }: EcommerceMetricsCardProps) {
-  const { data: metrics, isLoading, error } = useQuery({
+  const {
+    data: metrics,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["ecommerce-metrics", period],
     queryFn: () => fetchEcommerceMetrics(period),
     staleTime: 5 * 60 * 1000, // Данные считаются свежими 5 минут
@@ -104,9 +105,24 @@ export function EcommerceMetricsCard({ period }: EcommerceMetricsCardProps) {
     return (viewToOrderCount / viewsTotal) * 100;
   }, [metrics?.views?.total, viewToOrderCount]);
 
-  const uniqueUsersViewsText = pluralize(uniqueUsersViews, "пользователь", "пользователя", "пользователей");
-  const uniqueUsersCartText = pluralize(uniqueUsersCart, "пользователь", "пользователя", "пользователей");
-  const uniqueUsersFavoritesText = pluralize(uniqueUsersFavorites, "пользователь", "пользователя", "пользователей");
+  const uniqueUsersViewsText = pluralize(
+    uniqueUsersViews,
+    "пользователь",
+    "пользователя",
+    "пользователей"
+  );
+  const uniqueUsersCartText = pluralize(
+    uniqueUsersCart,
+    "пользователь",
+    "пользователя",
+    "пользователей"
+  );
+  const uniqueUsersFavoritesText = pluralize(
+    uniqueUsersFavorites,
+    "пользователь",
+    "пользователя",
+    "пользователей"
+  );
 
   const viewToCartCount = metrics?.conversions?.viewToCart?.count ?? 0;
   const viewToCartCountText = pluralize(viewToCartCount, "конверсия", "конверсии", "конверсий");
@@ -184,7 +200,9 @@ export function EcommerceMetricsCard({ period }: EcommerceMetricsCardProps) {
       <div className="space-y-4">
         <div>
           <h3 className="text-lg font-semibold">Поведение пользователей</h3>
-          <p className="text-xs text-muted-foreground mt-0.5">Просмотры, корзина, избранное, вовлеченность и конверсии</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Просмотры, корзина, избранное, вовлеченность и конверсии
+          </p>
         </div>
 
         {/* Основные метрики поведения */}
@@ -233,7 +251,10 @@ export function EcommerceMetricsCard({ period }: EcommerceMetricsCardProps) {
         </MetricsSection>
 
         {/* Конверсии */}
-        <MetricsSection title="Конверсии" description="Эффективность превращения просмотров в заказы">
+        <MetricsSection
+          title="Конверсии"
+          description="Эффективность превращения просмотров в заказы"
+        >
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <MetricCard
               icon={TrendingUp}
@@ -268,7 +289,7 @@ export function EcommerceMetricsCard({ period }: EcommerceMetricsCardProps) {
             <MetricCard
               icon={TrendingUp}
               title="Общая конверсия"
-              value={overallConversionRate > 0 ? `${overallConversionRate.toFixed(2)}%` : "0.00%"}
+              value={overallConversionRate > 0 ? `${overallConversionRate.toFixed(1)}%` : "0.0%"}
               description="Просмотр → Заказ (все пути)"
               tooltipTitle="Общая конверсия"
               tooltipContent="Общий процент конверсии от просмотра к заказу через все возможные пути (прямой и через корзину). Показывает общую эффективность превращения просмотров в продажи."

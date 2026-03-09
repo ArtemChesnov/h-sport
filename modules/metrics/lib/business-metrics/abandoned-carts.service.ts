@@ -80,10 +80,10 @@ export async function getAbandonedCartsAnalysis(days: number): Promise<Abandoned
     LIMIT 5
   `;
 
-  // Распределение по часам
+  // Распределение по часам (московское время)
   const byHourRaw = await prisma.$queryRaw<HourCountRow[]>`
     SELECT
-      EXTRACT(HOUR FROM c."createdAt")::int AS hour,
+      EXTRACT(HOUR FROM (c."createdAt" AT TIME ZONE 'Europe/Moscow'))::int AS hour,
       COUNT(*)::bigint AS count
     FROM "Cart" c
     LEFT JOIN "Order" o ON o."cartToken" = c."cartToken"
