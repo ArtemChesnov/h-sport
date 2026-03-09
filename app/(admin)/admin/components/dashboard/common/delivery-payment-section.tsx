@@ -57,22 +57,20 @@ export function DeliveryPaymentSection({
                   />
                 ) : (
                   <>
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {delivery.distribution.map(({ method, count, percentage }) => (
-                        <div key={method} className="space-y-1.5">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="font-medium">
-                              {deliveryMethodLabels[method] || method}
+                        <div
+                          key={method}
+                          className="flex items-center justify-between p-2 rounded-lg bg-muted/50"
+                        >
+                          <span className="text-sm font-medium">
+                            {deliveryMethodLabels[method] || method}
+                          </span>
+                          <div className="text-right">
+                            <span className="text-sm font-semibold">{count} шт</span>
+                            <span className="text-xs text-muted-foreground ml-2">
+                              ({percentage.toFixed(1)}%)
                             </span>
-                            <span className="text-muted-foreground">
-                              {count} ({percentage.toFixed(1)}%)
-                            </span>
-                          </div>
-                          <div className="w-full bg-muted rounded-full h-2">
-                            <div
-                              className="bg-primary h-2 rounded-full transition-all"
-                              style={{ width: `${percentage}%` }}
-                            />
                           </div>
                         </div>
                       ))}
@@ -113,22 +111,20 @@ export function DeliveryPaymentSection({
                     icon={CreditCard}
                   />
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {payment.distribution.map(({ method, count, percentage }) => (
-                      <div key={method} className="space-y-1.5">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="font-medium">
-                            {paymentMethodLabels[method] || method}
+                      <div
+                        key={method}
+                        className="flex items-center justify-between p-2 rounded-lg bg-muted/50"
+                      >
+                        <span className="text-sm font-medium">
+                          {paymentMethodLabels[method] || method}
+                        </span>
+                        <div className="text-right">
+                          <span className="text-sm font-semibold">{count} шт</span>
+                          <span className="text-xs text-muted-foreground ml-2">
+                            ({percentage.toFixed(1)}%)
                           </span>
-                          <span className="text-muted-foreground">
-                            {count} ({percentage.toFixed(1)}%)
-                          </span>
-                        </div>
-                        <div className="w-full bg-muted rounded-full h-2">
-                          <div
-                            className="bg-primary h-2 rounded-full transition-all"
-                            style={{ width: `${percentage}%` }}
-                          />
                         </div>
                       </div>
                     ))}
