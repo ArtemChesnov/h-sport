@@ -1,5 +1,11 @@
 import { StoreEmptyBlock } from "@/shared/components/common";
 import { CTA } from "@/shared/constants";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Страница не найдена",
+  robots: { index: false, follow: true },
+};
 
 export default function NotFoundPage() {
   return (

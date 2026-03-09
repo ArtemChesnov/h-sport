@@ -103,7 +103,7 @@ export const Header: React.FC<Props> = ({ className }) => {
           <div className="flex justify-start order-1">
             <Link href="/" onClick={handleLogoClick} className="cursor-pointer shrink-0 md:hidden">
               <Image
-                alt="H Sport"
+                alt="H-Sport"
                 src="/assets/logos/logo-big.png"
                 width={55}
                 height={104}
@@ -123,7 +123,7 @@ export const Header: React.FC<Props> = ({ className }) => {
             className="hidden md:flex cursor-pointer shrink-0 justify-self-center order-2"
           >
             <Image
-              alt="H Sport"
+              alt="H-Sport"
               src="/assets/logos/logo-big.png"
               width={55}
               height={104}

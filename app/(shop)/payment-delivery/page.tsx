@@ -28,7 +28,7 @@ export default function PaymentDeliveryPage() {
           <section>
             <h2 className={sectionTitle}>Оплата</h2>
             <p className={paragraph}>
-              При оформлении заказа в интернет-магазине H Sport доступны следующие способы оплаты:
+              При оформлении заказа в интернет-магазине H-Sport доступны следующие способы оплаты:
             </p>
             <ul className="mb-4 list-none space-y-2">
               <li className={listItem}>Банковские карты</li>
@@ -138,7 +138,7 @@ export default function PaymentDeliveryPage() {
           <section>
             <h2 className={sectionTitle}>Дополнительные условия</h2>
             <p className={paragraph}>
-              Интернет-магазин H Sport оставляет за собой право изменять стоимость и сроки доставки
+              Интернет-магазин H-Sport оставляет за собой право изменять стоимость и сроки доставки
               в зависимости от условий транспортных компаний.
             </p>
             <p className={paragraph}>
@@ -156,7 +156,7 @@ export default function PaymentDeliveryPage() {
           <section id="обмен-и-возврат">
             <h2 className={sectionTitle}>Обмен и возврат</h2>
             <p className={paragraph}>
-              Мы заботимся о том, чтобы покупки в H Sport были удобными и безопасными. Все условия
+              Мы заботимся о том, чтобы покупки в H-Sport были удобными и безопасными. Все условия
               возврата и обмена соответствуют требованиям Закона РФ «О защите прав потребителей».
             </p>
             <h3 className="mb-2 mt-6 text-[17px] font-semibold max-[576px]:text-[16px]">
@@ -194,7 +194,7 @@ export default function PaymentDeliveryPage() {
               <li className={listItem}>возврат денежных средств в полном объёме.</li>
             </ul>
             <p className={paragraph}>
-              2.2. Расходы по пересылке товара ненадлежащего качества оплачивает H Sport.
+              2.2. Расходы по пересылке товара ненадлежащего качества оплачивает H-Sport.
             </p>
 
             <h3 className="mb-2 mt-6 text-[17px] font-semibold max-[576px]:text-[16px]">

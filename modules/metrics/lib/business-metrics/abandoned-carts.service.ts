@@ -40,11 +40,11 @@ export async function getAbandonedCartsAnalysis(days: number): Promise<Abandoned
   const now = new Date();
   const from = new Date();
   from.setDate(now.getDate() - (days - 1));
-  from.setHours(0, 0, 0, 0);
+  from.setHours(0, 0, 0, 0); // граница периода — полночь по локальному времени сервера
 
   // Оптимизированный запрос: используем LEFT JOIN для поиска брошенных корзин
-  // Брошенная корзина = корзина с cartToken, у которой нет соответствующего заказа
-  const [summary] = await prisma.$queryRaw<AbandonedCartSummary[]>`
+  // Брошенная корзина = корзина с cartToken и товарами (totalItems > 0), у которой нет заказа с тем же cartToken
+  const summaryRows = await prisma.$queryRaw<AbandonedCartSummary[]>`
     SELECT
       COUNT(*)::bigint AS total,
       SUM(c.total) AS total_value,
@@ -59,7 +59,7 @@ export async function getAbandonedCartsAnalysis(days: number): Promise<Abandoned
       AND o.id IS NULL
   `;
 
-  // Топ-5 товаров в брошенных корзинах
+  // Топ-5 товаров в брошенных корзинах (те же условия: с товарами, без заказа)
   const topProducts = await prisma.$queryRaw<TopProductRow[]>`
     SELECT
       p.id AS product_id,
@@ -74,6 +74,7 @@ export async function getAbandonedCartsAnalysis(days: number): Promise<Abandoned
     WHERE c."createdAt" >= ${from}
       AND c."createdAt" <= ${now}
       AND c."cartToken" IS NOT NULL
+      AND c."totalItems" > 0
       AND o.id IS NULL
     GROUP BY p.id, p.name, p.slug
     ORDER BY count DESC
@@ -106,10 +107,10 @@ export async function getAbandonedCartsAnalysis(days: number): Promise<Abandoned
       AND c."totalItems" > 0
   `;
 
-  const total = Number(summary?.total ?? 0);
-  const totalValue = Number(summary?.total_value ?? 0);
-  const totalItems = Number(summary?.total_items ?? 0);
-  const withPromoCode = Number(summary?.with_promo ?? 0);
+  const total = Number(summaryRows[0]?.total ?? 0);
+  const totalValue = Number(summaryRows[0]?.total_value ?? 0);
+  const totalItems = Number(summaryRows[0]?.total_items ?? 0);
+  const withPromoCode = Number(summaryRows[0]?.with_promo ?? 0);
   const totalCarts = Number(totalCartsResult?.total ?? 0);
 
   const averageValue = total > 0 ? Math.round(totalValue / total) : 0;

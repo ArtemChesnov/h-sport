@@ -16,7 +16,11 @@ export function CertificatePageClient() {
   const imageRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    if (typeof window === "undefined" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (
+      typeof window === "undefined" ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
 
     const els = [h1Ref.current, pRef.current, h2Ref.current].filter(Boolean);
     gsap.set(els, { opacity: 0, y: 24 });
@@ -78,7 +82,7 @@ export function CertificatePageClient() {
               "min-[1440px]:max-w-[1000px] min-[1600px]:max-w-[1600px] "
             }
           >
-            Сертификат H Sport — это свобода выбора качественной спортивной одежды, обуви и
+            Сертификат H-Sport — это свобода выбора качественной спортивной одежды, обуви и
             аксессуаров. Позвольте близким выбрать именно то, что им нужно для тренировок, активного
             отдыха или повседневного стиля.
           </p>

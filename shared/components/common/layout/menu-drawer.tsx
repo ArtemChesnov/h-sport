@@ -61,7 +61,7 @@ export const MenuDrawer: React.FC<React.PropsWithChildren<Props>> = ({ className
           {/* Важно: в Linux/CI пути к файлам чувствительны к регистру. Адаптив как у лого в хедере. */}
           <Link href="/" onClick={closeDrawer} className="inline-block shrink-0 cursor-pointer">
             <Image
-              alt="H Sport"
+              alt="H-Sport"
               src="/assets/logos/logo-big.png"
               width={55}
               height={104}

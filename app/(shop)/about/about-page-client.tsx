@@ -93,7 +93,7 @@ export function AboutPageClient() {
             ref={titleRef}
             className="text-primary! text-center font-normal leading-[120%] uppercase mt-12 max-[576px]:mt-8 max-[576px]:text-[24px] min-[577px]:text-[36px] min-[768px]:text-[48px] min-[1024px]:text-[64px] min-[1280px]:text-[80px] min-[1920px]:mt-25 min-[1920px]:text-[100px]"
           >
-            H sport — это больше,
+            H-Sport — это больше,
             <br /> чем просто спортивная одежда.
           </h2>
         </div>
@@ -112,7 +112,7 @@ export function AboutPageClient() {
             ref={block2Ref}
             className="max-[576px]:w-full max-[576px]:max-w-full max-[576px]:ml-0 min-[577px]:ml-8 min-[768px]:ml-16 min-[1024px]:ml-24 min-[1920px]:ml-40 min-[577px]:max-w-[400px] min-[768px]:max-w-[520px] min-[1024px]:max-w-[620px] min-[1280px]:max-w-[700px] min-[1920px]:max-w-[790px] text-[16px] max-[576px]:text-[14px] min-[577px]:text-[18px] min-[768px]:text-[22px] min-[1920px]:text-[26px] leading-[130%]"
           >
-            Каждая вещь H sport — это результат точного баланса между трендом и функциональностью:
+            Каждая вещь H-Sport — это результат точного баланса между трендом и функциональностью:
             от зала до улиц, от утренней пробежки до вечернего расслабления.
           </p>
           <p
