@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "next dev",
+    "postinstall": "prisma generate",
     "clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\"",
     "build": "next build && node scripts/postbuild-standalone.js",
     "rebuild": "npm run clean && npm run build",
