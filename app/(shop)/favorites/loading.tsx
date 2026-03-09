@@ -1,8 +1,14 @@
 /**
- * Loading для избранного. Скелетон под оверлеем.
+ * Loading для избранного. Скелетон в том же контейнере, что и страница.
  */
+import { Container, ShopBreadcrumbs } from "@/shared/components/common";
 import { FavoritesPageSkeleton } from "@/shared/components/common/skeleton";
 
 export default function FavoritesLoading() {
-  return <FavoritesPageSkeleton variant="full" />;
+  return (
+    <Container className="">
+      <ShopBreadcrumbs />
+      <FavoritesPageSkeleton variant="full" />
+    </Container>
+  );
 }

@@ -13,6 +13,7 @@ import {
   TooltipTrigger,
 } from "@/shared/components/ui";
 import { MetricsSection } from "@/shared/components/admin";
+import { pluralizeWithCount } from "@/shared/lib/formatters";
 import { METRICS_CONSTANTS } from "@/shared/constants";
 import { ShoppingCart, Info } from "lucide-react";
 import Link from "next/link";
@@ -32,7 +33,10 @@ export function AbandonedCartsTopProducts({ products }: AbandonedCartsTopProduct
   }
 
   return (
-    <MetricsSection title="Топ товары в брошенных корзинах" description="Какие товары чаще всего остаются в корзинах">
+    <MetricsSection
+      title="Топ товары в брошенных корзинах"
+      description="Какие товары чаще всего остаются в корзинах"
+    >
       <Tooltip>
         <TooltipTrigger asChild>
           <Card className="rounded-2xl border shadow-sm cursor-help">
@@ -42,7 +46,9 @@ export function AbandonedCartsTopProducts({ products }: AbandonedCartsTopProduct
                 <CardTitle className="text-base font-semibold">Топ товары</CardTitle>
                 <Info className="h-3.5 w-3.5 text-muted-foreground opacity-60" />
               </div>
-              <CardDescription className="text-xs">Чаще всего остаются в брошенных корзинах</CardDescription>
+              <CardDescription className="text-xs">
+                Чаще всего остаются в брошенных корзинах
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
@@ -61,7 +67,9 @@ export function AbandonedCartsTopProducts({ products }: AbandonedCartsTopProduct
                     ) : (
                       <span className="text-sm font-medium flex-1">{product.name}</span>
                     )}
-                    <span className="text-sm font-semibold ml-4">{product.count} раз</span>
+                    <span className="text-sm font-semibold ml-4">
+                      {pluralizeWithCount(product.count, "раз", "раза", "раз")}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -70,7 +78,9 @@ export function AbandonedCartsTopProducts({ products }: AbandonedCartsTopProduct
         </TooltipTrigger>
         <TooltipContent className="max-w-sm">
           <p className="text-xs leading-relaxed">
-            Топ товаров, которые чаще всего остаются в брошенных корзинах. Помогает выявить проблемы с определенными товарами (цена, описание, фотографии) и оптимизировать их для повышения конверсии.
+            Топ товаров, которые чаще всего остаются в брошенных корзинах. Помогает выявить проблемы
+            с определенными товарами (цена, описание, фотографии) и оптимизировать их для повышения
+            конверсии.
           </p>
         </TooltipContent>
       </Tooltip>

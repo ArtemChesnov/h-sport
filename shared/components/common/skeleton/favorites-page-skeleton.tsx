@@ -35,20 +35,22 @@ export function FavoritesPageSkeleton({ variant = "full", className }: Favorites
         />
       </div>
       <div
-        className={
+        className={cn(
           variant === "account"
             ? "grid grid-cols-1 min-[410px]:grid-cols-2 gap-3 max-[576px]:gap-3 min-[873px]:gap-4"
-            : "grid grid-cols-1 min-[410px]:grid-cols-2 gap-3 max-[576px]:gap-3 min-[768px]:gap-4 lg:grid-cols-3 xl:grid-cols-4"
-        }
+            : "grid grid-cols-1 min-[410px]:grid-cols-2 gap-3 max-[576px]:gap-3 min-[768px]:gap-4 lg:grid-cols-3 xl:grid-cols-4",
+          "min-w-0"
+        )}
       >
         {Array.from({ length: cardCount }, (_, i) => (
           <div
             key={i}
-            className={
+            className={cn(
+              "min-w-0 w-full",
               variant === "account"
                 ? "rounded-lg border border-neutral-100 bg-white overflow-hidden"
-                : undefined
-            }
+                : "overflow-hidden"
+            )}
           >
             <FavoritesCardSkeleton />
           </div>

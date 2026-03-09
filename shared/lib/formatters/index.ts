@@ -7,4 +7,4 @@ export {
   formatShortDate,
 } from "./date";
 export { formatMoney } from "./format-money";
-export { pluralize } from "./pluralize";
+export { pluralize, pluralizeWithCount } from "./pluralize";
