@@ -1,6 +1,7 @@
 /** Профиль пользователя: get/update, адрес по умолчанию. */
 
 import { prisma } from "@/prisma/prisma-client";
+import { isPrivilegedEmail } from "@/shared/lib/auth/privileged";
 import { isValidEmail } from "@/shared/lib/validation";
 import type * as DTO from "@/shared/services/dto";
 
@@ -70,6 +71,12 @@ export async function getUserProfile(userId: string): Promise<GetProfileResult> 
     ok: true,
     profile: mapUserToProfileDto(dbUser, address),
   };
+}
+
+/** Роль для отображения: из БД или ADMIN, если email совпадает с ADMIN_EMAIL. */
+function effectiveRole(user: { email: string; role: string }): "USER" | "ADMIN" {
+  if (user.role === "ADMIN" || isPrivilegedEmail(user.email)) return "ADMIN";
+  return "USER";
 }
 
 /** Обновление профиля и адреса по умолчанию. */
@@ -237,7 +244,7 @@ function mapUserToProfileDto(
     secondName: user.secondName,
     // Преобразуем Date в ISO-строку YYYY-MM-DD для клиента
     birthDate: user.birthDate ? user.birthDate.toISOString().slice(0, 10) : null,
-    role: user.role as "USER" | "ADMIN",
+    role: effectiveRole(user),
     address: address
       ? {
           country: address.country,

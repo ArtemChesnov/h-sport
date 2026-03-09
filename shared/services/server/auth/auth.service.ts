@@ -4,6 +4,7 @@
  */
 
 import { createUser, verifyCredentials } from "@/modules/auth/lib/db";
+import { isPrivilegedEmail } from "@/shared/lib/auth/privileged";
 import { prisma } from "@/prisma/prisma-client";
 
 export type SessionUser = {
@@ -17,10 +18,11 @@ export type SessionUser = {
 /**
  * Verifies credentials and returns session user data for sign-in.
  * Returns null if credentials are invalid or user not found.
+ * Если email совпадает с ADMIN_EMAIL — в сессию подставляется роль ADMIN.
  */
 export async function getSessionUserAfterSignIn(
   email: string,
-  password: string,
+  password: string
 ): Promise<SessionUser | null> {
   const user = await verifyCredentials(email, password);
   if (!user) return null;
@@ -38,10 +40,12 @@ export async function getSessionUserAfterSignIn(
 
   if (!fullUser) return null;
 
+  const role = fullUser.role === "ADMIN" || isPrivilegedEmail(fullUser.email) ? "ADMIN" : "USER";
+
   return {
     id: fullUser.id,
     email: fullUser.email,
-    role: fullUser.role as "USER" | "ADMIN",
+    role,
     emailVerified: fullUser.emailVerified,
     sessionVersion: fullUser.sessionVersion,
   };
@@ -85,7 +89,7 @@ export async function signUp(input: SignUpInput): Promise<SignUpResult> {
   const sessionUser: SessionUser = {
     id: user.id,
     email: user.email,
-    role: "USER",
+    role: isPrivilegedEmail(user.email) ? "ADMIN" : "USER",
     emailVerified: null,
     sessionVersion: fullUser?.sessionVersion ?? 0,
   };

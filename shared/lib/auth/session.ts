@@ -5,6 +5,7 @@
 import { SignJWT, jwtVerify } from "jose";
 import { NextRequest, NextResponse } from "next/server";
 import { env, isSecureCookies } from "@/shared/lib/config/env";
+import { isPrivilegedEmail } from "@/shared/lib/auth/privileged";
 
 /**
  * Минимальная длина AUTH_SECRET для безопасного HS256
@@ -95,7 +96,8 @@ export async function verifySession(token: string): Promise<SessionUser | null> 
     return {
       id: userId,
       email: payload.email as string,
-      role: payload.role as "USER" | "ADMIN",
+      role:
+        payload.role === "ADMIN" || isPrivilegedEmail(payload.email as string) ? "ADMIN" : "USER",
       emailVerified: payload.emailVerified ? new Date(payload.emailVerified as string) : null,
       sessionVersion,
     };
