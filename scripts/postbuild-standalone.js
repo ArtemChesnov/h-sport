@@ -12,6 +12,9 @@ if (!fs.existsSync(standalone)) {
 const copies = [
   { src: path.join(root, ".next", "static"), dest: path.join(standalone, ".next", "static") },
   { src: path.join(root, "public"), dest: path.join(standalone, "public") },
+  // pdfkit: встроенные данные шрифтов (afm-файлы) для стандартных шрифтов вроде Helvetica.
+  // Next.js кладёт их в .next/server/chunks/data, standalone-runtime ожидает тот же путь внутри standalone.
+  { src: path.join(root, ".next", "server", "chunks", "data"), dest: path.join(standalone, ".next", "server", "chunks", "data") },
 ];
 
 for (const { src, dest } of copies) {

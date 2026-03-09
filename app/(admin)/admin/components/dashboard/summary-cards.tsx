@@ -101,8 +101,8 @@ export function SummaryCards({ summary, isLoading }: SummaryCardsProps) {
           </TooltipTrigger>
           <TooltipContent className="max-w-sm">
             <p className="text-xs leading-relaxed">
-              Общее количество заказов за выбранный период. Включает все заказы независимо от
-              статуса.
+              Общее количество «живых» заказов за выбранный период. Учитываются заказы со статусами:
+              оплачен, обрабатывается, отправлен, доставлен.
             </p>
           </TooltipContent>
         </Tooltip>
