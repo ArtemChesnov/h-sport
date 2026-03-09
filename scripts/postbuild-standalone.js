@@ -12,8 +12,6 @@ if (!fs.existsSync(standalone)) {
 const copies = [
   { src: path.join(root, ".next", "static"), dest: path.join(standalone, ".next", "static") },
   { src: path.join(root, "public"), dest: path.join(standalone, "public") },
-  // pdfkit: данные шрифтов (afm) — bundled-код ищет их в .next/server/chunks/data, копируем из пакета
-  { src: path.join(root, "node_modules", "pdfkit", "js", "data"), dest: path.join(standalone, ".next", "server", "chunks", "data") },
 ];
 
 for (const { src, dest } of copies) {

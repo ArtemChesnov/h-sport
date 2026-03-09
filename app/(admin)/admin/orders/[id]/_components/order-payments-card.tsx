@@ -90,21 +90,6 @@ export function OrderPaymentsCard({ order }: OrderPaymentsCardProps) {
                         Открыть чек
                       </a>
                     </Button>
-                    <Button
-                      asChild
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 cursor-pointer hover:bg-violet-50 hover:border-violet-200 hover:text-violet-700 transition-all"
-                    >
-                      <a
-                        href={`${payment.receiptUrl}${payment.receiptUrl.includes("?") ? "&" : "?"}format=pdf`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        download
-                      >
-                        Скачать PDF
-                      </a>
-                    </Button>
                   </div>
                 </>
               )}
