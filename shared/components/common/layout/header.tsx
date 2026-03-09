@@ -67,7 +67,7 @@ export const Header: React.FC<Props> = ({ className }) => {
       setAuthDialogOpen(true);
       return;
     }
-    setPendingPath("/favorites");
+    if (pathname !== "/favorites") setPendingPath("/favorites");
   };
 
   const handleAccountClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -76,11 +76,12 @@ export const Header: React.FC<Props> = ({ className }) => {
       setAuthDialogOpen(true);
       return;
     }
-    setPendingPath("/account");
+    const onAccount = pathname === "/account" || pathname?.startsWith("/account/");
+    if (!onAccount) setPendingPath("/account");
   };
 
   const handleCartClick = () => {
-    setPendingPath("/cart");
+    if (pathname !== "/cart") setPendingPath("/cart");
   };
 
   const handleLogoClick = () => {
