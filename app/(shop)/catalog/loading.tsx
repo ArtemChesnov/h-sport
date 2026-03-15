@@ -31,7 +31,7 @@ export default function CatalogLoading() {
                   {Array.from({ length: 6 }).map((_, index) => (
                     <div
                       key={`mobile-skel-${index}`}
-                      className="min-w-0 aspect-[3/4] min-h-[280px] min-[410px]:min-h-[240px] min-[640px]:min-h-[320px] sm:min-h-[380px] overflow-hidden"
+                      className="min-w-0 aspect-[3/4] min-[390px]:aspect-[3/6] min-[577px]:aspect-[3/4] min-h-[280px] min-[410px]:min-h-[240px] min-[640px]:min-h-[320px] sm:min-h-[380px] overflow-hidden"
                     >
                       <ProductCardSkeleton />
                     </div>

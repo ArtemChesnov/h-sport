@@ -71,7 +71,7 @@ export function ProductList({
               {Array.from({ length: 6 }).map((_, index) => (
                 <div
                   key={`grid-skel-${index}`}
-                  className="aspect-[3/4] min-h-[320px] sm:min-h-[380px]"
+                  className="aspect-[3/4] min-[390px]:aspect-[3/6] min-[577px]:aspect-[3/4] min-h-[320px] sm:min-h-[380px]"
                 >
                   <ProductCardSkeleton />
                 </div>
@@ -92,7 +92,7 @@ export function ProductList({
               {Array.from({ length: 6 }).map((_, index) => (
                 <div
                   key={`mobile-skel-${index}`}
-                  className="min-w-0 aspect-[3/4] min-h-[280px] min-[410px]:min-h-[240px] min-[640px]:min-h-[320px] sm:min-h-[380px] overflow-hidden"
+                  className="min-w-0 aspect-[3/4] min-[390px]:aspect-[3/6] min-[577px]:aspect-[3/4] min-h-[280px] min-[410px]:min-h-[240px] min-[640px]:min-h-[320px] sm:min-h-[380px] overflow-hidden"
                 >
                   <ProductCardSkeleton />
                 </div>
@@ -143,7 +143,7 @@ export function ProductList({
             {safeProducts.map((product, index) => (
               <div
                 key={`grid-2-${product.id}`}
-                className="catalog-card aspect-[3/4] min-h-[320px] sm:min-h-[380px] overflow-hidden flex"
+                className="catalog-card aspect-[3/4] min-[390px]:aspect-[3/6] min-[577px]:aspect-[3/4] min-h-[320px] sm:min-h-[380px] overflow-hidden flex"
               >
                 <ProductCard
                   product={product}
@@ -170,7 +170,7 @@ export function ProductList({
             {safeProducts.map((product, index) => (
               <div
                 key={`mobile-${product.id}`}
-                className="catalog-card min-w-0 aspect-[3/4] min-h-[280px] min-[410px]:min-h-[240px] min-[640px]:min-h-[320px] sm:min-h-[380px] overflow-hidden flex"
+                className="catalog-card min-w-0 aspect-[3/4] min-[390px]:aspect-[3/6] min-[577px]:aspect-[3/4] min-h-[280px] min-[410px]:min-h-[240px] min-[640px]:min-h-[320px] sm:min-h-[380px] overflow-hidden flex"
               >
                 <ProductCard
                   product={product}
