@@ -4,8 +4,8 @@
 
 export const MENU_PRIMARY_LINKS = [
   { label: "О нас", href: "/about" },
-  { label: "Новинки", href: "/" },
-  { label: "Бестселлеры", href: "/" },
+  { label: "Новинки", href: "/catalog?sort=new" },
+  { label: "Бестселлеры", href: "/catalog?sort=popular" },
   { label: "Подарочный сертификат", href: "/certificate" },
   { label: "Шоурум", href: "/showroom" },
 ] as const;
