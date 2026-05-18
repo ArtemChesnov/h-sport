@@ -119,7 +119,7 @@ export function AboutPageClient() {
             ref={block3Ref}
             className="max-[576px]:w-full max-[576px]:max-w-full max-[576px]:ml-0 min-[577px]:ml-12 min-[768px]:ml-24 min-[1024px]:ml-40 min-[1280px]:ml-100 min-[1920px]:ml-158.75 min-[577px]:max-w-[400px] min-[768px]:max-w-[520px] min-[1024px]:max-w-[620px] min-[1280px]:max-w-[700px] min-[1920px]:max-w-[790px] text-[16px] max-[576px]:text-[14px] min-[577px]:text-[18px] min-[768px]:text-[22px] min-[1920px]:text-[26px] leading-[130%]"
           >
-            Мы верим, что спорт — это не про идеал, а про силу быть собой
+            Мы верим, что спорт — это не про идеал, а про силу быть собой.
           </p>
         </div>
 
